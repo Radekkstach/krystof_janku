@@ -1,0 +1,19 @@
+# závislosti a tajné údaje
+node_modules/
+.env
+.env*
+
+# systémové soubory
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Vercel
+.vercel
+
+# build výstupy (vytvářejí je skripty export-jeden-soubor.ps1 a ruční kopie pro Netlify)
+Dawell-DTI-16.html
+web-k-nahrani/
+
+# interní poznámky k projektu – jen lokálně, repozitář je veřejný
+POZNAMKY-K-PROJEKTU.md

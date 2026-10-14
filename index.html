@@ -1,0 +1,1511 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dawell · Indukční shrink‑fit ohřívač</title>
+<meta name="description" content="3D prezentace indukčního smršťovacího ohřívače Dawell CZ pro upínání nástrojů: jak funguje, proč indukce, přínosy a parametry.">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<meta name="theme-color" content="#0E1013">
+<script src="i18n.js"></script>
+<meta property="og:title" content="Dawell CZ · Indukční shrink‑fit ohřívač">
+<meta property="og:description" content="Nástroj upnutý za pár sekund. Malý a přenosný indukční ohřívač pro shrink-fit upínače – 3D prezentace.">
+<meta property="og:image" content="produkt.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orange:#FF702B; --orange-2:#FF9254; --orange-soft:rgba(255,112,43,.16);
+  --bg:#0E1013; --bg-2:#14171B; --panel:#1A1E24; --panel-2:#20252C; --line:#2A3039; --line-2:#363D48;
+  --text:#EEF0F3; --muted:#9BA4B0; --dim:#6B7482;
+  --steel-1:#D9DEE4; --steel-2:#8E97A3; --steel-3:#4C5461;
+  --hot-1:#FFD37A; --hot-2:#FF7A1A; --hot-3:#D8321C;
+  --cold:#5EC4F2; --ok:#49D17D;
+  --radius:16px; --max:1180px;
+  --font:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:clip;color-scheme:dark}   /* clip: záře za fotkou (.hero-glow) nesmí na mobilu rozšířit stránku do strany */
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(1200px 600px at 80% -10%, rgba(232,101,28,.14), transparent 60%),radial-gradient(900px 500px at -10% 30%, rgba(94,196,242,.06), transparent 60%)}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:48px 48px;
+  -webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 20%,transparent 75%);mask-image:radial-gradient(ellipse at 50% 0%,#000 20%,transparent 75%)}
+.wrap{position:relative;z-index:1;max-width:var(--max);margin:0 auto;padding:0 24px}
+a{color:inherit}
+h1,h2,h3{margin:0;letter-spacing:-.02em;line-height:1.1}
+h1{font-size:clamp(34px,5vw,62px);font-weight:800}
+h2{font-size:clamp(26px,3.4vw,40px);font-weight:800}
+h3{font-size:18px;font-weight:700}
+p{margin:0}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--orange-2)}
+.eyebrow::before{content:"";width:28px;height:2px;background:var(--orange);border-radius:2px}
+.lead{font-size:clamp(16px,1.6vw,19px);color:var(--muted);max-width:60ch}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:12px;font-weight:700;text-decoration:none;border:1px solid transparent;cursor:pointer;font-size:15px;transition:transform .15s,box-shadow .2s,background .2s;font-family:var(--font)}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:linear-gradient(180deg,var(--orange-2),var(--orange));color:#fff;box-shadow:0 10px 30px rgba(232,101,28,.3)}
+.btn-primary:hover{box-shadow:0 14px 36px rgba(232,101,28,.45)}
+.btn-ghost{background:rgba(255,255,255,.04);border-color:var(--line-2);color:var(--text)}
+.btn-ghost:hover{background:rgba(255,255,255,.08)}
+.btn svg{width:18px;height:18px}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(14,16,19,.72);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.nav-right{display:flex;align-items:center;gap:12px}
+.lang{display:flex;border:1px solid var(--line-2);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.03)}
+.lang button{appearance:none;border:0;background:transparent;color:var(--muted);font:700 12px var(--font);letter-spacing:.06em;padding:9px 11px;cursor:pointer}
+.lang button:hover{color:var(--text)}
+.lang button.on{background:var(--orange);color:#fff}
+@media (max-width:600px){#presentBtn{display:none}}
+.logo{display:flex;align-items:center;gap:14px;text-decoration:none}
+.logo-img{height:34px;width:auto;display:block}
+.logo-sep{width:1px;height:26px;background:var(--line-2)}
+.logo-sub{font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;line-height:1.2;max-width:130px}
+@media (max-width:600px){.logo-sub,.logo-sep{display:none}.logo-img{height:28px}}
+section,header{scroll-margin-top:72px}
+/* horní lišta: kvůli tlačítku kalkulačky je prezentační režim jen ikona (popisek v title);
+   podtitul u loga se ukazuje jen tam, kde nejsou odkazy (šířky změřené pro CS/EN/DE) */
+.nav .wrap{gap:20px}
+.nav-btn{padding:10px 14px;font-size:13px;white-space:nowrap}
+.nav-btn svg{width:17px;height:17px}
+#presentBtn{padding:10px!important}
+#presentBtn span{display:none}
+@media (min-width:1121px){.logo-sub,.logo-sep{display:none}}
+@media (max-width:700px){.nav-btn span{display:none}.nav-btn{padding:10px}}
+
+/* KALKULAČKA NÁVRATNOSTI – modální okno (<dialog>) otevírané tlačítkem v horním panelu */
+dialog.calc{width:min(1120px,calc(100% - 32px));max-height:calc(100dvh - 32px);padding:0;border:1px solid var(--line-2);border-radius:22px;background:linear-gradient(180deg,var(--panel),var(--bg-2));color:var(--text);box-shadow:0 40px 120px rgba(0,0,0,.6);overflow:auto}
+dialog.calc::backdrop{background:rgba(5,6,8,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+body:has(dialog.calc[open]){overflow:hidden}
+.calc-in{position:relative;padding:32px}
+@media (max-width:600px){.calc-in{padding:22px 16px}}
+.calc-x{position:absolute;right:16px;top:16px;width:38px;height:38px;border-radius:10px;border:1px solid var(--line-2);background:var(--panel);color:var(--text);cursor:pointer;display:grid;place-items:center}
+.calc-x:hover{background:var(--panel-2)}
+.calc-x svg{width:16px;height:16px}
+.calc h2{margin-top:12px;padding-right:44px}
+.calc-lead{margin-top:10px;font-size:15px}
+/* dvě stejně široké a stejně vysoké poloviny (zadání | výsledek) se stejným rámečkem;
+   drobný text a tlačítko dole jsou v obou panelech přitažené ke spodnímu okraji (.calc-foot) */
+.calc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin-top:24px;align-items:stretch}
+@media (max-width:1100px){.calc-grid{grid-template-columns:1fr}}
+.calc-grid>*{min-width:0}
+.calc-form,.calc-res{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--radius);background:var(--bg-2);padding:20px;container-type:inline-size}
+@media (max-width:600px){.calc-form,.calc-res{padding:16px}}
+.calc-foot{margin-top:auto;padding-top:4px}
+.calc-h{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--orange-2);margin:0 0 12px}
+.calc-h.mt{margin-top:26px}
+.calc-hint{font-size:12px;color:var(--dim);margin-top:10px}
+/* pole: popisek nahoře, pod ním posuvník + číslo s jednotkou (obojí se hýbe spolu) */
+.flds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 22px}
+@container (max-width:400px){.flds{grid-template-columns:minmax(0,1fr)}}
+.fld label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.fld-row{display:flex;align-items:center;gap:12px}
+.fld-row .rng{flex:1 1 auto;width:100%;min-width:0}
+/* dlouhá slova (hlavně němčina) se v úzkých sloupcích tabulek dělí místo přetékání */
+.mtab th,.rtab th{-webkit-hyphens:auto;hyphens:auto;overflow-wrap:anywhere}
+.inp{flex:0 0 128px;display:flex;align-items:center;border:1px solid var(--line-2);border-radius:10px;background:var(--bg);transition:border-color .2s}
+.inp:focus-within{border-color:var(--orange)}
+.inp input{flex:1;min-width:0;width:100%;border:0;background:transparent;color:var(--text);font:600 15px var(--mono);padding:9px 8px 9px 10px;outline:none;text-align:right}
+.inp i{font-style:normal;font-size:12px;color:var(--dim);padding-right:10px;white-space:nowrap}
+/* posuvník ve stylu časové osy animace: oranžová stopa, bílý knoflík s oranžovým okrajem */
+.rng{-webkit-appearance:none;appearance:none;height:24px;margin:0;background:transparent;cursor:pointer;--p:50%}
+.rng::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(90deg,var(--orange) var(--p),var(--line-2) var(--p))}
+.rng::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;background:#fff;border:3px solid var(--orange);box-shadow:0 0 0 4px rgba(232,101,28,.18)}
+.rng::-moz-range-track{height:4px;border-radius:2px;background:var(--line-2)}
+.rng::-moz-range-progress{height:4px;border-radius:2px;background:var(--orange)}
+.rng::-moz-range-thumb{width:10px;height:10px;border-radius:50%;background:#fff;border:3px solid var(--orange)}
+.rng:focus-visible{outline:2px solid var(--orange-2);outline-offset:3px;border-radius:6px}
+/* tabulka časů a rizik podle způsobu ohřevu */
+.mtab{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13px}
+.mtab th,.mtab td{padding:5px 4px;text-align:left}
+.mtab thead th{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);vertical-align:bottom;line-height:1.25;text-align:right;padding-right:6px}
+.mtab thead th.ind{color:var(--orange-2)}
+.mtab tbody th{font-weight:500;color:var(--muted);width:34%}
+.mtab tbody th i{font-style:normal;color:var(--dim);font-size:12px;white-space:nowrap}
+.mtab td input{width:100%;border:1px solid var(--line-2);border-radius:8px;background:var(--bg);color:var(--text);font:600 14px var(--mono);padding:7px 6px;text-align:right;outline:none}
+.mtab td input:focus{border-color:var(--orange)}
+.mtab td.na{color:var(--dim);text-align:right;padding-right:10px}
+/* výsledky: tabulka (úspora oproti horkému vzduchu a hořáku vedle sebe). Písmo se řídí šířkou panelu (cqi)
+   a mezi částkou a měnou se smí zalomit, takže se hodnoty nikdy nepřekrývají */
+.rtab{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed}
+.rtab th,.rtab td{padding:9px 0;border-bottom:1px solid var(--line);vertical-align:baseline}
+.rtab thead th{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:right;line-height:1.25;vertical-align:bottom;padding:0 0 9px 16px}
+.rtab tbody th{text-align:left;font-size:13px;font-weight:500;color:var(--muted);width:38%;padding-right:8px;line-height:1.3}
+.rtab td{text-align:right;font:600 clamp(12px,3.6cqi,15px)/1.3 var(--mono);color:var(--text);padding-left:12px}
+.rtab td{-webkit-hyphens:auto;hyphens:auto}
+.rtab td.neg{color:var(--hot-2)}
+.rtab tr.tot>*{background:rgba(73,209,125,.11);border-bottom:0;padding-top:12px;padding-bottom:12px}
+.rtab tr.tot th{color:var(--text);font-weight:700;border-radius:10px 0 0 10px;padding-left:10px}
+.rtab tr.tot td{font:800 clamp(15px,5cqi,22px)/1.2 var(--font);color:var(--ok)}
+.rtab tr.tot td:last-child{border-radius:0 10px 10px 0;padding-right:10px}
+.rtab tr.pay>*{border-bottom:0;padding-top:12px}
+.rtab tr.pay th{color:var(--text);font-weight:700}
+.rtab tr.pay td{font:800 clamp(16px,5cqi,22px)/1.2 var(--font)}
+.rtab tbody th{width:52%}
+/* přepínač porovnání (horký vzduch / hořák) */
+.seg{display:flex;gap:4px;padding:4px;border:1px solid var(--line-2);border-radius:12px;background:rgba(255,255,255,.03)}
+.seg button{flex:1;min-width:0;appearance:none;border:0;border-radius:9px;background:transparent;color:var(--muted);font:700 14px/1.25 var(--font);padding:10px 12px;cursor:pointer;transition:background .2s,color .2s}
+.seg button:hover{color:var(--text)}
+.seg button.on{background:var(--orange);color:#fff}
+/* v tabulce časů je zvýrazněný sloupec, se kterým se právě porovnává */
+.mtab thead th.sel{color:var(--text)}
+.mtab td.sel input{border-color:rgba(255,112,43,.55)}
+.calc-note{font-size:12px;color:var(--dim);margin-top:14px}
+.calc-src{margin-top:12px;font-size:12px;color:var(--muted)}
+.calc-src summary{cursor:pointer;color:var(--orange-2);font-weight:600}
+.calc-src ul{margin:8px 0 0;padding-left:18px;display:grid;gap:6px}
+.calc-src a{color:var(--muted)}
+.calc-reset{margin-top:14px;padding:10px 14px;font-size:13px}
+.nav-links{display:flex;gap:18px;font-size:14px;color:var(--muted);white-space:nowrap}
+.nav-links a{text-decoration:none}
+.nav-links a:hover{color:var(--text)}
+@media (max-width:1120px){.nav-links{display:none}}
+
+/* HERO */
+.hero{padding:88px 0 56px}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+@media (max-width:900px){.hero-grid{grid-template-columns:1fr}}
+.hero h1 .accent{color:var(--orange-2)}
+.hero .actions{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
+.photo-wrap{position:relative}
+.hero-glow{position:absolute;inset:-30%;background:radial-gradient(closest-side,rgba(232,101,28,.22),transparent);filter:blur(30px);z-index:0;animation:breathe 6s ease-in-out infinite;pointer-events:none}
+.hero-photo{position:relative;z-index:1;border-radius:22px;overflow:hidden;border:1px solid var(--line-2);background:var(--panel);box-shadow:0 40px 80px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.03) inset}
+.hero-photo img{display:block;width:100%;height:auto;transform:scale(1.02)}
+.hero-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(14,16,19,.75));pointer-events:none}
+.hero-badge{position:absolute;left:18px;bottom:18px;z-index:2;display:flex;gap:10px;flex-wrap:wrap}
+.chip{padding:8px 12px;border-radius:999px;background:rgba(20,23,27,.85);border:1px solid var(--line-2);font-size:12px;font-weight:600;color:var(--text);backdrop-filter:blur(8px)}
+.chip i{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--orange);margin-right:8px;vertical-align:1px;box-shadow:0 0 10px var(--orange)}
+@keyframes breathe{0%,100%{opacity:.6;transform:scale(1)}50%{opacity:1;transform:scale(1.06)}}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:64px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{padding:22px 22px 18px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,var(--panel),var(--bg-2))}
+.kpi .kl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.kpi .v{font-size:clamp(22px,2.5vw,30px);font-weight:800;letter-spacing:-.02em;margin-top:6px;line-height:1.15}
+.kpi .l{font-size:13px;color:var(--muted);margin-top:6px}
+.kpi.price{border-color:rgba(255,112,43,.55);background:linear-gradient(135deg,rgba(255,112,43,.24),rgba(255,112,43,.06))}
+.kpi.price .kl,.kpi.price .v{color:var(--orange-2)}
+
+section{padding:96px 0}
+.sec-head{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:end;margin-bottom:40px}
+@media (max-width:900px){.sec-head{grid-template-columns:1fr}}
+.sec-head h2{margin-top:12px}
+
+/* ============ 3D STAGE ============ */
+.stage{border:1px solid var(--line-2);border-radius:22px;background:#0B0D10;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.stage:fullscreen{border-radius:0;display:flex;flex-direction:column;background:#0B0D10}
+.stage:fullscreen .stage-top{flex:1;min-height:0}
+.stage:fullscreen .scene{height:100%}
+.stage-top{display:grid;grid-template-columns:1fr 280px}
+@media (max-width:980px){.stage-top{grid-template-columns:1fr}}
+.scene{position:relative;min-height:560px;background:#0B0D10;overflow:hidden}
+@media (max-width:980px){.scene{min-height:420px}}
+@media (max-width:600px){.scene{min-height:340px}}
+#view3d{position:absolute;inset:0;cursor:grab}
+#view3d:active{cursor:grabbing}
+#view3d canvas{display:block;width:100%!important;height:100%!important}
+.labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lab{position:absolute;transform:translate(-50%,-100%);opacity:0;transition:opacity .45s;will-change:left,top}
+.lab .tag{display:inline-block;padding:6px 10px;border-radius:8px;background:rgba(14,16,19,.86);border:1px solid rgba(232,101,28,.55);color:var(--text);font:600 12px var(--font);white-space:nowrap;backdrop-filter:blur(6px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.lab .tag.hot{border-color:var(--hot-1);color:var(--hot-1)}
+.lab .tag.ok{border-color:var(--ok);color:var(--ok)}
+.lab::after{content:"";position:absolute;left:50%;top:100%;width:1px;height:22px;background:linear-gradient(180deg,rgba(232,101,28,.9),transparent)}
+.lab i{position:absolute;left:50%;top:calc(100% + 22px);width:7px;height:7px;border-radius:50%;background:var(--orange-2);transform:translate(-50%,-50%);box-shadow:0 0 10px var(--orange)}
+.lab.show{opacity:1}
+.scene .step-title{position:absolute;left:22px;top:18px;display:flex;align-items:center;gap:12px;pointer-events:none}
+.scene .step-title .n{font-family:var(--mono);font-size:12px;color:var(--orange-2);border:1px solid rgba(232,101,28,.5);padding:3px 8px;border-radius:6px;background:rgba(14,16,19,.7)}
+.scene .step-title .t{font-weight:700;font-size:17px;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+.scene .step-sub{position:absolute;left:22px;top:52px;font-size:13px;color:var(--muted);max-width:480px;pointer-events:none;text-shadow:0 2px 8px rgba(0,0,0,.9)}
+.scene .cam-hint{position:absolute;left:22px;bottom:16px;font-size:11px;color:var(--dim);pointer-events:none;display:flex;gap:8px;align-items:center}
+.scene .cam-hint svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8}
+.scene .vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 55%,rgba(0,0,0,.55))}
+.inset{border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--line);padding:2px 4px}
+@media (max-width:980px){.readouts .inset{grid-column:1/-1;justify-self:center;width:100%;max-width:300px}}
+@media (max-width:700px){.scene .step-sub,.scene .cam-hint{display:none}}
+.inset svg{width:100%;height:auto;display:block}
+.inset text{font-family:var(--mono);fill:var(--muted);font-size:11px}
+.inset .lbl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;fill:var(--dim)}
+.loader{position:absolute;inset:0;display:grid;place-items:center;background:#0B0D10;z-index:5;transition:opacity .6s}
+.loader.hide{opacity:0;pointer-events:none}
+.loader .ring{width:46px;height:46px;border-radius:50%;border:3px solid var(--line-2);border-top-color:var(--orange);animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader p{margin-top:14px;font-size:12px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+.nogl{position:absolute;inset:0;display:none;place-items:center;text-align:center;padding:30px;color:var(--muted);z-index:6}
+
+.readouts{border-left:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--bg-2));padding:18px;display:flex;flex-direction:column;gap:12px}
+@media (max-width:980px){.readouts{border-left:0;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(2,1fr)}}
+.ro{padding:13px 16px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+.ro .l{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.ro .v{font-family:var(--mono);font-size:27px;font-weight:600;margin-top:4px;display:flex;align-items:baseline;gap:6px}
+.ro .v small{font-size:13px;color:var(--muted)}
+.ro.temp .v{color:var(--hot-1)}
+.ro .bar{height:6px;border-radius:3px;background:var(--line);margin-top:10px;overflow:hidden}
+.ro .bar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--hot-1),var(--hot-2),var(--hot-3))}
+.ro.status .v{font-family:var(--font);font-size:16px;font-weight:700;align-items:center}
+.ro.status .v::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--muted);box-shadow:0 0 10px currentColor;flex:none}
+.ro.status[data-state="heat"] .v::before{background:var(--hot-2);color:var(--hot-2);animation:blink .8s infinite}
+.ro.status[data-state="cool"] .v::before{background:var(--cold);color:var(--cold)}
+.ro.status[data-state="ok"] .v::before{background:var(--ok);color:var(--ok)}
+@keyframes blink{50%{opacity:.35}}
+.ro.phase{padding:10px 16px}
+.ro.phase .ph{display:flex;gap:4px;margin-top:8px}
+.ro.phase .ph i{flex:1;height:5px;border-radius:3px;background:var(--line)}
+.ro.phase .ph i.on{background:var(--orange)}
+.ro.phase .ph i.done{background:rgba(73,209,125,.6)}
+
+/* scrubber */
+.scrub{height:22px;position:relative;background:var(--bg-2);border-top:1px solid var(--line);cursor:pointer}
+.scrub .track{position:absolute;left:0;right:0;top:9px;height:4px;background:var(--line)}
+.scrub .fill{position:absolute;left:0;top:9px;height:4px;width:0;background:linear-gradient(90deg,var(--orange),var(--orange-2))}
+.scrub .knob{position:absolute;top:4px;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--orange);transform:translateX(-50%);box-shadow:0 0 0 4px rgba(232,101,28,.2)}
+.scrub .mark{position:absolute;top:7px;width:2px;height:8px;background:var(--line-2)}
+.scrub .fastband{position:absolute;top:3px;bottom:3px;border-radius:4px;background:rgba(94,196,242,.14);border:1px solid rgba(94,196,242,.4)}
+.fast{position:absolute;right:16px;bottom:14px;display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:rgba(14,16,19,.88);border:1px solid rgba(94,196,242,.6);color:var(--cold);font:700 13px var(--font);opacity:0;transition:opacity .4s;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.fast.show{opacity:1}
+.fast svg{width:16px;height:16px;fill:currentColor}
+.fast .real{font:500 12px var(--mono);color:var(--muted)}
+.stage-bottom{border-top:1px solid var(--line);padding:14px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:var(--bg-2)}
+.steps{display:flex;gap:6px;flex:1;min-width:280px;flex-wrap:wrap}
+.step{appearance:none;border:1px solid var(--line);background:transparent;color:var(--muted);padding:8px 12px;border-radius:10px;font:600 12px var(--font);cursor:pointer;display:flex;gap:8px;align-items:center;transition:all .2s}
+.step .k{font-family:var(--mono);color:var(--dim)}
+.step:hover{border-color:var(--line-2);color:var(--text)}
+.step.active{background:var(--orange-soft);border-color:rgba(232,101,28,.55);color:var(--text)}
+.step.active .k{color:var(--orange-2)}
+.step.done .k{color:var(--ok)}
+.controls{display:flex;gap:8px;align-items:center}
+.ctl{appearance:none;border:1px solid var(--line-2);background:var(--panel);color:var(--text);width:38px;height:38px;border-radius:10px;cursor:pointer;display:grid;place-items:center}
+.ctl:hover{background:var(--panel-2)}
+.ctl.on{border-color:var(--orange);color:var(--orange-2)}
+.ctl svg{width:16px;height:16px;fill:currentColor}
+.ctl.speed{width:auto;padding:0 10px;font:600 12px var(--mono)}
+.hint{font-size:12px;color:var(--dim);margin-top:12px;display:flex;gap:18px;flex-wrap:wrap}
+.hint kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--line-2);border-bottom-width:2px;padding:1px 6px;border-radius:5px;color:var(--muted)}
+
+/* PHYSICS */
+/* „Proč indukce?“ souměrně: nadpis na střed, obrázek uprostřed, pod ním 4 fakta v mřížce 2 × 2 */
+.sec-head.center{grid-template-columns:1fr;justify-items:center;text-align:center}
+.sec-head.center .eyebrow::after{content:"";width:28px;height:2px;background:var(--orange);border-radius:2px}
+.sec-head.center .lead{margin:0 auto}
+.phys{display:grid;grid-template-columns:1fr;gap:28px;justify-items:center}
+/* rámeček obrázku má stejné okraje jako mřížka faktů pod ním (celá šířka, stejný rámeček a zaoblení); obrázek uvnitř na střed */
+.phys .phys-fig{width:100%;border:1px solid var(--line);border-radius:14px;padding:14px}
+.phys .phys-fig svg{max-width:760px;margin:0 auto}
+.phys-fig{border:1px solid var(--line-2);border-radius:22px;background:#0B0D10;padding:10px;overflow:hidden}
+.phys-fig svg{width:100%;height:auto;display:block}
+.phys-fig text{font-family:var(--mono);font-size:11px;fill:var(--muted)}
+.phys-fig .fl{fill:none;stroke:var(--orange-2);stroke-width:1.3;stroke-dasharray:5 6;animation:dash 1.1s linear infinite;opacity:.8}
+@keyframes dash{to{stroke-dashoffset:-18}}
+.phys-fig .eddy{fill:none;stroke:var(--hot-3);stroke-width:2;stroke-dasharray:3 4;animation:dashr .7s linear infinite}
+@keyframes dashr{to{stroke-dashoffset:14}}
+.phys-fig .skin{animation:skin 2s ease-in-out infinite}
+@keyframes skin{0%,100%{opacity:.75}50%{opacity:1}}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%}
+@media (max-width:760px){.facts{grid-template-columns:1fr}}
+.fact{display:grid;grid-template-columns:44px 1fr;gap:16px;padding:18px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),transparent)}
+.fact .ic{width:44px;height:44px;border-radius:11px;background:var(--orange-soft);border:1px solid rgba(232,101,28,.35);display:grid;place-items:center;color:var(--orange-2);font-family:var(--mono);font-weight:600}
+.fact p{color:var(--muted);font-size:14px;margin-top:4px}
+
+/* BENEFITS */
+.benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media (max-width:900px){.benefits{grid-template-columns:1fr 1fr}}
+@media (max-width:600px){.benefits{grid-template-columns:1fr}}
+.card{padding:26px;border-radius:var(--radius);border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--bg-2));position:relative;overflow:hidden;transition:transform .25s,border-color .25s}
+.card:hover{transform:translateY(-3px);border-color:rgba(232,101,28,.45)}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--orange),transparent);opacity:0;transition:opacity .25s}
+.card:hover::before{opacity:1}
+.card .big{font-family:var(--mono);font-size:30px;font-weight:600;color:var(--orange-2);letter-spacing:-.02em}
+.card h3{margin-top:10px}
+.card p{color:var(--muted);font-size:14px;margin-top:8px}
+
+/* COMPARE (náklady na ohřev) */
+.ptable-wrap{border:1px solid var(--line);border-radius:var(--radius);background:var(--bg-2);overflow-x:auto}
+.ptable{width:100%;min-width:680px;border-collapse:collapse;font-size:14px}
+.ptable th,.ptable td{padding:15px 20px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.ptable tbody tr:last-child th,.ptable tbody tr:last-child td{border-bottom:0}
+.ptable thead th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.ptable tbody th{font-weight:700;color:var(--text);width:27%}
+.ptable tbody th span{display:block;font-size:12px;font-weight:400;color:var(--muted);margin-top:2px}
+.ptable td{color:var(--muted)}
+.ptable .best{background:var(--orange-soft)}
+.ptable thead th.best{color:var(--orange-2)}
+.ptable td.best{color:var(--text);font-weight:600}
+.ptable .rt{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:9px;vertical-align:1px}
+.ptable .rt.g{background:var(--ok);box-shadow:0 0 8px rgba(73,209,125,.6)}
+.ptable .rt.m{background:#E8B931}
+.ptable .rt.b{background:var(--hot-3)}
+.foot{font-size:12px;color:var(--dim);margin-top:12px}
+
+/* SPECS */
+.specs{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:900px){.specs{grid-template-columns:1fr}}
+/* levá karta parametrů a pravá karta obsluhy mají stejnou výšku (grid stretch); řádky parametrů vyplní zbylé místo */
+.spec-table{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:linear-gradient(180deg,var(--panel),var(--bg-2));display:flex;flex-direction:column}
+.spec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;padding:18px 22px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,rgba(255,112,43,.18),transparent 75%)}
+.spec-model{font:600 24px var(--mono);color:var(--orange-2);letter-spacing:-.01em}
+.spec-name{font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.spec-kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border-bottom:1px solid var(--line)}
+.spec-kpi{padding:12px 22px;background:var(--bg-2)}
+.spec-kpi b{display:block;font:600 26px var(--mono);color:var(--text);letter-spacing:-.02em}
+.spec-kpi b small{font-size:14px;color:var(--orange-2);margin-left:4px}
+.spec-kpi .sub{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.spec-rows{flex:1;display:flex;flex-direction:column}
+.spec-table .row{flex:1;align-items:center;display:grid;grid-template-columns:minmax(130px,.85fr) 1.15fr;gap:16px;padding:9px 22px;border-bottom:1px solid var(--line);font-size:14px;transition:background .2s}
+.spec-table .row:last-child{border-bottom:0}
+.spec-table .row:hover{background:rgba(255,112,43,.06)}
+.spec-table .k{color:var(--muted);display:flex;gap:10px;align-items:baseline}
+.spec-table .k::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--orange);flex:none;transform:translateY(-2px)}
+.spec-table .v{font-weight:600;color:var(--text)}
+.todo{color:var(--orange-2);border-bottom:1px dashed rgba(232,101,28,.6);cursor:help}
+.workflow{padding:26px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,var(--panel),var(--bg-2))}
+.workflow ol{margin:14px 0 0;padding:0;list-style:none;display:grid;gap:12px}
+.workflow li{display:grid;grid-template-columns:30px 1fr;gap:12px;font-size:14px;color:var(--muted)}
+.workflow li b{color:var(--text)}
+.workflow li .n{width:26px;height:26px;border-radius:8px;background:var(--orange-soft);color:var(--orange-2);display:grid;place-items:center;font:600 12px var(--mono);border:1px solid rgba(232,101,28,.35)}
+
+/* ABOUT */
+.about{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:center;padding:36px;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(180deg,var(--panel),var(--bg-2))}
+@media (max-width:860px){.about{grid-template-columns:1fr}}
+.about-r{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{padding:16px 18px;border-radius:12px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+.stat .v{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--orange-2);letter-spacing:-.02em}
+.stat .l{font-size:12px;color:var(--muted);margin-top:4px}
+/* CTA */
+.cta{border:1px solid rgba(232,101,28,.4);border-radius:26px;padding:56px;background:radial-gradient(700px 300px at 10% 0%,rgba(232,101,28,.25),transparent 60%),linear-gradient(180deg,var(--panel),var(--bg-2));display:grid;grid-template-columns:1.2fr .8fr;gap:30px;align-items:center}
+@media (max-width:800px){.cta{grid-template-columns:1fr;padding:32px}}
+.contact{display:grid;gap:10px;font-size:15px}
+.contact div{display:flex;gap:12px;align-items:center;color:var(--muted)}
+.contact b{color:var(--text)}
+footer{padding:40px 0 60px;color:var(--dim);font-size:13px;border-top:1px solid var(--line)}
+.rv{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.hero-glow{animation:none}}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="logo" href="#top"><img src="logo-light.webp" alt="DAWELL CZ – Induction &amp; Resistance Heating" class="logo-img"><span class="logo-sep"></span><span class="logo-sub" data-i18n="nav.sub">Indukční shrink‑fit ohřívač</span></a>
+    <div class="nav-links">
+      <a href="#jak" data-i18n="nav.anim">3D animace</a><a href="#proc" data-i18n="nav.why">Proč indukce</a><a href="#prinosy" data-i18n="nav.benefits">Přínosy</a><a href="#srovnani" data-i18n="nav.compare">Srovnání</a><a href="#parametry" data-i18n="nav.specs">Parametry</a><a href="#kontakt" data-i18n="nav.contact">Kontakt</a>
+    </div>
+    <div class="nav-right"><button class="btn btn-primary nav-btn" id="calcBtn" type="button" data-i18n-title="nav.calc" title="Kalkulačka návratnosti">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18h8"/></svg>
+      <span data-i18n="nav.calc">Kalkulačka návratnosti</span>
+    </button>
+    <button class="btn btn-ghost" id="presentBtn" style="padding:10px 14px;font-size:13px" data-i18n-title="nav.present" title="Prezentační režim">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      <span data-i18n="nav.present">Prezentační režim</span>
+    </button>
+    <div class="lang" id="lang"><button data-lang="cs">CS</button><button data-lang="en">EN</button><button data-lang="de">DE</button></div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ KALKULAČKA NÁVRATNOSTI (modální okno, otevírá tlačítko v horním panelu) ============ -->
+<dialog class="calc" id="calc" aria-labelledby="calcTitle">
+  <div class="calc-in">
+    <button class="calc-x" id="calcClose" type="button" data-i18n-title="calc.close" title="Zavřít"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <span class="eyebrow" data-i18n="calc.eyebrow">Kalkulačka</span>
+    <h2 id="calcTitle" data-i18n="calc.title">Za jak dlouho se ohřívač zaplatí</h2>
+    <p class="lead calc-lead" data-i18n="calc.lead"></p>
+    <div class="calc-grid">
+      <div class="calc-form">
+        <h3 class="calc-h" data-i18n="calc.basic">Váš provoz</h3>
+        <!-- každé pole: posuvník (s…) a číslo (c…) jsou propojené; pořizovací cena a cena upínače jsou jen v CALC (nezobrazují se) -->
+        <div class="flds">
+          <div class="fld"><label id="lChanges" for="cChanges" data-i18n="calc.changes">Výměn nástrojů za den</label><div class="fld-row"><input type="range" class="rng" id="sChanges" aria-labelledby="lChanges"><span class="inp"><input type="number" id="cChanges" min="0" inputmode="numeric"><i data-i18n="calc.pcs">ks</i></span></div></div>
+          <div class="fld"><label id="lLabor" for="cLabor" data-i18n="calc.labor">Náklad na hodinu práce</label><div class="fld-row"><input type="range" class="rng" id="sLabor" aria-labelledby="lLabor"><span class="inp"><input type="number" id="cLabor" min="0" inputmode="decimal"><i data-i18n="calc.curH">Kč/h</i></span></div></div>
+          <div class="fld"><label id="lDays" for="cDays" data-i18n="calc.days">Pracovních dní v roce</label><div class="fld-row"><input type="range" class="rng" id="sDays" aria-labelledby="lDays"><span class="inp"><input type="number" id="cDays" min="0" max="366" inputmode="numeric"><i data-i18n="calc.daysU">dní</i></span></div></div>
+          <div class="fld"><label id="lElec" for="cElec" data-i18n="calc.elec">Cena elektřiny</label><div class="fld-row"><input type="range" class="rng" id="sElec" aria-labelledby="lElec"><span class="inp"><input type="number" id="cElec" min="0" inputmode="decimal"><i data-i18n="calc.curKWh">Kč/kWh</i></span></div></div>
+        </div>
+
+        <h3 class="calc-h mt" data-i18n="calc.more">Časy a parametry jednotlivých způsobů ohřevu</h3>
+        <table class="mtab">
+          <thead><tr><th></th><th class="ind" data-i18n="calc.mInd">Indukce DTI-16</th><th data-i18n="calc.mHot">Horký vzduch</th><th data-i18n="calc.mGas">Plynový hořák</th></tr></thead>
+          <tbody>
+            <tr><th><span data-i18n="calc.tHeat">Ohřev</span> <i>(s)</i></th><td><input type="number" id="mHeatInd" min="0" step="1" inputmode="numeric"></td><td><input type="number" id="mHeatHot" min="0" step="1" inputmode="numeric"></td><td><input type="number" id="mHeatGas" min="0" step="1" inputmode="numeric"></td></tr>
+            <tr><th><span data-i18n="calc.tCool">Chlazení</span> <i>(s)</i></th><td><input type="number" id="mCoolInd" min="0" step="1" inputmode="numeric"></td><td><input type="number" id="mCoolHot" min="0" step="1" inputmode="numeric"></td><td><input type="number" id="mCoolGas" min="0" step="1" inputmode="numeric"></td></tr>
+            <tr><th><span data-i18n="calc.tPow">Příkon</span> <i>(kW)</i></th><td><input type="number" id="mPowInd" min="0" step="0.1" inputmode="decimal"></td><td><input type="number" id="mPowHot" min="0" step="0.1" inputmode="decimal"></td><td><input type="number" id="mPowGas" min="0" step="0.1" inputmode="decimal"></td></tr>
+            <tr><th><span data-i18n="calc.tBroken">Poškozené upínače</span> <i data-i18n="calc.perYear">(ks/rok)</i></th><td><input type="number" id="mBrkInd" min="0" step="1" inputmode="numeric"></td><td><input type="number" id="mBrkHot" min="0" step="1" inputmode="numeric"></td><td><input type="number" id="mBrkGas" min="0" step="1" inputmode="numeric"></td></tr>
+          </tbody>
+        </table>
+        <div class="calc-foot">
+          <p class="calc-hint" data-i18n="calc.hint"></p>
+          <button type="button" class="btn btn-ghost calc-reset" id="calcReset" data-i18n="calc.reset">Výchozí hodnoty</button>
+        </div>
+      </div>
+
+      <div class="calc-res" aria-live="polite">
+        <h3 class="calc-h" data-i18n="calc.compare">Porovnat indukci s</h3>
+        <!-- přepínač porovnání: výsledky se počítají jen pro zvolený způsob ohřevu -->
+        <div class="seg" id="calcSeg"><button type="button" data-m="Hot" class="on" data-i18n="calc.hot">horkým vzduchem</button><button type="button" data-m="Gas" data-i18n="calc.gas">plynovým hořákem</button></div>
+        <h3 class="calc-h mt" data-i18n="calc.res">O kolik je indukce lepší (model za rok)</h3>
+        <table class="rtab">
+          <tbody>
+            <tr><th data-i18n="calc.rPer">Čas na jedno upnutí</th><td id="rPer"></td></tr>
+            <tr><th data-i18n="calc.rHours">Čas obsluhy za rok</th><td id="rHours"></td></tr>
+            <tr><th data-i18n="calc.rLabor">Náklady na práci</th><td id="rLabor"></td></tr>
+            <tr><th data-i18n="calc.rHolders">Poškozené upínače</th><td id="rHolders"></td></tr>
+            <tr><th data-i18n="calc.rEnergy">Energie</th><td id="rEnergy"></td></tr>
+            <tr class="tot"><th data-i18n="calc.total">Indukce ušetří ročně</th><td id="rTot"></td></tr>
+            <tr class="pay"><th data-i18n="calc.payback">Doba návratnosti</th><td id="rPay"></td></tr>
+          </tbody>
+        </table>
+        <div class="calc-foot">
+          <p class="calc-note" data-i18n="calc.note"></p>
+          <details class="calc-src"><summary data-i18n="calc.srcT">Zdroje a předpoklady</summary><div data-i18n="calc.src"></div></details>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow" data-i18n="hero.eyebrow">Novinka · indukční technologie</span>
+      <h1 style="margin-top:18px" data-i18n="hero.title">Nástroj upnutý <span class="accent">za pár sekund.</span><br>Malý a přenosný.</h1>
+      <p class="lead" style="margin-top:22px" data-i18n="hero.lead">Stolní indukční ohřívač pro tepelné (shrink‑fit) upínání nástrojů. Cívka během několika sekund bezkontaktně ohřeje nos upínače, karbidová stopka zajede dovnitř a po zchladnutí drží silou, které se kleština ani hydraulika nevyrovná. Žádné pohyblivé díly, žádné opotřebení, opakovatelnost pokaždé.</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="#jak"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span data-i18n="hero.cta1">Spustit 3D animaci</span></a>
+        <a class="btn btn-ghost" href="#parametry" data-i18n="hero.cta2">Technické údaje</a>
+      </div>
+    </div>
+    <div class="photo-wrap">
+      <div class="hero-glow"></div>
+      <div class="hero-photo">
+        <img src="produkt.webp" alt="Indukční shrink-fit ohřívač Dawell CZ se smršťovacím upínačem a indukční cívkou">
+        <div class="hero-badge"><span class="chip"><i></i><span data-i18n="hero.chip1">Stolní provedení</span></span><span class="chip" data-i18n="hero.chip2">Regulace teploty</span><span class="chip" data-i18n="hero.chip3">Pojízdný držák + pevná cívka</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="wrap">
+    <!-- dlaždice se generují z i18n.js (kpi.tiles) při přepnutí jazyka -->
+    <div class="kpis rv" id="kpis"></div>
+  </div>
+</header>
+
+<!-- ============ 3D ANIMACE ============ -->
+<section id="jak">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow" data-i18n="anim.eyebrow">3D animace procesu</span><h2 data-i18n="anim.title">Jak to funguje – krok za krokem</h2></div>
+      <p class="lead" data-i18n="anim.lead">Celý cyklus upnutí od vložení upínače po hotový, změřitelně přesný nástroj. Kamera vede sama, scénu ale můžete kdykoli uchopit myší a otočit si ji.</p>
+    </div>
+
+    <div class="stage" id="stage">
+      <div class="stage-top">
+        <div class="scene" id="sceneBox">
+          <div id="view3d"></div>
+          <div class="vignette"></div>
+          <div class="labels" id="labels"></div>
+          <div class="step-title"><span class="n" id="stepNum">01 / 07</span><span class="t" id="stepName">Vložení upínače</span></div>
+          <div class="step-sub" id="stepSub"></div>
+          <div class="fast" id="fast"><svg viewBox="0 0 24 24"><path d="M3 6l8 6-8 6zM12 6l8 6-8 6z"/></svg><span id="fastTxt"></span><span class="real" id="fastReal"></span></div>
+          <div class="cam-hint"><svg viewBox="0 0 24 24"><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/><circle cx="12" cy="12" r="3"/></svg><span id="camHint" data-i18n="anim.camhint">tažením myší otočíte scénu · kolečkem přiblížíte · kamera se po kroku vrátí</span></div>
+
+          <div class="loader" id="loader"><div style="text-align:center"><img src="logo-light.webp" alt="" style="height:38px;opacity:.9;margin-bottom:22px"><div class="ring" style="margin:0 auto"></div><p data-i18n="loader">Načítám 3D scénu</p></div></div>
+          <div class="nogl" id="nogl"><div><h3 data-i18n="nogl.title">3D zobrazení není v tomto prohlížeči dostupné</h3><p style="margin-top:8px" data-i18n="nogl.text">Otevřete stránku v aktuálním Chrome / Edge.</p></div></div>
+        </div>
+
+        <aside class="readouts">
+          <!-- řez nosem upínače: v panelu vedle videa, aby nezakrýval scénu -->
+          <div class="inset">
+            <svg viewBox="0 0 210 184" aria-label="Řez nosem upínače">
+              <defs>
+                <linearGradient id="iSteel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9CFD7"/><stop offset=".5" stop-color="#6E7783"/><stop offset="1" stop-color="#2E343D"/></linearGradient>
+                <linearGradient id="iHot" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE39A"/><stop offset=".45" stop-color="#FF8A2A"/><stop offset="1" stop-color="#B8321C"/></linearGradient>
+                <linearGradient id="iCarb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9AA3AE"/><stop offset=".5" stop-color="#5B6470"/><stop offset="1" stop-color="#262B33"/></linearGradient>
+              </defs>
+              <text x="14" y="20" class="lbl" data-i18n="inset.title">Řez nosem upínače · zvětšeno</text>
+              <g transform="translate(66,100)">
+                <circle r="52" fill="url(#iSteel)"/>
+                <circle id="ringHot" r="52" fill="url(#iHot)" opacity="0"/>
+                <circle id="boreCircle" r="18" fill="#0B0D10" stroke="#5B6470" stroke-width="1"/>
+                <circle id="shankCircle" r="18" fill="url(#iCarb)" opacity="0"/>
+                <g id="clampArrows" stroke="#49D17D" stroke-width="2" fill="none" opacity="0" stroke-linecap="round">
+                  <path d="M0 -44 v12 m-4 -4 l4 4 l4 -4"/><path d="M0 44 v-12 m-4 4 l4 -4 l4 4"/><path d="M-44 0 h12 m-4 -4 l4 4 l-4 4"/><path d="M44 0 h-12 m4 -4 l-4 4 l4 4"/>
+                </g>
+              </g>
+              <text x="160" y="70" text-anchor="middle" class="lbl" data-i18n="inset.bore">otvor</text>
+              <text id="boreDim" x="160" y="90" text-anchor="middle" style="fill:#EEF0F3;font-size:13px;font-weight:600">Ø12,000</text>
+              <text x="160" y="112" text-anchor="middle" class="lbl" data-i18n="inset.shank">stopka</text>
+              <text x="160" y="132" text-anchor="middle" style="fill:#9BA4B0;font-size:13px;font-weight:600">Ø12,000</text>
+              <text id="fitText" x="105" y="174" text-anchor="middle" style="fill:#49D17D;font-size:11px;font-weight:600" opacity="0" data-i18n="inset.fit">přesah = upínací síla</text>
+            </svg>
+          </div>
+          <div class="ro temp"><div class="l" data-i18n="ro.temp">Teplota nosu upínače</div><div class="v"><span id="roTemp">20</span><small>°C</small></div><div class="bar"><i id="roTempBar"></i></div></div>
+          <div class="ro"><div class="l" data-i18n="ro.time">Čas cyklu</div><div class="v"><span id="roTime">0,0</span><small>s</small></div></div>
+          <div class="ro status" id="roStatus" data-state="idle"><div class="l" data-i18n="ro.status">Stav</div><div class="v"><span id="roStatusText">Připraveno</span></div></div>
+          <div class="ro phase"><div class="l" data-i18n="ro.phase">Fáze cyklu</div><div class="ph" id="phaseBar"></div></div>
+        </aside>
+      </div>
+      <div class="scrub" id="scrub"><div class="track"></div><div class="fill" id="scrubFill"></div><div class="knob" id="scrubKnob"></div></div>
+      <div class="stage-bottom">
+        <div class="steps" id="steps"></div>
+        <div class="controls">
+          <button class="ctl" id="btnPrev" data-i18n-title="ctl.prev" title="Předchozí krok (←)"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6z"/></svg></button>
+          <button class="ctl" id="btnPlay" data-i18n-title="ctl.play" title="Přehrát / pauza (mezerník)"><svg viewBox="0 0 24 24" id="iconPlay"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></button>
+          <button class="ctl" id="btnNext" data-i18n-title="ctl.next" title="Další krok (→)"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6z"/></svg></button>
+          <button class="ctl" id="btnRestart" data-i18n-title="ctl.restart" title="Od začátku (R)"><svg viewBox="0 0 24 24"><path d="M12 5V2L7 6l5 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7z"/></svg></button>
+          <button class="ctl speed" id="btnSpeed" data-i18n-title="ctl.speed" title="Rychlost">1×</button>
+          <button class="ctl" id="btnCam" data-i18n-title="ctl.cam" title="Automatická kamera (C)"><svg viewBox="0 0 24 24"><path d="M4 7h3l2-2h6l2 2h3v12H4z M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg></button>
+          <button class="ctl" id="btnFull" data-i18n-title="ctl.full" title="Celá obrazovka (F)"><svg viewBox="0 0 24 24"><path d="M4 4h6v2H6v4H4zm10 0h6v6h-2V6h-4zM4 14h2v4h4v2H4zm14 0h2v6h-6v-2h4z"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="hint">
+      <span><kbd data-i18n="hint.space">mezerník</kbd> <span data-i18n="hint.play">přehrát / pauza</span></span><span><kbd>←</kbd><kbd>→</kbd> <span data-i18n="hint.steps">kroky</span></span><span><kbd>R</kbd> <span data-i18n="hint.restart">od začátku</span></span><span><kbd>C</kbd> <span data-i18n="hint.cam">auto kamera</span></span><span><kbd>F</kbd> <span data-i18n="hint.full">celá obrazovka</span></span>
+      <span style="margin-left:auto" data-i18n="hint.note">Rozměry v řezu jsou pro názornost zvětšeny; hodnoty roztažení vycházejí z tepelné roztažnosti oceli (~12 µm/m·K).</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROČ INDUKCE ============ -->
+<section id="proc" style="background:linear-gradient(180deg,transparent,rgba(255,255,255,.02),transparent)">
+  <div class="wrap">
+    <div class="sec-head center">
+      <div><span class="eyebrow" data-i18n="why.eyebrow">Fyzika za tím</span><h2 data-i18n="why.title">Proč indukce?</h2></div>
+      <p class="lead" data-i18n="why.lead">Teplo nevzniká v cívce, ale přímo v materiálu upínače. Střídavé magnetické pole indukuje v povrchové vrstvě nosu vířivé proudy a ty ho ohřejí zevnitř. Rychle, přesně, jen tam, kde je to potřeba.</p>
+    </div>
+    <div class="phys">
+      <div class="phys-fig rv">
+        <svg viewBox="0 0 640 380" aria-label="Princip indukčního ohřevu">
+          <defs>
+            <linearGradient id="pSteel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9CFD7"/><stop offset=".5" stop-color="#6E7783"/><stop offset="1" stop-color="#2E343D"/></linearGradient>
+            <linearGradient id="pSkin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD37A"/><stop offset="1" stop-color="#D8321C"/></linearGradient>
+            <filter id="pBlur"><feGaussianBlur stdDeviation="6"/></filter>
+          </defs>
+          <rect x="60" y="150" width="440" height="80" rx="4" fill="url(#pSteel)"/>
+          <rect x="60" y="178" width="440" height="24" fill="#0B0D10"/>
+          <g class="skin">
+            <rect x="250" y="150" width="170" height="80" fill="#FF7A1A" opacity=".35" filter="url(#pBlur)"/>
+            <rect x="250" y="150" width="170" height="9" fill="url(#pSkin)"/>
+            <rect x="250" y="221" width="170" height="9" fill="url(#pSkin)"/>
+          </g>
+          <g fill="#3C4149" stroke="#8E97A3" stroke-width="1.5">
+            <circle cx="270" cy="124" r="11"/><circle cx="302" cy="124" r="11"/><circle cx="334" cy="124" r="11"/><circle cx="366" cy="124" r="11"/><circle cx="398" cy="124" r="11"/>
+            <circle cx="270" cy="256" r="11"/><circle cx="302" cy="256" r="11"/><circle cx="334" cy="256" r="11"/><circle cx="366" cy="256" r="11"/><circle cx="398" cy="256" r="11"/>
+          </g>
+          <g fill="#F7903F" style="font-family:JetBrains Mono,monospace;font-size:12px;font-weight:600">
+            <text x="270" y="128" text-anchor="middle">⊗</text><text x="302" y="128" text-anchor="middle">⊗</text><text x="334" y="128" text-anchor="middle">⊗</text><text x="366" y="128" text-anchor="middle">⊗</text><text x="398" y="128" text-anchor="middle">⊗</text>
+            <text x="270" y="260" text-anchor="middle">⊙</text><text x="302" y="260" text-anchor="middle">⊙</text><text x="334" y="260" text-anchor="middle">⊙</text><text x="366" y="260" text-anchor="middle">⊙</text><text x="398" y="260" text-anchor="middle">⊙</text>
+          </g>
+          <ellipse class="fl" cx="334" cy="190" rx="110" ry="92"/><ellipse class="fl" cx="334" cy="190" rx="135" ry="118"/><ellipse class="fl" cx="334" cy="190" rx="160" ry="146"/>
+          <path class="eddy" d="M262 158 h146 M262 164 h146"/><path class="eddy" d="M262 216 h146 M262 222 h146"/>
+          <text x="60" y="140" data-i18n="why.svg1">nos upínače (ocel)</text>
+          <text x="60" y="194" style="fill:#6B7482" data-i18n="why.svg2">otvor pro stopku</text>
+          <text x="440" y="110" style="fill:#F7903F" data-i18n="why.svg3">cívka · VF proud</text>
+          <text x="440" y="284" style="fill:#F7903F" data-i18n="why.svg4">magnetické pole</text>
+          <text x="262" y="310" style="fill:#FFB27A" data-i18n="why.svg5">vířivé proudy → Jouleovo teplo v povrchové vrstvě</text>
+          <text x="60" y="350" style="fill:#9BA4B0" data-i18n="why.svg6">kužel a příruba mimo cívku zůstávají chladné · ohřívá se jen část, která se má roztáhnout</text>
+          <g style="font-size:10px;fill:#5EC4F2"><text x="68" y="246">~ 20 °C</text><text x="455" y="246">~ 20 °C</text></g>
+          <text x="334" y="246" text-anchor="middle" style="font-size:10px;fill:#FFD37A;font-weight:600">250–350 °C</text>
+        </svg>
+      </div>
+      <div class="facts">
+        <div class="fact rv"><div class="ic">1</div><div><h3 data-i18n="why.f1h">Teplo vzniká v upínači, ne okolo něj</h3><p data-i18n="why.f1p">Cívka se nedotýká dílu. Vířivé proudy ohřívají tenkou povrchovou vrstvu nosu a teplo prostupuje ke stěně otvoru během několika sekund. Pec potřebuje desítky minut, horký vzduch je pomalý a nepřesný.</p></div></div>
+        <div class="fact rv"><div class="ic">2</div><div><h3 data-i18n="why.f2h">Přesně na teplotu, nikdy přepálit</h3><p data-i18n="why.f2p">Regulace teploty na panelu drží pracovní rozsah upínače. Nedochází k popouštění oceli ani k degradaci tvrdokovu nástroje; stopka se vkládá do již ohřátého otvoru a sama se nehřeje.</p></div></div>
+        <div class="fact rv"><div class="ic">3</div><div><h3 data-i18n="why.f3h">Roztažení ~40 µm stačí</h3><p data-i18n="why.f3p">Ocel se při ohřevu o ~280 K roztáhne o zhruba 12 µm na každý milimetr průměru a kelvin na tisíc. U otvoru Ø12 mm to je asi 40 µm, což hravě překoná přesah uložení, a po zchladnutí vznikne rovnoměrný radiální tlak po celém obvodu stopky.</p></div></div>
+        <div class="fact rv"><div class="ic">4</div><div><h3 data-i18n="why.f4h">Uvolnění nástroje stejným cyklem</h3><p data-i18n="why.f4p">Nasadit cívku, pár sekund ohřát, nástroj vytáhnout. Upínač se neopotřebovává, nejsou tu žádné šrouby, kleštiny ani membrány, které by ztrácely sílu.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PŘÍNOSY ============ -->
+<section id="prinosy">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow" data-i18n="ben.eyebrow">Co to přinese zákazníkovi</span><h2 data-i18n="ben.title">Přesnost, kterou je vidět na dílu i na faktuře</h2></div>
+      <p class="lead" data-i18n="ben.lead">Shrink‑fit není jen další způsob upnutí. Je to přímý vliv na životnost nástrojů, kvalitu povrchu a prostoje stroje.</p>
+    </div>
+    <div class="benefits">
+      <div class="card rv"><div class="big" data-i18n="ben.3b">~ 2 min</div><h3 data-i18n="ben.3h">Výměna nástroje</h3><p data-i18n="ben.3p">Ohřev v sekundách, zchladnutí do minuty. Místo seřizování kleštin a utahování momentovým klíčem jeden stisk tlačítka.</p></div>
+      <div class="card rv"><div class="big">G2.5</div><h3 data-i18n="ben.5h">Vyvážení pro vysoké otáčky</h3><p data-i18n="ben.5p">Symetrické, rotačně souměrné těleso bez drážek a šroubů. Nižší vibrace, tišší stroj, menší zatížení vřetene.</p></div>
+      <div class="card rv"><div class="big" data-i18n="ben.6b">0 dílů</div><h3 data-i18n="ben.6h">Nic k opotřebení</h3><p data-i18n="ben.6p">Žádné kleštiny, matice, membrány ani těsnění. Upínač je jeden kus oceli, stačí ho udržovat čistý. Opakovatelnost stejná po tisíci cyklech.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SROVNÁNÍ ============ -->
+<section id="srovnani" style="background:linear-gradient(180deg,transparent,rgba(255,255,255,.02),transparent)">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow" data-i18n="cmp.eyebrow">Srovnání nákladů</span><h2 data-i18n="cmp.title">Indukce vs. horký vzduch a pec</h2></div>
+      <p class="lead" data-i18n="cmp.lead"></p>
+    </div>
+    <div class="ptable-wrap rv"><table class="ptable" id="priceTable"></table></div>
+    <p class="foot" data-i18n="cmp.foot"></p>
+  </div>
+</section>
+
+<!-- ============ PARAMETRY ============ -->
+<section id="parametry">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow" data-i18n="spec.eyebrow">Zařízení</span><h2 data-i18n="spec.title">Technické údaje a obsluha</h2></div>
+      <p class="lead" data-i18n="spec.lead">Kompaktní stolní jednotka: držák upínače na lineárním pojezdu, pevná indukční cívka, regulace teploty a jedno tlačítko. Nic víc obsluha nepotřebuje.</p>
+    </div>
+    <div class="specs">
+      <div class="spec-table rv" id="specTable"></div>
+      <div class="workflow rv">
+        <h3 data-i18n="wf.title">Obsluha v šesti krocích</h3>
+        <ol>
+          <li><span class="n">1</span><span data-i18n="wf.1"><b>Vložit upínač do držáku.</b> Nos směřuje k cívce, kužel leží v držáku.</span></li>
+          <li><span class="n">2</span><span data-i18n="wf.2"><b>Přisunout cívku po vedení</b> tak, aby obepnula nos upínače.</span></li>
+          <li><span class="n">3</span><span data-i18n="wf.3"><b>Stisknout START.</b> Regulátor ohřeje upínač na nastavenou teplotu a vypne.</span></li>
+          <li><span class="n">4</span><span data-i18n="wf.4"><b>Zasunout nástroj</b> na doraz, případně na nastavenou délku.</span></li>
+          <li><span class="n">5</span><span data-i18n="wf.5"><b>Odsunout cívku</b> a nechat zchladnout (ambientně nebo v chladicí stanici).</span></li>
+          <li><span class="n">6</span><span data-i18n="wf.6"><b>Hotovo.</b> Nástroj drží, upínač jde rovnou do stroje. Uvolnění: opakovat kroky 2–3 a nástroj vytáhnout.</span></li>
+        </ol>
+        <p style="margin-top:18px;font-size:13px;color:var(--dim)" data-i18n="wf.safety">Bezpečnost: nos upínače je po ohřevu horký, manipulovat rukavicemi nebo počkat na zchladnutí. Před ohřevem otvor vyčistit, zbytky maziva by se mohly zapéct.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ O SPOLEČNOSTI ============ -->
+<section id="firma" style="padding-top:0">
+  <div class="wrap">
+    <div class="about rv">
+      <div class="about-l">
+        <img src="logo-light.webp" alt="DAWELL CZ" style="height:40px">
+        <p class="lead" style="margin-top:16px;font-size:15px" data-i18n="about.lead">Český výrobce mobilních indukčních a odporových ohřevů z Třebíče. Od roku 2012 vyvíjí, vyrábí a exportuje ohřívací zařízení pro průmysl, servis a montáž. Shrink‑fit ohřívač staví na stejné indukční platformě, která už běží v tisících dílen.</p>
+      </div>
+      <div class="about-r">
+        <div class="stat"><div class="v">2012</div><div class="l" data-i18n="about.s1">rok založení</div></div>
+        <div class="stat"><div class="v">50 000+</div><div class="l" data-i18n="about.s2">prodaných zařízení</div></div>
+        <div class="stat"><div class="v">45+</div><div class="l" data-i18n="about.s3">exportních zemí</div></div>
+        <div class="stat"><div class="v">15</div><div class="l" data-i18n="about.s4">základních typů ohřívačů</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ KONTAKT ============ -->
+<section id="kontakt">
+  <div class="wrap">
+    <div class="cta rv">
+      <div>
+        <span class="eyebrow" data-i18n="cta.eyebrow">Předvedení u vás</span>
+        <h2 style="margin-top:12px" data-i18n="cta.title">Přivezeme zařízení</h2>
+        <p class="lead" style="margin-top:14px" data-i18n="cta.lead">Upneme váš nástroj před vámi a změříme házivost na vašem vřetenu. Technologie je ověřená v německém průmyslu, teď ji přinášíme na český trh.</p>
+      </div>
+      <div class="contact" id="contact"></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap" style="display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:14px"><img src="logo-light.webp" alt="DAWELL CZ" style="height:26px;opacity:.85"><span>© <span id="year"></span> Dawell CZ s.r.o. · Třebíč · <a href="https://www.dawell.cz" style="color:var(--muted)">www.dawell.cz</a></span></span>
+    <span data-i18n="foot.note">Hodnoty v animaci a srovnání jsou typické pro technologii shrink‑fit; parametry konkrétního zařízení viz Technické údaje.</span>
+  </div>
+</footer>
+
+<!-- Three.js r147 (UMD) – funguje i při otevření souboru přímo z disku -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/CopyShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/shaders/GammaCorrectionShader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/RenderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/geometries/RoundedBoxGeometry.js"></script>
+
+<script>
+/* =====================================================================
+   KONFIGURACE – upravte zde, vše se propíše do stránky.
+   Hodnoty označené todo:true se zobrazí oranžově přerušovaně = doplnit.
+   ===================================================================== */
+if (window.THREE) THREE.ColorManagement.legacyMode = false;   // hex barvy = sRGB → lineární (správná expozice)
+const PRODUCT = {
+  brand: "DAWELL CZ",
+  name: "Indukční shrink‑fit ohřívač",
+  model: "DTI-16",
+  /* texty parametrů jsou v i18n.js (pole specs, stejné pořadí ve všech jazycích); zde jen indexy řádků "doplnit" */
+  specsTodo: [],
+  /* srovnání nákladů: i18n.js → price.rows; indexy řádků, které čekají na doplnění */
+  priceTodo: [],
+  contact: { person: "Kryštof Janků", phone: "+420 000 000 000", email: "k.janku@dawell.cz", web: "www.dawell.cz" }
+};
+
+const $ = id => document.getElementById(id);
+document.querySelectorAll('[data-bind="brand"]').forEach(e => e.textContent = PRODUCT.brand);
+$('year').textContent = new Date().getFullYear();
+
+/* ---------- jazyky (slovník v i18n.js) ---------- */
+let LANG = 'cs', T = I18N.cs, animReady = false;
+function setLang(l) {
+  if (!I18N[l]) l = 'cs'; LANG = l; T = I18N[l];
+  document.documentElement.lang = l; document.title = T._meta.title;
+  document.querySelector('meta[name=description]').content = T._meta.desc;
+  document.querySelectorAll('[data-i18n]').forEach(e => { const v = T[e.dataset.i18n]; if (v != null) e.innerHTML = v; });
+  document.querySelectorAll('[data-i18n-title]').forEach(e => { const v = T[e.dataset.i18nTitle]; if (v != null) e.title = v; });
+  document.querySelectorAll('#lang button').forEach(b => b.classList.toggle('on', b.dataset.lang === l));
+  /* dlaždice pod úvodem (kpi.tiles: nadpis, hodnota, popisek; poslední = cena) */
+  const kt = T['kpi.tiles'];
+  $('kpis').innerHTML = kt.map((k, i) => `<div class="kpi${i === kt.length - 1 ? ' price' : ''}"><div class="kl">${k[0]}</div><div class="v">${k[1]}</div><div class="l">${k[2]}</div></div>`).join('');
+  /* karta parametrů: hlavička s typem (řádek 0), dlaždice (spec.tiles: hodnota, jednotka, popisek), pod nimi základní parametry */
+  $('specTable').innerHTML =
+    `<div class="spec-head"><span class="spec-model">${T.specs[0][1]}</span><span class="spec-name">${T['nav.sub']}</span></div>` +
+    `<div class="spec-kpis">${T['spec.tiles'].map(k => `<div class="spec-kpi"><b>${k[0]}<small>${k[1]}</small></b><span class="sub">${k[2]}</span></div>`).join('')}</div>` +
+    `<div class="spec-rows">${T.specs.slice(1).map((row, j) => { const todo = PRODUCT.specsTodo.includes(j + 1); return `<div class="row"><span class="k">${row[0]}</span><span class="v"><span class="${todo ? 'todo' : ''}" ${todo ? `title="${T['spec.todo']}"` : ''}>${row[1]}</span></span></div>`; }).join('')}</div>`;
+  /* srovnání: předpona +| ~| -| v buňce = barevná tečka (výhoda / průměr / nevýhoda) */
+  const pr = T.price, RATE = { '+': 'g', '~': 'm', '-': 'b' };
+  const cell = v => { const m = /^([+~-])\|/.exec(v); return m ? `<i class="rt ${RATE[m[1]]}"></i>${v.slice(2)}` : v; };
+  $('priceTable').innerHTML = `<thead><tr><th></th>${pr.cols.map((c, j) => `<th class="${j ? '' : 'best'}">${c}</th>`).join('')}</tr></thead><tbody>` +
+    pr.rows.map((r, i) => { const todo = PRODUCT.priceTodo.includes(i); return `<tr><th scope="row">${r[0]}${r[1] ? `<span>${r[1]}</span>` : ''}</th>` +
+      r.slice(2).map((v, j) => `<td class="${j ? '' : 'best'}"><span class="${todo ? 'todo' : ''}" ${todo ? `title="${T['cmp.todo']}"` : ''}>${cell(v)}</span></td>`).join('') + '</tr>'; }).join('') + '</tbody>';
+  if (animReady) applyLangToAnim();
+  if (window.calcApplyLang) window.calcApplyLang();
+  try { localStorage.setItem('lang', l); } catch (e) {}
+  /* jazyk do adresy; v zabezpečeném rámečku (např. vložená stránka) to prohlížeč smí odmítnout */
+  try { const u = new URL(location.href); u.searchParams.set('lang', l); history.replaceState(null, '', u); } catch (e) {}
+}
+document.querySelectorAll('#lang button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.lang)));
+{
+  const q = new URLSearchParams(location.search).get('lang'); let saved = null; try { saved = localStorage.getItem('lang'); } catch (e) {}
+  const nav = (navigator.language || 'cs').slice(0, 2);
+  setLang(q || saved || (I18N[nav] ? nav : 'cs'));
+}
+{
+  const c = PRODUCT.contact;
+  $('contact').innerHTML = `
+  <div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><b>${c.person}</b></div>
+  <div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><a href="tel:${c.phone.replace(/\s/g, '')}" style="text-decoration:none"><b>${c.phone}</b></a></div>
+  <div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><a href="mailto:${c.email}" style="text-decoration:none"><b>${c.email}</b></a></div>
+  <div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><b>${c.web}</b></div>`;
+}
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .15 });
+document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+/* =====================================================================
+   KALKULAČKA NÁVRATNOSTI – <dialog id="calc">, otevírá tlačítko v horním panelu.
+   Srovnává indukci DTI-16 s horkým vzduchem i plynovým hořákem najednou (dva sloupce výsledků).
+   Výchozí hodnoty podle jazyka: CS = Kč (ČR), EN = € (průměr EU), DE = € (Německo); zdroje jsou v i18n.js → calc.src.
+   Jedno upnutí: ušetřený čas = (ohřev + chlazení) jiné metody − (ohřev + chlazení) indukce.
+   Za rok: ušetřené hodiny × sazba práce + rozdíl poškozených upínačů × cena upínače
+           + rozdíl energie (elektřina × cena kWh; hořák: propan CALC.gasKWh). Pořizovací cena a cena upínače se nezobrazují.
+   ===================================================================== */
+const CALC = {
+  /* peněžní výchozí hodnoty podle jazyka (při přepnutí jazyka se nastaví znovu) */
+  loc: {
+    /* price (pořizovací cena) a holder (cena upínače) se nezobrazují, počítá se s nimi jen v pozadí */
+    cs: { cur: 'CZK', price: 48400, labor: 480, holder: 5100, elec: 6 },
+    en: { cur: 'EUR', price: 1990, labor: 35, holder: 210, elec: 0.18 },
+    de: { cur: 'EUR', price: 1990, labor: 45, holder: 210, elec: 0.17 },
+  },
+  /* propan pro hořák za kWh tepla: 59,80 Kč/kg s DPH (Hornbach) → 49,4 Kč/kg bez DPH ÷ 12,8 kWh/kg ≈ 3,9 Kč/kWh; v € přepočteno 24,3 Kč/€ */
+  gasKWh: { CZK: 3.9, EUR: 0.16 },
+  /* rozsahy posuvníků [min, max, krok]; do políčka jde zadat i číslo mimo rozsah */
+  range: {
+    CZK: { labor: [200, 1000, 10], elec: [2, 12, 0.1] },
+    EUR: { labor: [10, 80, 1], elec: [0.08, 0.4, 0.01] },
+    any: { changes: [1, 30, 1], days: [150, 365, 1] },
+  },
+  base: { changes: 4, days: 250 },
+  /* jedno upnutí podle způsobu ohřevu: ohřev a chlazení (s), příkon (kW), poškozené upínače za rok */
+  method: {
+    Ind: { Heat: 20, Cool: 120, Pow: 1.2, Brk: 0 },   // Dawell DTI-16: ohřev do 20 s, chlazení stlačeným vzduchem ~120 s
+    Hot: { Heat: 120, Cool: 180, Pow: 2, Brk: 0 },    // horký vzduch: cyklus „několik minut“, horkovzdušná pistole ~2 kW
+    Gas: { Heat: 60, Cool: 180, Pow: 3.2, Brk: 1 },   // hořák: časy odhad (výrobci upínačů plamen nedoporučují); 250 g/h propanu ≈ 3,2 kW
+  },
+};
+const calcDlg = $('calc');
+const CALC_KEYS = ['changes', 'labor', 'days', 'elec'];   // viditelná pole (posuvník + číslo)
+const calcNum = {}, calcRng = {};   // číselná políčka c… a posuvníky s…
+CALC_KEYS.forEach(k => { const K = k[0].toUpperCase() + k.slice(1); calcNum[k] = $('c' + K); calcRng[k] = $('s' + K); });
+let calcLang = null;
+const calcLoc = () => ({ cs: 'cs-CZ', en: 'en-GB', de: 'de-DE' })[LANG];
+const numVal = el => { const x = parseFloat(String(el.value).replace(',', '.')); return isFinite(x) ? x : 0; };
+function rngFill(r) { const p = (numVal(r) - r.min) / ((r.max - r.min) || 1) * 100; r.style.setProperty('--p', Math.max(0, Math.min(100, p)) + '%'); }
+function syncRng(k) { const r = calcRng[k]; r.value = Math.max(+r.min, Math.min(+r.max, numVal(calcNum[k]))); rngFill(r); }
+function setRanges(cur) {
+  const R = { ...CALC.range.any, ...CALC.range[cur] };
+  CALC_KEYS.forEach(k => { const [a, b, s] = R[k], r = calcRng[k]; r.min = a; r.max = b; r.step = s; calcNum[k].step = s; });
+}
+function calcMonths(n) {
+  const f = T['calc.mo'], r = n < 10 ? Math.round(n * 10) / 10 : Math.round(n);
+  if (r < 1) return T['calc.lt1'];
+  const w = r % 1 ? f[3] : r === 1 ? f[0] : r <= 4 ? f[1] : f[2];   // cs: 1 měsíc / 2–4 měsíce / 5+ měsíců / 4,2 měsíce
+  return new Intl.NumberFormat(calcLoc(), { maximumFractionDigits: 1 }).format(r) + ' ' + w;
+}
+/* mezera před měnou smí zalomit (nezlomitelná → obyčejná), aby se částka vešla i do úzkého sloupce */
+const calcMoney = n => new Intl.NumberFormat(calcLoc(), { style: 'currency', currency: CALC.loc[LANG].cur, maximumFractionDigits: 0 })
+  .format(Math.round(n) || 0).replace(/[  ](?=[^\d\s]+$)/, ' ');
+function calcRun() {
+  const v = k => Math.max(0, numVal(calcNum[k]));
+  const m = (p, id) => Math.max(0, numVal($('m' + p + id)));
+  const nf = d => new Intl.NumberFormat(calcLoc(), { minimumFractionDigits: d, maximumFractionDigits: d });
+  const perYear = v('changes') * v('days');                          // upnutí za rok
+  const indCycle = m('Heat', 'Ind') + m('Cool', 'Ind');
+  const indKWh = m('Pow', 'Ind') * m('Heat', 'Ind') / 3600;
+  /* každá buňka říká, o kolik je indukce lepší („o 2,7 min rychleji“); kdyby uživatel zadal hodnoty, kdy je horší, napíše „horší“ oranžově */
+  const F = T['calc.fmt'];
+  const say = (el, x, txt, good, bad) => {
+    const same = Math.abs(x) < 0.5;
+    el.textContent = same ? F.same : (x > 0 ? F[good] : F[bad]).replace('{v}', txt);
+    el.classList.toggle('neg', !same && x < 0);
+  };
+  /* počítá se jen zvolené porovnání (přepínač #calcSeg: Hot = horký vzduch, Gas = plynový hořák) */
+  const id = calcMethod;
+  const sec = m('Heat', id) + m('Cool', id) - indCycle;               // ušetřené sekundy na jedno upnutí
+  const hours = perYear * sec / 3600;
+  const L = CALC.loc[LANG];                                            // skryté hodnoty: pořizovací cena a cena upínače
+  const labor = hours * v('labor');
+  const holders = (m('Brk', id) - m('Brk', 'Ind')) * L.holder;
+  const kWh = m('Pow', id) * m('Heat', id) / 3600;                    // hořák: teplo z propanu, horký vzduch: elektřina
+  const ePrice = id === 'Gas' ? CALC.gasKWh[L.cur] : v('elec');
+  const energy = perYear * (kWh * ePrice - indKWh * v('elec'));
+  const total = labor + holders + energy;
+  say($('rPer'), sec, nf(1).format(Math.abs(sec) / 60) + ' min', 'faster', 'slower');
+  say($('rHours'), hours, nf(0).format(Math.abs(hours)) + ' h', 'less', 'more');
+  say($('rLabor'), labor, calcMoney(Math.abs(labor)), 'lower', 'higher');
+  say($('rHolders'), holders, calcMoney(Math.abs(holders)), 'lower', 'higher');
+  say($('rEnergy'), energy, calcMoney(Math.abs(energy)), 'lower', 'higher');
+  $('rTot').textContent = calcMoney(total); $('rTot').classList.toggle('neg', total < 0);
+  $('rPay').textContent = total > 0 ? calcMonths(L.price / (total / 12)) : T['calc.na'];
+}
+let calcMethod = 'Hot';
+function calcSetMethod(id) {
+  calcMethod = id;
+  document.querySelectorAll('#calcSeg button').forEach(b => b.classList.toggle('on', b.dataset.m === id));
+  /* zvýraznit sloupec porovnávaného způsobu v tabulce časů (sloupce: popisek, Ind, Hot, Gas) */
+  const col = { Hot: 2, Gas: 3 }[id];
+  calcDlg.querySelectorAll('.mtab tr').forEach(tr => [...tr.children].forEach((c, i) => c.classList.toggle('sel', i === col)));
+  calcRun();
+}
+function calcDefaults() {
+  const L = CALC.loc[LANG]; calcLang = LANG; setRanges(L.cur);
+  CALC_KEYS.forEach(k => { calcNum[k].value = k in L ? L[k] : CALC.base[k]; syncRng(k); });
+  for (const id in CALC.method) for (const p in CALC.method[id]) { const el = $('m' + p + id); if (el) el.value = CALC.method[id][p]; }
+  calcSetMethod(calcMethod);
+}
+/* volá setLang(): při změně jazyka nastaví měnu, rozsahy posuvníků a peněžní výchozí hodnoty daného trhu */
+window.calcApplyLang = () => {
+  if (LANG !== calcLang) {
+    const L = CALC.loc[LANG]; calcLang = LANG; setRanges(L.cur);
+    ['labor', 'elec'].forEach(k => { calcNum[k].value = L[k]; });
+    CALC_KEYS.forEach(syncRng);
+  }
+  calcRun();
+};
+CALC_KEYS.forEach(k => {
+  calcRng[k].addEventListener('input', () => { calcNum[k].value = calcRng[k].value; rngFill(calcRng[k]); calcRun(); });
+  calcNum[k].addEventListener('input', () => { syncRng(k); calcRun(); });
+});
+calcDlg.querySelectorAll('.mtab input').forEach(i => i.addEventListener('input', calcRun));
+document.querySelectorAll('#calcSeg button').forEach(b => b.addEventListener('click', () => calcSetMethod(b.dataset.m)));
+$('calcReset').addEventListener('click', calcDefaults);
+$('calcBtn').addEventListener('click', () => calcDlg.showModal());
+$('calcClose').addEventListener('click', () => calcDlg.close());
+calcDlg.addEventListener('click', e => { if (e.target === calcDlg) calcDlg.close(); });   // klik na ztmavené pozadí
+calcDefaults();
+
+/* =====================================================================
+   ČASOVÁ OSA PROCESU – vše je funkcí globálního času t (s)
+   ===================================================================== */
+/* chlazení stlačeným vzduchem: reálně COOL_REAL s, v animaci zrychleně COOL_X× (pohyby běží normální rychlostí) */
+const COOL_REAL = 120, COOL_X = 10, COOL_A = 20, COOL_B = COOL_A + COOL_REAL / COOL_X;   // 20 → 32 s animace
+/* kroky: vložení (se starým vrtákem), zajetí do cívky, ohřev, vyjmutí vrtáku, nová fréza, vyjetí, chlazení, hotovo */
+const STEP_T = [0, 3, 5.6, 11, 14, 17, COOL_A, COOL_B + 0.5];
+const STEPS = STEP_T.map((t, i) => ({ t, get name() { return T.steps[i].name; }, get sub() { return T.steps[i].sub.replace('{x}', COOL_X); } }));
+const TOTAL = COOL_B + 4, LOOP_PAUSE = 2.4, T_AMB = 20, T_MAX = 300, BORE = 12.000, EXPAND = 0.040;
+const AXIS_Y = 17.6;              // výška osy upínače nad stolem (cm)
+/* konec přístroje podle fotky: vedení → pevná cívka (COIL_X) → teplotní čidlo (SENSOR_X) → čelo s mřížkou.
+   Upínač stojí na začátku v HOLDER_X0 a v držáku zajede tak, aby cívka obepnula úplný konec nosu (COIL_AT v souřadnicích upínače). */
+const COIL_X = 44, SENSOR_X = 48.3, COIL_AT = 19.5, HOLDER_X0 = 10, HOLDER_TRAVEL = COIL_X - COIL_AT - HOLDER_X0, TOOL_HOME = 24;
+/* reálný čas cyklu (s) – během chlazení běží COOL_X× rychleji než animace */
+const realTime = t => t < COOL_A ? t : t < COOL_B ? COOL_A + (t - COOL_A) * COOL_X : t + (COOL_B - COOL_A) * (COOL_X - 1);
+const mmss = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const easeInOut = p => p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const seg = (t, a, b, f = easeInOut) => f(clamp((t - a) / (b - a)));
+const fmt = (n, d) => n.toFixed(d).replace('.', T._meta.decimal);
+
+function phases(t) {
+  const holderIn = seg(t, 0.3, 2.6, easeOut);
+  const slideIn  = seg(t, 3.2, 5.3);       // upínač zajíždí do cívky
+  const drillOut = seg(t, 11.3, 13.2);     // starý vrták se vytáhne z roztaženého otvoru…
+  const lift     = seg(t, 13.2, 13.9);     // …a odloží nahoru
+  const toolIn   = seg(t, 14.3, 16.5);     // nová fréza
+  const slideOut = seg(t, 17.2, 19.4);     // upínač s nástrojem vyjíždí z cívky
+  const pressed  = t > 5.6 && t < 6.2;
+  const heatUp   = seg(t, 5.9, 10.8, easeOut);
+  const coolDown = seg(t, COOL_A, COOL_B, p => 1 - Math.pow(1 - p, 2.4));
+  const heat     = t < COOL_A ? heatUp : heatUp * (1 - coolDown);
+  const heating  = t >= 5.9 && t < 11;
+  const cooling  = t >= COOL_A && t < COOL_B;
+  const gunIn    = seg(t, COOL_A, COOL_A + 1.0);          // ofukovací pistole přijede…
+  const gunOut   = seg(t, COOL_B - 1.0, COOL_B);          // …a po chlazení odjede
+  const airOn    = t >= COOL_A + 0.9 && t < COOL_B - 0.9;
+  const done     = seg(t, COOL_B + 0.5, COOL_B + 1.3, easeOut);
+  let si = 0; for (let i = 0; i < STEPS.length; i++) if (t >= STEPS[i].t) si = i;
+  return { holderIn, slideIn, slideOut, drillOut, lift, toolIn, pressed, heatUp, heat, heating, cooling, gunIn, gunOut, airOn, done, si, temp: T_AMB + (T_MAX - T_AMB) * heat };
+}
+
+/* =====================================================================
+   3D SCÉNA
+   ===================================================================== */
+const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+let R = null; // runtime objects
+
+function canvasTex(w, h, draw, repeat) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = window.__maxAniso || 16;
+  if (repeat) { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(repeat[0], repeat[1]); }
+  return t;
+}
+function labelPlane(w, h, draw, opts = {}) {
+  const tex = canvasTex(Math.round(w * 64), Math.round(h * 64), draw);
+  const m = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, toneMapped: false, opacity: opts.opacity ?? 1 });
+  const p = new THREE.Mesh(new THREE.PlaneGeometry(w, h), m); p.renderOrder = 2; return p;
+}
+class Helix extends THREE.Curve {
+  constructor(r, pitch, turns, a0 = 0) { super(); this.r = r; this.pitch = pitch; this.turns = turns; this.a0 = a0; }
+  getPoint(t, o = new THREE.Vector3()) { const a = this.a0 + t * this.turns * Math.PI * 2; return o.set(t * this.turns * this.pitch - this.turns * this.pitch / 2, this.r * Math.cos(a), this.r * Math.sin(a)); }
+}
+function lathe(points, mat, segments = 96) {
+  const g = new THREE.LatheGeometry(points.map(p => new THREE.Vector2(p[1], p[0])), segments);
+  const m = new THREE.Mesh(g, mat); m.rotation.z = -Math.PI / 2; m.castShadow = true; m.receiveShadow = true; return m;
+}
+
+function init3D() {
+  const box = $('view3d');
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' }); }
+  catch (e) { $('nogl').style.display = 'grid'; $('loader').classList.add('hide'); return null; }
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  window.__maxAniso = renderer.capabilities.getMaxAnisotropy();
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  box.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  scene.background = canvasTex(4, 512, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#1b2129'); gr.addColorStop(.55, '#0f1216'); gr.addColorStop(1, '#0b0d10'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
+  scene.fog = new THREE.Fog(0x0b0d10, 110, 260);
+  const camera = new THREE.PerspectiveCamera(34, 1, 0.5, 600);
+  camera.position.set(-22, 26, 46);
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+
+  /* lights */
+  scene.add(new THREE.HemisphereLight(0x9fb3cc, 0x16110c, 0.35));
+  const key = new THREE.DirectionalLight(0xfff0dc, 1.5); key.position.set(-28, 70, 44); key.castShadow = true;
+  key.shadow.mapSize.set(4096, 4096); Object.assign(key.shadow.camera, { left: -42, right: 42, top: 30, bottom: -30, near: 10, far: 220 });
+  key.target.position.set(23, 8, 0); scene.add(key.target);
+  key.shadow.bias = -0.0004; key.shadow.normalBias = 0.03; scene.add(key);
+  const rim = new THREE.DirectionalLight(0x8fc8ff, 0.7); rim.position.set(60, 30, -50); scene.add(rim);
+  const heatLight = new THREE.PointLight(0xff6a14, 0, 30, 2); heatLight.position.set(16, AXIS_Y + 2.5, 5); scene.add(heatLight);
+
+  /* materials */
+  /* Dawell oranžová #FF702B – po ACES tone mappingu a osvětlení vychází na skříni nejvěrněji z tmavšího základu */
+  const matOrange = new THREE.MeshStandardMaterial({ color: 0xd23f0a, roughness: .5, metalness: .1, envMapIntensity: .7 });
+  const matBlack = new THREE.MeshStandardMaterial({ color: 0x15181c, roughness: .55, metalness: .35 });
+  const matSteel = new THREE.MeshStandardMaterial({ color: 0xdfe3e8, roughness: .2, metalness: 1, side: THREE.DoubleSide });
+  const matNose = new THREE.MeshStandardMaterial({ color: 0xdfe3e8, roughness: .24, metalness: 1, side: THREE.DoubleSide, emissive: 0x000000, emissiveIntensity: 1 });
+  const matCarbide = new THREE.MeshStandardMaterial({ color: 0x59616d, roughness: .3, metalness: .95 });
+  const matCeramic = new THREE.MeshStandardMaterial({ color: 0xf1efe6, roughness: .55, metalness: 0 });
+  const matRod = new THREE.MeshStandardMaterial({ color: 0xc9cfd6, roughness: .25, metalness: 1 });
+
+  /* table (svařovací stůl s otvory) */
+  const tableTex = canvasTex(1024, 1024, (g, w, h) => {
+    g.fillStyle = '#1c2026'; g.fillRect(0, 0, w, h);
+    for (let i = 0; i < 60000; i++) { g.fillStyle = `rgba(255,255,255,${Math.random() * .06})`; g.fillRect(Math.random() * w, Math.random() * h, 1.5, 1.5); }
+    for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
+      const x = 128 + i * 256, y = 128 + j * 256, r = 36;
+      const gr = g.createRadialGradient(x, y, r * .2, x, y, r); gr.addColorStop(0, '#04050a'); gr.addColorStop(.8, '#090b0f'); gr.addColorStop(1, '#2d3239');
+      g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = 2; g.stroke();
+    }
+  }, [10, 10]);
+  const table = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshStandardMaterial({ map: tableTex, bumpMap: tableTex, bumpScale: .15, roughness: .72, metalness: .3 }));
+  table.rotation.x = -Math.PI / 2; table.receiveShadow = true; scene.add(table);
+
+  /* ---------- device (podle produktové fotky: oranžová skříň se šikmým čelem, černý spodní pás) ---------- */
+  const device = new THREE.Group(); scene.add(device);
+  const addBox = (w, h, d, mat, x, y, z, r = .35, parent = device, seg = 3) => { const m = new THREE.Mesh(new THREE.RoundedBoxGeometry(w, h, d, seg, r), mat); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m; };
+  addBox(62, 3.2, 14, matBlack, 23, 1.6, 0, .3);
+  /* průřez skříně (z, y) před zaoblením 0,3: zadní stěna svislá, horní plocha rovná, čelo šikmé dolů dopředu */
+  const BZ = 6.7, BY = 3.5, TZ = 3.1, TY = 11.1;                 // spodní a horní hrana šikmého čela
+  const FA = Math.atan2(BZ - TZ, TY - BY);                        // sklon čela od svislice
+  const bodyShape = new THREE.Shape(); [[-BZ, BY], [-TZ, TY], [6.7, TY], [6.7, BY]].forEach((p, i) => i ? bodyShape.lineTo(p[0], p[1]) : bodyShape.moveTo(p[0], p[1]));   // x tvaru = −z světa
+  const body = new THREE.Mesh(new THREE.ExtrudeGeometry(bodyShape, { depth: 61.4, bevelEnabled: true, bevelThickness: .3, bevelSize: .3, bevelSegments: 3, curveSegments: 4 }), matOrange);
+  body.rotation.y = Math.PI / 2; body.position.x = -7.7; body.castShadow = true; body.receiveShadow = true; device.add(body);
+  /* čelní panel: skupina ležící v rovině šikmého čela (lokální z = ven z čela) */
+  const frontPanel = new THREE.Group(); device.add(frontPanel);
+  frontPanel.position.set(0, 7.6, BZ - (7.6 - BY) * (BZ - TZ) / (TY - BY)); frontPanel.rotation.x = -FA;
+  const FZ = .36;                                                  // odsazení dekálů nad zaobleným povrchem
+  const onFace = (m, x, y, z = FZ) => { m.position.set(x, y, z); frontPanel.add(m); return m; };
+  const zCylF = (r1, r2, h, mat, x, y, z0 = 0) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r2, h, 48), mat); m.rotation.x = Math.PI / 2; m.castShadow = true; return onFace(m, x, y, FZ + z0 + h / 2); };
+  const darkText = (txt, align = 'left') => (g, w, h) => { g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(20,20,20,.92)'; g.font = `700 ${h * .5}px Inter, Arial`; g.textAlign = align; g.textBaseline = 'middle'; g.fillText(txt, align === 'center' ? w / 2 : 4, h * .52); };
+  /* START/STOP: chromovaný rámeček, tmavé tlačítko, LED kroužek */
+  zCylF(1.05, 1.05, .25, matRod, -5.6, 2.1);
+  const btn = zCylF(.72, .76, .5, new THREE.MeshStandardMaterial({ color: 0x2a2f36, roughness: .4, metalness: .5 }), -5.6, 2.1, .1);
+  const led = new THREE.Mesh(new THREE.TorusGeometry(.86, .07, 12, 48), new THREE.MeshBasicMaterial({ color: 0x49d17d, toneMapped: false })); onFace(led, -5.6, 2.1, FZ + .27);
+  onFace(labelPlane(3.4, .7, darkText('START / STOP', 'center')), -5.6, .55);
+  /* regulace teploty: černý knoflík s ryskou a stupnicí */
+  onFace(labelPlane(3.2, 3.2, (g, w, h) => {
+    g.clearRect(0, 0, w, h); g.strokeStyle = 'rgba(20,20,20,.9)'; g.lineWidth = 4;
+    for (let a = -2.3; a <= 2.31; a += .46) { g.beginPath(); g.moveTo(w / 2 + Math.sin(a) * w * .36, h / 2 - Math.cos(a) * h * .36); g.lineTo(w / 2 + Math.sin(a) * w * .47, h / 2 - Math.cos(a) * h * .47); g.stroke(); }
+  }), -2.4, 2.1);
+  const knob = zCylF(.85, .95, .9, new THREE.MeshStandardMaterial({ color: 0x15181c, roughness: .55, metalness: .2 }), -2.4, 2.1);
+  const ptr = new THREE.Mesh(new THREE.BoxGeometry(.14, .62, .06), new THREE.MeshBasicMaterial({ color: 0xf2f2ee })); ptr.position.set(0, .45, -.25); ptr.rotation.x = -Math.PI / 2; knob.add(ptr); knob.rotation.y = .8;
+  onFace(labelPlane(5.6, 1.2, (g, w, h) => {
+    g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(20,20,20,.92)'; g.textBaseline = 'middle';
+    g.font = `800 ${h * .42}px Inter, Arial`; g.fillText('°C', 4, h * .3); g.font = `700 ${h * .3}px Inter, Arial`; g.fillText('TEMPERATURE', 4 + h * .62, h * .3); g.fillText('CONTROL', 4 + h * .62, h * .72);
+  }), 1.6, 2.1);
+  /* bílý štítek s logem DAWELL CZ (jako na fotce); nejdřív text, po načtení obrázku skutečné logo */
+  const drawPlate = (g, w, h, img) => {
+    g.clearRect(0, 0, w, h); g.fillStyle = '#f4f4f1'; g.beginPath(); g.roundRect ? g.roundRect(2, 2, w - 4, h - 4, h * .08) : g.rect(2, 2, w - 4, h - 4); g.fill();
+    if (img) { const lh = h * .78, lw = Math.min(w * .92, lh * img.naturalWidth / img.naturalHeight); g.drawImage(img, (w - lw) / 2, (h - lh) / 2, lw, lw * img.naturalHeight / img.naturalWidth); }
+    else { g.fillStyle = '#2b2b2b'; g.font = `800 ${h * .45}px Inter, Arial`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(PRODUCT.brand, w / 2, h / 2); }
+  };
+  const brand = onFace(labelPlane(9, 2.7, (g, w, h) => drawPlate(g, w, h, null)), -2.6, -1.6);
+  const logoImg = new Image(); logoImg.onload = () => { const c = brand.material.map.image; drawPlate(c.getContext('2d'), c.width, c.height, logoImg); brand.material.map.needsUpdate = true; }; logoImg.src = 'logo-dark.webp';
+  onFace(labelPlane(9, .6, darkText('INDUCTION SHRINK‑FIT HEATER' + (PRODUCT.model ? ' · ' + PRODUCT.model : ''), 'center')), -2.6, -3.35);
+  /* výstražný štítek na čele: žlutý trojúhelník s vykřičníkem (obecná výstraha) */
+  onFace(labelPlane(2.8, 2.5, (g, w, h) => {
+    const lw = w * .09, m = lw / 2 + 2;
+    g.clearRect(0, 0, w, h); g.lineJoin = 'round';
+    g.beginPath(); g.moveTo(w / 2, m); g.lineTo(w - m, h - m); g.lineTo(m, h - m); g.closePath();
+    g.fillStyle = '#f2c81c'; g.fill(); g.lineWidth = lw; g.strokeStyle = '#111'; g.stroke();
+    g.fillStyle = '#111';
+    g.beginPath(); g.moveTo(w * .465, h * .36); g.lineTo(w * .535, h * .36); g.lineTo(w * .515, h * .67); g.lineTo(w * .485, h * .67); g.closePath(); g.fill();
+    g.beginPath(); g.arc(w / 2, h * .77, w * .042, 0, Math.PI * 2); g.fill();
+  }), 33, .6);
+  /* větrací mřížka na pravém čele */
+  const grille = labelPlane(7, 5, (g, w, h) => {
+    g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(0,0,0,.85)';
+    for (let y = 10; y < h; y += 14) for (let x = 10; x < w; x += 14) { g.beginPath(); g.arc(x, y, 4, 0, Math.PI * 2); g.fill(); }
+  }); grille.rotation.y = Math.PI / 2; grille.position.set(54.04, 7.3, -1.2); device.add(grille);
+
+  /* lineární vedení uprostřed horní plochy (pod upínačem) až k cívce: drážka, ocelová lišta se šrouby */
+  addBox(39.5, .12, 3.6, new THREE.MeshStandardMaterial({ color: 0x1a1d22, roughness: .8 }), 21.25, 11.42, 0, .04);
+  addBox(38.5, .9, 2.6, matRod, 21.25, 11.85, 0, .12);
+  for (let x = 3.5; x <= 39.5; x += 3.1) { const h = new THREE.Mesh(new THREE.CircleGeometry(.3, 20), matBlack); h.rotation.x = -Math.PI / 2; h.position.set(x, 12.31, 0); device.add(h); }
+
+  /* pojízdný vozík: jezdec na liště + držák upínače (tvar V); jede společně s upínačem */
+  const sled = new THREE.Group(); scene.add(sled);
+  addBox(4, .6, 3.4, matBlack, 7.65, 12.6, 0, .12, sled);
+  const vShape = new THREE.Shape(); [[-3.5, 0], [3.5, 0], [3.5, 4.4], [2.5, 4.4], [0, 1.9], [-2.5, 4.4], [-3.5, 4.4]].forEach((p, i) => i ? vShape.lineTo(p[0], p[1]) : vShape.moveTo(p[0], p[1]));
+  const cradle = new THREE.Mesh(new THREE.ExtrudeGeometry(vShape, { depth: 2.5, bevelEnabled: true, bevelThickness: .15, bevelSize: .15, bevelSegments: 2 }), matBlack);
+  cradle.rotation.y = Math.PI / 2; cradle.position.set(6.4, 12.9, 0); cradle.castShadow = true; cradle.receiveShadow = true; sled.add(cradle);
+
+  /* ruční ofukovací pistole na konci hadice se stlačeným vzduchem: při chlazení přejíždí podél nosu upínače.
+     Počátek skupiny gun = hrot trysky, tryska míří po lokální ose +Z (natáčí se přes lookAt). */
+  const gun = new THREE.Group(); gun.visible = false; gun.scale.setScalar(1.25); scene.add(gun);
+  const matGun = new THREE.MeshStandardMaterial({ color: 0x23272d, roughness: .45, metalness: .2 });
+  const matBrass = new THREE.MeshStandardMaterial({ color: 0xc9a24a, roughness: .3, metalness: 1 });
+  const zCyl = (r1, r2, len, mat, z) => { const m = new THREE.Mesh(new THREE.CylinderGeometry(r1, r2, len, 24), mat); m.rotation.x = Math.PI / 2; m.position.z = z; m.castShadow = true; gun.add(m); return m; };
+  zCyl(.16, .3, .6, matBrass, -.3);          // hrot
+  zCyl(.2, .2, 6.5, matRod, -3.85);          // trubka trysky
+  zCyl(.42, .42, .8, matBrass, -7.3);        // převlečná matice
+  addBox(2.0, 2.6, 4.4, matGun, 0, .3, -9.6, .45, gun);                                  // tělo
+  addBox(1.7, 5.6, 2.3, matGun, 0, -3.0, -10.6, .5, gun).rotation.x = .28;               // rukojeť
+  addBox(.6, 2.4, .7, matRod, 0, -2.2, -8.2, .2, gun).rotation.x = .2;                   // spoušť
+  const gunHoseAt = V3(0, -3 - 4.0 * Math.cos(.28), -10.6 - 4.0 * Math.sin(.28));     // spodek rukojeti
+  const fit = new THREE.Mesh(new THREE.CylinderGeometry(.38, .38, 1.2, 20), matBrass); fit.rotation.x = .28;
+  fit.position.set(0, -3 - 3.4 * Math.cos(.28), -10.6 - 3.4 * Math.sin(.28)); gun.add(fit);
+  /* hadice: od rukojeti dolů za skříň a po stole pryč ze záběru; přestavuje se podle polohy pistole */
+  const hose = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial({ color: 0x2f8fe0, roughness: .45, metalness: 0 }));
+  hose.castShadow = true; hose.visible = false; scene.add(hose);
+  const updateHose = () => {
+    const p0 = gun.localToWorld(gunHoseAt.clone());
+    const c = new THREE.CatmullRomCurve3([p0, V3(p0.x, p0.y - 2.5, p0.z - 1.2), V3(p0.x - 1.5, 7, Math.min(p0.z - 5, -10)), V3(p0.x - 3, .35, Math.min(p0.z - 11, -16)), V3(p0.x - 8, .35, -60), V3(p0.x - 14, .35, -130)]);
+    hose.geometry.dispose(); hose.geometry = new THREE.TubeGeometry(c, 90, .32, 10, false);
+  };
+  const airTip = V3(15, AXIS_Y + 3, -3.6), airDir = V3(0, -2.1, 3.6).normalize();
+
+  /* ---------- holder (SK40 shrink-fit chuck) ---------- */
+  const holder = new THREE.Group(); scene.add(holder);
+  holder.position.y = AXIS_Y;
+  const bodyPts = [[-4, 0], [-4, .75], [-2.7, .75], [-2.7, 1.1], [-2.5, 1.3], [4.3, 2.22], [4.3, 3.15], [4.8, 3.15], [5.05, 2.75], [5.55, 2.75], [5.8, 3.15], [6.3, 3.15], [6.3, 2.0], [9.0, 2.0], [9.0, 0]];
+  holder.add(lathe(bodyPts, matSteel));
+  const nosePts = [[8.99, 0], [8.99, 2.0], [9.0, 1.6], [20.3, 1.18], [21, 1.0], [21, .62], [17, .62], [17, 0]];
+  const nose = lathe(nosePts, matNose); holder.add(nose);
+  const hMark = labelPlane(6, 1, (g, w, h) => { g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(0,0,0,.55)'; g.font = `600 ${h * .5}px JetBrains Mono, monospace`; g.fillText('ISO40  SHRINK Ø12', 6, h * .68); }, { opacity: .9 });
+  hMark.position.set(12.2, 1.45, .5); hMark.rotation.x = -Math.PI / 2 + .35; holder.add(hMark);
+
+  /* ---------- tool (carbide end mill) ---------- */
+  const tool = new THREE.Group(); scene.add(tool); tool.position.y = AXIS_Y;
+  const shank = new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, 8, 48), matCarbide); shank.rotation.z = -Math.PI / 2; shank.position.x = 21; shank.castShadow = true; tool.add(shank);
+  const fluteTex = canvasTex(256, 256, (g, w, h) => {
+    g.fillStyle = '#737c88'; g.fillRect(0, 0, w, h); g.strokeStyle = '#2b3038'; g.lineWidth = 14;
+    for (let i = -4; i < 8; i++) { g.beginPath(); g.moveTo(i * 48, h + 40); g.lineTo(i * 48 + 150, -40); g.stroke(); }
+  }, [5, 1]);
+  const flutes = new THREE.Mesh(new THREE.CylinderGeometry(.64, .64, 6.2, 48), new THREE.MeshStandardMaterial({ map: fluteTex, roughness: .35, metalness: .9 }));
+  flutes.rotation.z = -Math.PI / 2; flutes.position.x = 28.1; flutes.castShadow = true; tool.add(flutes);
+  const tip = new THREE.Mesh(new THREE.ConeGeometry(.64, .35, 48), matCarbide); tip.rotation.z = -Math.PI / 2; tip.position.x = 31.37; tool.add(tip);
+
+  /* ---------- konec přístroje podle fotky: cívka z bílého opleteného kabelu, čidlo, černý oblouk ---------- */
+  const coil = new THREE.Group(); scene.add(coil); coil.position.set(COIL_X, AXIS_Y, 0);
+  /* 2,5 závitu: začátek vzadu, konec vpředu, oba konce míří dolů k průchodkám v horní ploše */
+  const helix = new Helix(2.7, 1.15, 2.5, -Math.PI / 2);
+  const braidTex = canvasTex(128, 64, (g, w, h) => {
+    g.fillStyle = '#ecebe5'; g.fillRect(0, 0, w, h); g.strokeStyle = 'rgba(120,118,108,.45)'; g.lineWidth = 3;
+    for (let i = -4; i < 10; i++) { g.beginPath(); g.moveTo(i * 16, 0); g.lineTo(i * 16 + 32, h); g.stroke(); g.beginPath(); g.moveTo(i * 16 + 32, 0); g.lineTo(i * 16, h); g.stroke(); }
+  }, [70, 2]);
+  const matBraid = new THREE.MeshStandardMaterial({ map: braidTex, color: 0xd9d7cf, roughness: .85, metalness: 0 });
+  const coilMesh = new THREE.Mesh(new THREE.TubeGeometry(helix, 300, .42, 16, false), matBraid); coilMesh.castShadow = true; coil.add(coilMesh);
+  /* přívody v černé smršťovací bužírce dolů do dvou průchodek (vzadu a vpředu, jako na fotce) */
+  const TOP = 11.4 - AXIS_Y;                                         // horní plocha skříně v souřadnicích cívky
+  const matShrink = new THREE.MeshStandardMaterial({ color: 0x1c1e22, roughness: .45, metalness: .1 });
+  const holeMat = new THREE.MeshBasicMaterial({ color: 0x050607 });
+  const lead = (p0, s) => {   // s = −1 vzadu, +1 vpředu
+    const zh = s > 0 ? 2.2 : -3.2, xh = p0.x + s * .45;
+    const c = new THREE.CatmullRomCurve3([p0.clone().add(V3(-s * .2, .25, 0)), p0, V3(p0.x + s * .1, -1.2, p0.z + s * .1), V3(xh, -3.8, (p0.z + zh) / 2), V3(xh, TOP + .6, zh), V3(xh, TOP - .4, zh)]);
+    const m = new THREE.Mesh(new THREE.TubeGeometry(c, 64, .44, 14, false), matShrink); m.castShadow = true; coil.add(m);
+    const gr = new THREE.Mesh(new THREE.TorusGeometry(.62, .17, 12, 32), matBlack); gr.rotation.x = Math.PI / 2; gr.position.set(xh, TOP + .03, zh); coil.add(gr);
+    const hole = new THREE.Mesh(new THREE.CircleGeometry(.62, 24), holeMat); hole.rotation.x = -Math.PI / 2; hole.position.set(xh, TOP + .02, zh); coil.add(hole);
+  };
+  lead(helix.getPoint(0), -1); lead(helix.getPoint(1), 1);
+
+  /* teplotní čidlo hned za cívkou v ose upínače: černá patka a sloupek, bílá keramická hlava se šrouby
+     nakloněná čočkou na konec nosu. Vršek hlavy ~16,3 cm, aby nad ní prošel vytahovaný vrták i nová fréza. */
+  const sensor = new THREE.Group(); scene.add(sensor); sensor.position.set(SENSOR_X, 11.4, 0);
+  addBox(3.4, .45, 3.4, matBlack, 0, .22, 0, .12, sensor);                // patka s lemem
+  addBox(2.0, 2.5, 2.0, matBlack, 0, 1.7, 0, .1, sensor);                  // hranatý sloupek
+  const sHead = new THREE.Group(); sHead.position.set(-.1, 3.7, 0); sHead.rotation.z = -.32; sensor.add(sHead);   // nakloněná ke konci nosu
+  addBox(2.6, 1.5, 2.0, matCeramic, 0, 0, 0, .15, sHead);
+  const matScrewDark = new THREE.MeshStandardMaterial({ color: 0x3a3f46, roughness: .4, metalness: .8 });
+  [[-.55, .35], [.45, -.35]].forEach(([x, z]) => { const s = new THREE.Mesh(new THREE.CylinderGeometry(.24, .24, .08, 16), matScrewDark); s.position.set(x, .76, z); sHead.add(s); });
+  const screw = new THREE.Mesh(new THREE.CylinderGeometry(.38, .38, .22, 6), matRod); screw.rotation.x = Math.PI / 2; screw.position.set(.35, -.3, 1.05); sHead.add(screw);   // imbusový šroub z boku
+  const lens = new THREE.Mesh(new THREE.CircleGeometry(.45, 24), new THREE.MeshStandardMaterial({ color: 0x15181c, roughness: .2, metalness: .6 })); lens.rotation.y = -Math.PI / 2; lens.position.set(-1.31, 0, 0); sHead.add(lens);
+
+  /* černý plechový oblouk přes cívku: zadní noha svisle podél zadní stěny, přední po šikmém čele, šrouby dole.
+     Profil (z, y) vytažený podél x. Během ohřevu a výměny se zprůhlední (render3D), aby byl vidět děj uvnitř. */
+  const matArch = new THREE.MeshStandardMaterial({ color: 0x15181c, roughness: .6, metalness: .3, transparent: true });
+  const arch = new THREE.Group(); scene.add(arch);
+  {
+    const T = .28, Rr = 1.8, zb = -7.05, yb = 2.0, zf = 3.5, yt = 23.6, yBend = 11.25, yLow = 3.9;
+    const slope = (yBend - yLow) * (BZ - TZ) / (TY - BY);         // vodorovný posun přední nohy po šikmém čele
+    const s = new THREE.Shape();
+    s.moveTo(zb - T, yb); s.lineTo(zb - T, yt - Rr);
+    s.absarc(zb + Rr, yt - Rr, Rr + T, Math.PI, Math.PI / 2, true);
+    s.absarc(zf - Rr, yt - Rr, Rr + T, Math.PI / 2, 0, true);
+    s.lineTo(zf + T, yBend); s.lineTo(zf + T + slope, yLow); s.lineTo(zf + slope, yLow); s.lineTo(zf, yBend);
+    s.absarc(zf - Rr, yt - Rr, Rr, 0, Math.PI / 2, false);
+    s.absarc(zb + Rr, yt - Rr, Rr, Math.PI / 2, Math.PI, false);
+    s.lineTo(zb, yb); s.closePath();
+    const D = 5.6;
+    const m = new THREE.Mesh(new THREE.ExtrudeGeometry(s, { depth: D, bevelEnabled: true, bevelThickness: .05, bevelSize: .05, bevelSegments: 1, curveSegments: 16 }), matArch);
+    m.rotation.y = -Math.PI / 2; m.position.x = COIL_X + D / 2; m.castShadow = true; m.receiveShadow = true; arch.add(m);
+    const n = V3(0, BZ - TZ, TY - BY).normalize(), yS = 5.0, zS = zf + T + (yBend - yS) * (BZ - TZ) / (TY - BY);
+    [-1.8, 1.8].forEach(dx => { const sc = new THREE.Mesh(new THREE.CylinderGeometry(.32, .32, .14, 20), matArch); sc.quaternion.setFromUnitVectors(V3(0, 1, 0), n); sc.position.set(COIL_X + dx, yS, zS).addScaledVector(n, .07); arch.add(sc); });
+  }
+
+  /* ---------- starý vrták (v upínači od začátku; po ohřevu se vytáhne) – potomek upínače ---------- */
+  const drill = new THREE.Group(); holder.add(drill);
+  const drillTex = canvasTex(256, 256, (g, w, h) => {
+    g.fillStyle = '#c9a24a'; g.fillRect(0, 0, w, h); g.strokeStyle = '#5a4316'; g.lineWidth = 22;
+    for (let i = -4; i < 8; i++) { g.beginPath(); g.moveTo(i * 64, h + 40); g.lineTo(i * 64 + 110, -40); g.stroke(); }
+  }, [4, 1]);
+  const dShank = new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, 6, 40), matSteel); dShank.rotation.z = -Math.PI / 2; dShank.position.x = 20; dShank.castShadow = true; drill.add(dShank);
+  const dBody = new THREE.Mesh(new THREE.CylinderGeometry(.6, .6, 6.6, 40), new THREE.MeshStandardMaterial({ map: drillTex, roughness: .35, metalness: .85 }));
+  dBody.rotation.z = -Math.PI / 2; dBody.position.x = 26.3; dBody.castShadow = true; drill.add(dBody);
+  const dTip = new THREE.Mesh(new THREE.ConeGeometry(.6, .36, 40), new THREE.MeshStandardMaterial({ color: 0xc9a24a, roughness: .35, metalness: .85 })); dTip.rotation.z = -Math.PI / 2; dTip.position.x = 29.78; drill.add(dTip);
+  /* field rings (visible while heating) */
+  const rings = [];
+  for (let i = 0; i < 4; i++) {
+    const rm = new THREE.Mesh(new THREE.TorusGeometry(3.5, .05, 8, 96), new THREE.MeshBasicMaterial({ color: 0xff9a3c, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false }));
+    rm.rotation.y = Math.PI / 2; coil.add(rm); rings.push(rm);
+  }
+
+  /* ---------- particles ---------- */
+  const spriteTex = canvasTex(64, 64, (g, w, h) => { const gr = g.createRadialGradient(32, 32, 0, 32, 32, 32); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.35, 'rgba(255,255,255,.6)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, w, h); });
+  function particles(n, color, size, parent = scene) {
+    const pos = new Float32Array(n * 3), life = new Float32Array(n);
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({ map: spriteTex, color, size, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+    const pts = new THREE.Points(geo, mat); pts.frustumCulled = false; parent.add(pts);
+    return { pts, pos, life, n, mat, geo };
+  }
+  /* teplo: souřadnice v soustavě upínače (jede s ním); vzduch: světové souřadnice od trysek k nosu */
+  const heatP = particles(140, 0xffa24a, .22, holder), coolP = particles(320, 0x8fd8ff, .3);
+  coolP.vel = new Float32Array(coolP.n * 3); coolP.hit = new Uint8Array(coolP.n);
+  const resetHeat = (i, rnd) => { heatP.pos[i * 3] = COIL_AT - 2.5 + Math.random() * 4; heatP.pos[i * 3 + 1] = 1.1 + (rnd ? Math.random() * 4 : 0); heatP.pos[i * 3 + 2] = (Math.random() - .5) * 1.6; heatP.life[i] = .4 + Math.random() * .8; };
+  const resetCool = (i, rnd) => {   // proud z hrotu pistole v kuželu kolem airDir
+    const k = i * 3, s = rnd ? Math.random() * 4 : Math.random() * .4, sp = 12 + Math.random() * 6;
+    coolP.pos[k] = airTip.x + airDir.x * s; coolP.pos[k + 1] = airTip.y + airDir.y * s; coolP.pos[k + 2] = airTip.z + airDir.z * s;
+    coolP.vel[k] = airDir.x * sp + (Math.random() - .5) * 3; coolP.vel[k + 1] = airDir.y * sp + (Math.random() - .5) * 2.2; coolP.vel[k + 2] = airDir.z * sp + (Math.random() - .5) * 1.5;
+    coolP.hit[i] = 0;
+  };
+  for (let i = 0; i < heatP.n; i++) resetHeat(i, true);
+  for (let i = 0; i < coolP.n; i++) resetCool(i, true);
+
+  /* ---------- post-processing ---------- */
+  /* HDR buffer + bloom + vlastní ACES tone mapping a převod do sRGB (uvnitř composeru se tone mapping rendereru neaplikuje) */
+  // samples: MSAA vyhlazování hran i uvnitř post-processingu (WebGL2); bez něj jsou hrany zubaté
+  const hdrTarget = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: renderer.capabilities.isWebGL2 ? 8 : 0 });
+  const composer = new THREE.EffectComposer(renderer, hdrTarget);
+  composer.addPass(new THREE.RenderPass(scene, camera));
+  const bloom = new THREE.UnrealBloomPass(new THREE.Vector2(1, 1), 0.9, 0.5, 1.0); composer.addPass(bloom);
+  const ToneShader = {
+    uniforms: { tDiffuse: { value: null }, exposure: { value: 1.05 } },
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
+    fragmentShader: `uniform sampler2D tDiffuse; uniform float exposure; varying vec2 vUv;
+      vec3 aces(vec3 x){ const float a=2.51, b=0.03, c=2.43, d=0.59, e=0.14; return clamp((x*(a*x+b))/(x*(c*x+d)+e), 0.0, 1.0); }
+      void main(){ vec3 c = texture2D(tDiffuse, vUv).rgb * exposure; c = aces(c); gl_FragColor = vec4(pow(c, vec3(1.0/2.2)), 1.0); }`
+  };
+  composer.addPass(new THREE.ShaderPass(ToneShader));
+
+  /* ---------- controls ---------- */
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.dampingFactor = .08; controls.minDistance = 10; controls.maxDistance = 140; controls.maxPolarAngle = Math.PI / 2 - .04;
+  controls.target.set(20, 11, 0);
+  controls.addEventListener('start', () => { R.userCam = true; R.userCamSince = performance.now(); $('btnCam').classList.remove('on'); });
+
+  function resize() {
+    const w = box.clientWidth, h = box.clientHeight; if (!w || !h) return;
+    camera.aspect = w / h; camera.updateProjectionMatrix();
+    renderer.setSize(w, h, false); composer.setSize(w, h);
+  }
+  new ResizeObserver(resize).observe(box); resize();
+
+  return { renderer, scene, camera, composer, controls, holder, sled, nose, matNose, tool, drill, sensor, arch, matArch, frontPanel, coil, gun, hose, updateHose, airTip, airDir, rings, led, btn, heatLight, heatP, coolP, resetHeat, resetCool, knob, userCam: false, userCamSince: 0, autoCam: true };
+}
+
+/* kamera – klíčové snímky pro jednotlivé kroky */
+const CAM = [
+  { pos: V3(-26, 30, 66), look: V3(19, 10, 0) },      // vložení upínače se starým vrtákem (vidět i ovládání a logo na čele)
+  { pos: V3(42, 24, 52), look: V3(32, 14, 0) },       // zajetí do cívky
+  { pos: V3(36, 27, 40), look: V3(46, 15.5, 0) },     // ohřev konce upínače, čidlo hned za cívkou
+  { pos: V3(70, 22, 32), look: V3(56, 17, 0) },       // vyjmutí starého vrtáku
+  { pos: V3(74, 19, 30), look: V3(54, 17, 0) },       // zasunutí nové frézy
+  { pos: V3(46, 26, 48), look: V3(33, 15, 0) },       // vyjetí z cívky
+  { pos: V3(6, 34, 44), look: V3(25, 16, -4) },       // chlazení vzduchem
+  { pos: V3(-20, 28, 62), look: V3(21, 11, 0) },      // hotovo
+];
+
+/* 3D popisky (texty v i18n.js → labels, stejné pořadí) */
+const LABELS = [
+  { at: () => R.holder.localToWorld(V3(2, 4.0, 0)), show: t => t > 1.8 && t < 3.2 },
+  { at: () => R.sled.localToWorld(V3(7.6, 16.6, 3.0)), show: t => t > 2.2 && t < 3.2 },
+  { at: () => R.frontPanel.localToWorld(V3(-2.4, 2.1, 1.2)), show: t => t > .4 && t < 1.8 },
+  { at: () => R.coil.localToWorld(V3(0, 3.6, 0)), show: t => t > 3.4 && t < 5.6 },
+  { at: () => V3(9, 12.6, 1.4), show: t => t > 3.8 && t < 5.6 },
+  { at: () => R.sensor.localToWorld(V3(0, 5.2, 0)), show: t => t > 6.2 && t < 8.2 },
+  { cls: 'hot', at: () => R.holder.localToWorld(V3(COIL_AT, 2.6, 0)), show: t => t > 8.2 && t < 11 },
+  { at: () => R.drill.localToWorld(V3(27, 1.3, 0)), show: t => t > 11.4 && t < 13.2 },
+  { at: () => R.tool.localToWorld(V3(28, 1.3, 0)), show: t => t > 15.0 && t < 16.8 },
+  { at: () => R.gun.localToWorld(V3(0, 2.2, -9.6)), show: t => t > COOL_A + 1 && t < COOL_A + 4 },
+  { at: () => R.holder.localToWorld(V3(15, 2.6, 0)), show: t => t > COOL_A + 4 && t < COOL_B - .4 },
+  { cls: 'ok', at: () => R.holder.localToWorld(V3(19, 2.6, 0)), show: t => t > COOL_B + .9 },
+];
+
+const el = {
+  ringHot: $('ringHot'), bore: $('boreCircle'), shank: $('shankCircle'), clampArrows: $('clampArrows'), fitText: $('fitText'), boreDim: $('boreDim'),
+  roTemp: $('roTemp'), roTempBar: $('roTempBar'), roTime: $('roTime'),roStatus: $('roStatus'), roStatusText: $('roStatusText'),
+  stepNum: $('stepNum'), stepName: $('stepName'), stepSub: $('stepSub'), steps: $('steps'), scrubFill: $('scrubFill'), scrubKnob: $('scrubKnob'), phaseBar: $('phaseBar'), labels: $('labels'),
+  fast: $('fast'), fastReal: $('fastReal'),
+};
+{ const fb = document.createElement('div'); fb.className = 'fastband'; fb.style.left = (COOL_A / TOTAL * 100) + '%'; fb.style.width = ((COOL_B - COOL_A) / TOTAL * 100) + '%'; $('scrub').insertBefore(fb, el.scrubFill); }
+STEPS.forEach((s, i) => {
+  const b = document.createElement('button'); b.className = 'step'; b.innerHTML = `<span class="k">0${i + 1}</span>${s.name}`;
+  b.addEventListener('click', () => seek(s.t + 0.01)); el.steps.appendChild(b);
+  const ph = document.createElement('i'); el.phaseBar.appendChild(ph);
+  const mk = document.createElement('div'); mk.className = 'mark'; mk.style.left = (s.t / TOTAL * 100) + '%'; $('scrub').appendChild(mk);
+});
+const stepBtns = [...el.steps.children], phaseEls = [...el.phaseBar.children];
+const labelEls = LABELS.map((l, i) => { const d = document.createElement('div'); d.className = 'lab'; d.innerHTML = `<span class="tag ${l.cls || ''}">${T.labels[i]}</span><i></i>`; el.labels.appendChild(d); return d; });
+function applyLangToAnim() {
+  labelEls.forEach((d, i) => d.querySelector('.tag').textContent = T.labels[i]);
+  stepBtns.forEach((b, i) => b.innerHTML = `<span class="k">0${i + 1}</span>${T.steps[i].name}`);
+  curStep = -1; if (R) $('camHint').textContent = R.autoCam ? T['anim.camhint'] : T['anim.camfree'];
+  $('btnSpeed').textContent = (speed + '×').replace('.', T._meta.decimal);
+  $('fastTxt').textContent = T['anim.fast'].replace('{x}', COOL_X);
+}
+
+let t = 0, playing = true, speed = 1, last = performance.now(), pauseLeft = 0, curStep = -1, inView = true;
+animReady = true; applyLangToAnim();
+const hotColor = new THREE.Color(), cA = new THREE.Color(0x000000), cB = new THREE.Color(0x8a1a05), cC = new THREE.Color(0xe82a04), cD = new THREE.Color(0xff6a12);
+const tmpV = new THREE.Vector3();
+
+function render3D(t, dt, P) {
+  const { holderIn, slideIn, slideOut, drillOut, lift, toolIn, pressed, heat, heating, cooling, airOn, si } = P;
+  const hx = HOLDER_X0 + HOLDER_TRAVEL * (slideIn - slideOut);   // upínač v držáku jede po vedení do pevné cívky a zpět
+  R.holder.position.set(hx - 9 * (1 - holderIn), AXIS_Y + 13 * (1 - holderIn), 0);
+  R.holder.rotation.z = .12 * (1 - holderIn);
+  R.sled.position.x = hx;
+  /* starý vrták: od začátku v upínači, po ohřevu se vytáhne ven a odloží nahoru */
+  R.drill.visible = t < 13.9;
+  R.drill.position.set(14 * drillOut, 7 * lift, 0);
+  R.tool.visible = t > 14.0 && t < TOTAL + LOOP_PAUSE;
+  R.tool.position.x = hx + TOOL_HOME * (1 - toolIn);
+  R.heatLight.position.x = hx + COIL_AT;
+  /* oblouk nad cívkou: v přehledu plný, od zajetí do cívky po začátek chlazení průhledný, aby byl vidět děj uvnitř */
+  const ghost = seg(t, 2.6, 3.2) * (1 - seg(t, COOL_A, COOL_A + 1));
+  R.matArch.opacity = 1 - .78 * ghost; R.matArch.depthWrite = ghost < .01;
+  R.arch.children.forEach(m => { m.castShadow = ghost < .5; });
+  /* ofukovací pistole: přijede zezadu, ručně přejíždí podél nosu (normální rychlostí), na konci odjede */
+  const gp = P.gunIn * (1 - P.gunOut);
+  R.gun.visible = R.hose.visible = gp > .001;
+  if (R.gun.visible) {
+    const ph = (t - COOL_A) * Math.PI * 2 / 3.4, sx = hx + 15 + 5 * Math.sin(ph);
+    R.gun.position.set(sx + 3.4 + 4 * (1 - gp), AXIS_Y + 3 + 9 * (1 - gp), -3.4 - 12 * (1 - gp));   // drží se šikmo zezadu zprava
+    R.gun.lookAt(tmpV.set(sx + 1.2 * Math.cos(ph), AXIS_Y + .9, 0));   // míří na horní stranu nosu, lehce ve směru pohybu
+    R.gun.updateMatrixWorld(); R.updateHose();
+    R.airTip.copy(R.gun.position); R.gun.getWorldDirection(R.airDir);
+  }
+
+  /* heat */
+  if (heat < .5) hotColor.copy(cA).lerp(cC, heat * 2); else hotColor.copy(cC).lerp(cD, (heat - .5) * 1.4);
+  R.matNose.emissive.copy(hotColor); R.matNose.emissiveIntensity = 0.1 + heat * 0.9;
+  R.matNose.color.setRGB(.87 - .62 * heat, .89 - .78 * heat, .91 - .86 * heat);   // horká ocel tmavne a matní
+  R.matNose.roughness = .24 + .4 * heat; R.matNose.metalness = 1 - .45 * heat;
+  R.heatLight.intensity = heat * 1.3;
+  R.matNose.envMapIntensity = 1 - .75 * heat;
+  R.btn.position.z = pressed ? .5 : .71;   // tlačítko START na šikmém čele se při stisku zamáčkne
+  R.led.material.color.setHex(heating || pressed ? 0xff8a2a : 0x49d17d);
+  R.led.material.opacity = 1; R.led.material.transparent = true; R.led.material.opacity = heating ? .6 + .4 * Math.sin(t * 16) : (pressed ? 1 : .55);
+
+  /* field rings */
+  R.rings.forEach((r, i) => {
+    const ph = ((t * .9 + i / R.rings.length) % 1);
+    const s = 1 + ph * 1.1; r.scale.set(1, s, s); r.position.x = (ph - .5) * .6;
+    r.material.opacity = heating ? (1 - ph) * .6 * clamp(P.heatUp * 3) : 0;
+  });
+
+  /* particles */
+  const hp = R.heatP; hp.mat.opacity = clamp((heat - .25) / .5) * .42 * (t < COOL_A ? 1 : .4);
+  if (hp.mat.opacity > 0) {
+    for (let i = 0; i < hp.n; i++) { hp.pos[i * 3 + 1] += dt * (2.5 + hp.life[i] * 2); hp.pos[i * 3] += Math.sin(t * 3 + i) * dt * .6; if (hp.pos[i * 3 + 1] > 5.5) R.resetHeat(i, false); }
+    hp.geo.attributes.position.needsUpdate = true;
+  }
+  /* proud vzduchu z trysek: letí k nosu, od povrchu se odrazí a rozptýlí */
+  const cp = R.coolP; cp.mat.opacity = airOn ? .75 * clamp(heat * 4 + .35) : 0;
+  if (airOn) {
+    const nx0 = hx + 9, nx1 = hx + 21;
+    for (let i = 0; i < cp.n; i++) {
+      const k = i * 3; let x = cp.pos[k] += cp.vel[k] * dt, y = cp.pos[k + 1] += cp.vel[k + 1] * dt, z = cp.pos[k + 2] += cp.vel[k + 2] * dt;
+      const dy = y - AXIS_Y, r = Math.hypot(dy, z);
+      if (!cp.hit[i] && r < 1.35 && x > nx0 && x < nx1) {
+        const ny = dy / r, nz = z / r, dot = cp.vel[k + 1] * ny + cp.vel[k + 2] * nz;
+        cp.vel[k + 1] = (cp.vel[k + 1] - 2 * dot * ny) * .45 + (Math.random() - .3) * 2; cp.vel[k + 2] = (cp.vel[k + 2] - 2 * dot * nz) * .45 + Math.random() * 3;
+        cp.vel[k] += (Math.random() - .5) * 6; cp.hit[i] = 1;
+      }
+      if (z > 8 || Math.abs(dy) > 7 || x < nx0 - 4 || x > nx1 + 4) R.resetCool(i, false);
+    }
+    cp.geo.attributes.position.needsUpdate = true;
+  }
+
+  /* camera */
+  const now = performance.now();
+  if (R.userCam && R.autoCam && now - R.userCamSince > 7000) R.userCam = false;
+  if (!R.userCam && R.autoCam) {
+    const k = CAM[si]; const drift = Math.sin(t * .5) * .8, drift2 = Math.cos(t * .37) * .5;
+    const orbit = si === 7 ? (t - STEP_T[7]) * .06 : si === 6 ? (t - COOL_A) * .03 : 0;
+    const px = k.pos.x + drift + Math.sin(orbit) * 8, pz = k.pos.z + drift2 + (Math.cos(orbit) - 1) * 8;
+    const a = 1 - Math.exp(-dt * 2.4);
+    R.camera.position.lerp(tmpV.set(px, k.pos.y + drift2 * .5, pz), a);
+    R.controls.target.lerp(k.look, a);
+  }
+  R.controls.update();
+  R.composer.render();
+
+  /* labels */
+  const w = el.labels.clientWidth, h = el.labels.clientHeight;
+  LABELS.forEach((l, i) => {
+    const d = labelEls[i], vis = l.show(t) && w > 700;
+    d.classList.toggle('show', vis); if (!vis) return;
+    const p = l.at().project(R.camera);
+    if (p.z > 1) { d.classList.remove('show'); return; }
+    d.style.left = ((p.x + 1) / 2 * w) + 'px'; d.style.top = ((1 - p.y) / 2 * h - 30) + 'px';
+  });
+}
+
+function renderUI(t, P) {
+  const { heat, heating, toolIn, si, temp } = P;
+  const boreR = 18 + 7 * heat; el.bore.setAttribute('r', boreR); el.ringHot.setAttribute('opacity', heat);
+  /* v otvoru je stopka: na začátku starý vrták (do jeho vytažení), na konci nová fréza */
+  const shankIn = t < 11.3 || toolIn > .95;
+  el.shank.setAttribute('opacity', shankIn ? 1 : 0);
+  const clamped = shankIn ? clamp((1 - heat - .85) / .15) : 0;
+  el.clampArrows.setAttribute('opacity', clamped); el.fitText.setAttribute('opacity', clamped);
+  const boreD = BORE + EXPAND * heat; el.boreDim.textContent = 'Ø' + fmt(boreD, 3); el.boreDim.style.fill = heat > .05 ? '#FFD37A' : '#EEF0F3';
+  el.roTemp.textContent = Math.round(temp); el.roTempBar.style.width = (heat * 100) + '%';
+  el.roTime.textContent = fmt(realTime(Math.min(t, TOTAL)), 1);
+  const fastOn = P.cooling; el.fast.classList.toggle('show', fastOn);
+  if (fastOn) el.fastReal.textContent = `${T['anim.real']} ${mmss((t - COOL_A) * COOL_X)} / ${mmss(COOL_REAL)}`;
+  let st = 'idle', stKey = 'idle';
+  if (heating) { st = 'heat'; stKey = 'heat'; } else if (t >= 11 && t < COOL_A) { st = 'heat'; stKey = 'expanded'; }
+  else if (t >= COOL_A && t < COOL_B) { st = 'cool'; stKey = 'cool'; } else if (t >= COOL_B) { st = 'ok'; stKey = 'ok'; }
+  el.roStatus.dataset.state = st; el.roStatusText.textContent = T.status[stKey];
+  if (si !== curStep) {
+    curStep = si; el.stepNum.textContent = `0${si + 1} / 0${STEPS.length}`; el.stepName.textContent = STEPS[si].name; el.stepSub.textContent = STEPS[si].sub;
+    stepBtns.forEach((b, i) => { b.classList.toggle('active', i === si); b.classList.toggle('done', i < si); });
+    phaseEls.forEach((p, i) => { p.classList.toggle('on', i === si); p.classList.toggle('done', i < si); });
+    if (R) { R.userCam = false; }
+  }
+  const pct = clamp(t / TOTAL) * 100; el.scrubFill.style.width = pct + '%'; el.scrubKnob.style.left = pct + '%';
+}
+
+function frame(now) {
+  const dtRaw = Math.min(0.05, (now - last) / 1000); last = now; const dt = dtRaw * speed;
+  if (playing && inView) {
+    if (pauseLeft > 0) { pauseLeft -= dt; if (pauseLeft <= 0) { t = 0; curStep = -1; } }
+    else { t += dt; if (t >= TOTAL) { t = TOTAL; pauseLeft = LOOP_PAUSE; } }
+  }
+  const P = phases(t);
+  renderUI(t, P);
+  if (R && inView) render3D(t, dt, P);
+  requestAnimationFrame(frame);
+}
+function seek(nt) { t = clamp(nt, 0, TOTAL); pauseLeft = 0; curStep = -1; }
+function setPlaying(p) { playing = p; $('iconPlay').innerHTML = p ? '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>' : '<path d="M8 5v14l11-7z"/>'; }
+function stepTo(dir) { let si = 0; for (let i = 0; i < STEPS.length; i++) if (t >= STEPS[i].t + 0.02) si = i; seek(STEPS[clamp(si + dir, 0, STEPS.length - 1)].t + 0.01); }
+$('btnPlay').addEventListener('click', () => setPlaying(!playing));
+$('btnPrev').addEventListener('click', () => stepTo(-1));
+$('btnNext').addEventListener('click', () => stepTo(1));
+$('btnRestart').addEventListener('click', () => { seek(0); setPlaying(true); });
+$('btnSpeed').addEventListener('click', e => { speed = speed === 1 ? 2 : speed === 2 ? 0.5 : 1; e.currentTarget.textContent = (speed + '×').replace('.', T._meta.decimal); });
+$('btnCam').classList.add('on');
+$('btnCam').addEventListener('click', () => { if (!R) return; R.autoCam = !R.autoCam; R.userCam = !R.autoCam; $('btnCam').classList.toggle('on', R.autoCam); $('camHint').textContent = R.autoCam ? T['anim.camhint'] : T['anim.camfree']; });
+const stage = $('stage');
+function toggleFull() { if (document.fullscreenElement) document.exitFullscreen(); else stage.requestFullscreen?.()?.catch(() => {}); }
+$('btnFull').addEventListener('click', toggleFull);
+$('presentBtn').addEventListener('click', () => { stage.scrollIntoView({ behavior: 'smooth', block: 'center' }); seek(0); setPlaying(true); setTimeout(toggleFull, 300); });
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input,textarea') || calcDlg.open) return;   // v kalkulačce nechat klávesy formuláři
+  if (e.code === 'Space') { e.preventDefault(); setPlaying(!playing); }
+  else if (e.key === 'ArrowRight') stepTo(1); else if (e.key === 'ArrowLeft') stepTo(-1);
+  else if (e.key.toLowerCase() === 'r') { seek(0); setPlaying(true); }
+  else if (e.key.toLowerCase() === 'f') toggleFull();
+  else if (e.key.toLowerCase() === 'c') $('btnCam').click();
+});
+/* scrubber */
+{
+  const sc = $('scrub'); let drag = false;
+  const at = e => { const r = sc.getBoundingClientRect(); seek(clamp((e.clientX - r.left) / r.width) * TOTAL); };
+  sc.addEventListener('pointerdown', e => { drag = true; sc.setPointerCapture(e.pointerId); at(e); });
+  sc.addEventListener('pointermove', e => { if (drag) at(e); });
+  sc.addEventListener('pointerup', () => drag = false);
+}
+new IntersectionObserver(es => es.forEach(e => { inView = e.isIntersecting || !!document.fullscreenElement; }), { threshold: .05 }).observe(stage);
+
+/* start */
+window.addEventListener('load', () => {
+  if (!window.THREE) { $('nogl').style.display = 'grid'; $('loader').classList.add('hide'); }
+  else { try { R = init3D(); } catch (err) { console.error(err); $('nogl').style.display = 'grid'; } }
+  if (R) { R.camera.position.copy(CAM[0].pos); R.controls.target.copy(CAM[0].look); }
+  setTimeout(() => $('loader').classList.add('hide'), 400);
+  last = performance.now(); requestAnimationFrame(frame);
+});
+</script>
+</body>
+</html>
