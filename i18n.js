@@ -81,7 +81,7 @@ cs: {
   "why.f3h": "Roztažení ~40 µm stačí", "why.f3p": "Ocel se při ohřevu o ~280 K roztáhne o zhruba 12 µm na každý milimetr průměru a kelvin na tisíc. U otvoru Ø12 mm to je asi 40 µm, což hravě překoná přesah uložení, a po zchladnutí vznikne rovnoměrný radiální tlak po celém obvodu stopky.",
   "why.f4h": "Uvolnění nástroje stejným cyklem", "why.f4p": "Zajet upínačem do cívky, pár sekund ohřát, nástroj vytáhnout. Upínač se neopotřebovává, nejsou tu žádné šrouby, kleštiny ani membrány, které by ztrácely sílu.",
   "ben.eyebrow": "Co to přinese zákazníkovi", "ben.title": "Přesnost, kterou je vidět na dílu i na faktuře",
-  "ben.lead": "Shrink‑fit není jen další způsob upnutí. Je to přímý vliv na životnost nástrojů, kvalitu povrchu a prostoje stroje.",
+  "ben.lead": "Shrink‑fit není jen další způsob upnutí. Je to přímý vliv na životnost nástrojů, kvalitu povrchu a prostoje stroje.", "ben.calc": "Spočítat úsporu v kalkulačce",
   "ben.3b": "2–3 min", "ben.3h": "Výměna nástroje", "ben.3p": "Celá výměna nástroje za dvě až tři minuty: ohřev v sekundách, chlazení stlačeným vzduchem asi dvě minuty. Místo seřizování kleštin a utahování momentovým klíčem jeden stisk tlačítka.",
   "ben.5h": "Vyvážení pro vysoké otáčky", "ben.5p": "Symetrické, rotačně souměrné těleso bez drážek a šroubů. Nižší vibrace, tišší stroj, menší zatížení vřetene.",
   "ben.6b": "0 dílů", "ben.6h": "Nic k opotřebení", "ben.6p": "Žádné kleštiny, matice, membrány ani těsnění. Upínač je jeden kus oceli, stačí ho udržovat čistý. Opakovatelnost stejná po tisíci cyklech.",
@@ -134,6 +134,13 @@ cs: {
   "cta.eyebrow": "Předvedení u vás", "cta.title": "Přivezeme a předvedeme",
   "cta.lead": "Ohřívač přivezeme přímo k vám a předvedeme ho na vašich upínačích a nástrojích. Technologie ověřená na německém trhu, teď ji přinášíme i na český trh.",
   "foot.note": "Hodnoty v animaci a srovnání jsou typické pro technologii shrink‑fit; parametry konkrétního zařízení viz Technické údaje.",
+  /* právní informace – údaje z veřejného rejstříku (ARES); při změně ve firmě upravit ve všech třech jazycích */
+  "legal.line": "DAWELL CZ s.r.o., Budischowského 1073, Borovina, 674 01 Třebíč · IČO 29378362 · DIČ CZ29378362 · zapsaná v obchodním rejstříku vedeném Krajským soudem v Brně, oddíl C, vložka 76993",
+  "legal.link": "Právní informace a ochrana osobních údajů",
+  "legal.title": "Právní informace",
+  "legal.body": "<h3 class=\"calc-h\">Provozovatel stránky</h3><p><b>DAWELL CZ s.r.o.</b><br>Budischowského 1073, Borovina, 674 01 Třebíč, Česká republika<br>IČO: 29378362 · DIČ: CZ29378362<br>Zapsaná v obchodním rejstříku vedeném Krajským soudem v Brně, oddíl C, vložka 76993<br>Jednatelé: Luboš Nedvědický (předseda sboru jednatelů), David Skopal, Daniel Keliar, JESTART s.r.o.<br>E‑mail: <a href=\"mailto:sales@dawell.cz\">sales@dawell.cz</a> · Web: <a href=\"https://www.dawell.cz\">www.dawell.cz</a></p>" +
+    "<h3 class=\"calc-h mt\">Ochrana osobních údajů</h3><p>Stránka nepoužívá cookies ani měření návštěvnosti a nesbírá žádné údaje přes formuláře. V prohlížeči si ukládá jen zvolený jazyk.</p><p>Pro zobrazení se načítají písma ze služby Google Fonts a knihovna 3D grafiky ze služby jsDelivr; jejich servery přitom technicky obdrží IP adresu návštěvníka. Stránka běží na hostingu Vercel, který vede běžné provozní záznamy.</p><p>Správcem osobních údajů je DAWELL CZ s.r.o. Zásady zpracování: <a href=\"https://dawell.cz/ochrana-osobnich-udaju/\">dawell.cz/ochrana-osobnich-udaju</a>. Dotazy a uplatnění práv: <a href=\"mailto:sales@dawell.cz\">sales@dawell.cz</a>.</p>" +
+    "<h3 class=\"calc-h mt\">Údaje na stránce</h3><p>Hodnoty v animaci, srovnání a kalkulačce jsou orientační a typické pro technologii shrink‑fit. Nejde o závaznou nabídku; závazné jsou až údaje v konkrétní nabídce. Ceny jsou uvedeny bez DPH.</p>",
 },
 
 en: {
@@ -211,7 +218,7 @@ en: {
   "why.f3h": "~40 µm of expansion is enough", "why.f3p": "Heated by ~280 K, steel expands by roughly 12 µm per millimetre of diameter and kelvin per thousand. For a Ø12 mm bore that is about 40 µm – comfortably more than the fit interference – and after cooling a uniform radial pressure acts around the whole shank.",
   "why.f4h": "Release with the same cycle", "why.f4p": "Move the chuck into the coil, heat for a few seconds, pull the tool out. The chuck does not wear; there are no screws, collets or membranes to lose their force.",
   "ben.eyebrow": "What the customer gains", "ben.title": "Precision you can see on the part and on the invoice",
-  "ben.lead": "Shrink‑fit is not just another way of clamping. It directly affects tool life, surface quality and machine downtime.",
+  "ben.lead": "Shrink‑fit is not just another way of clamping. It directly affects tool life, surface quality and machine downtime.", "ben.calc": "Calculate your savings",
   "ben.3b": "2–3 min", "ben.3h": "Tool change", "ben.3p": "A complete tool change in two to three minutes: heating in seconds, about two minutes of compressed‑air cooling. One press of a button instead of adjusting collets and torque wrenches.",
   "ben.5h": "Balanced for high speed", "ben.5p": "A symmetrical, rotationally uniform body without slots or screws. Less vibration, a quieter machine, less load on the spindle.",
   "ben.6b": "0 parts", "ben.6h": "Nothing to wear out", "ben.6p": "No collets, nuts, membranes or seals. The chuck is a single piece of steel – just keep it clean. Repeatability unchanged after a thousand cycles.",
@@ -261,6 +268,12 @@ en: {
   "cta.eyebrow": "Contact", "cta.title": "Expert advice from the manufacturer",
   "cta.lead": "Our specialists will take you through shrink‑fit clamping with the DTI-16 and recommend the right configuration for your production. Technology proven on the German market.",
   "foot.note": "Values in the animation and comparison are typical for shrink‑fit technology; for the specific unit see Specifications.",
+  "legal.line": "DAWELL CZ s.r.o., Budischowského 1073, Borovina, 674 01 Třebíč, Czech Republic · Company ID 29378362 · VAT ID CZ29378362 · registered in the Commercial Register kept by the Regional Court in Brno, Section C, File 76993",
+  "legal.link": "Legal notice & privacy",
+  "legal.title": "Legal notice",
+  "legal.body": "<h3 class=\"calc-h\">Site operator</h3><p><b>DAWELL CZ s.r.o.</b><br>Budischowského 1073, Borovina, 674 01 Třebíč, Czech Republic<br>Company ID (IČO): 29378362 · VAT ID: CZ29378362<br>Registered in the Commercial Register kept by the Regional Court in Brno, Section C, File 76993<br>Managing directors: Luboš Nedvědický (chairman of the board of managing directors), David Skopal, Daniel Keliar, JESTART s.r.o.<br>E‑mail: <a href=\"mailto:sales@dawell.cz\">sales@dawell.cz</a> · Web: <a href=\"https://www.dawell.cz\">www.dawell.cz</a></p>" +
+    "<h3 class=\"calc-h mt\">Privacy</h3><p>This page uses no cookies or visitor analytics and collects no data through forms. It only stores the selected language in your browser.</p><p>To display the page, fonts are loaded from Google Fonts and the 3D graphics library from jsDelivr; their servers technically receive the visitor’s IP address. The site is hosted on Vercel, which keeps standard server logs.</p><p>The data controller is DAWELL CZ s.r.o. Privacy policy (in Czech): <a href=\"https://dawell.cz/ochrana-osobnich-udaju/\">dawell.cz/ochrana-osobnich-udaju</a>. Questions and requests: <a href=\"mailto:sales@dawell.cz\">sales@dawell.cz</a>.</p>" +
+    "<h3 class=\"calc-h mt\">Information on this page</h3><p>Values in the animation, comparison and calculator are indicative and typical for shrink‑fit technology. They are not a binding offer; only a specific quotation is binding. Prices exclude VAT.</p>",
 },
 
 de: {
@@ -338,7 +351,7 @@ de: {
   "why.f3h": "~40 µm Ausdehnung genügen", "why.f3p": "Bei ~280 K Erwärmung dehnt sich Stahl um etwa 12 µm je Millimeter Durchmesser und Kelvin pro Tausend. Bei einer Bohrung Ø12 mm sind das rund 40 µm – deutlich mehr als das Passungsübermaß – und nach dem Abkühlen wirkt ein gleichmäßiger radialer Druck am ganzen Schaftumfang.",
   "why.f4h": "Lösen mit demselben Zyklus", "why.f4p": "Futter in die Spule fahren, wenige Sekunden erwärmen, Werkzeug herausziehen. Das Futter verschleißt nicht; es gibt keine Schrauben, Spannzangen oder Membranen, die an Kraft verlieren.",
   "ben.eyebrow": "Was der Kunde gewinnt", "ben.title": "Präzision, die man am Werkstück und auf der Rechnung sieht",
-  "ben.lead": "Schrumpfspannen ist nicht nur eine weitere Spannmethode. Es wirkt direkt auf Standzeit, Oberflächenqualität und Maschinenstillstand.",
+  "ben.lead": "Schrumpfspannen ist nicht nur eine weitere Spannmethode. Es wirkt direkt auf Standzeit, Oberflächenqualität und Maschinenstillstand.", "ben.calc": "Ersparnis berechnen",
   "ben.3b": "2–3 min", "ben.3h": "Werkzeugwechsel", "ben.3p": "Ein kompletter Werkzeugwechsel in zwei bis drei Minuten: Erwärmen in Sekunden, etwa zwei Minuten Abkühlen mit Druckluft. Ein Tastendruck statt Spannzangen einstellen und Drehmomentschlüssel.",
   "ben.5h": "Gewuchtet für hohe Drehzahlen", "ben.5p": "Symmetrischer, rotationssymmetrischer Körper ohne Nuten und Schrauben. Weniger Vibration, leisere Maschine, geringere Spindelbelastung.",
   "ben.6b": "0 Teile", "ben.6h": "Nichts, was verschleißt", "ben.6p": "Keine Spannzangen, Muttern, Membranen oder Dichtungen. Das Futter ist ein Stück Stahl – es muss nur sauber bleiben. Reproduzierbarkeit auch nach tausend Zyklen.",
@@ -388,5 +401,11 @@ de: {
   "cta.eyebrow": "Kontakt", "cta.title": "Fachberatung direkt vom Hersteller",
   "cta.lead": "Unsere Spezialisten erläutern Ihnen das Schrumpfspannen mit dem DTI-16 und empfehlen die passende Konfiguration für Ihre Fertigung. Technologie, bewährt auf dem deutschen Markt.",
   "foot.note": "Die Werte in Animation und Vergleich sind typisch für die Schrumpftechnik; Daten des konkreten Geräts siehe Technische Daten.",
+  "legal.line": "DAWELL CZ s.r.o., Budischowského 1073, Borovina, 674 01 Třebíč, Tschechische Republik · Ident.-Nr. (IČO) 29378362 · USt-IdNr. CZ29378362 · Handelsregister beim Kreisgericht Brno, Abteilung C, Einlage 76993",
+  "legal.link": "Impressum & Datenschutz",
+  "legal.title": "Impressum",
+  "legal.body": "<h3 class=\"calc-h\">Anbieter</h3><p><b>DAWELL CZ s.r.o.</b><br>Budischowského 1073, Borovina, 674 01 Třebíč, Tschechische Republik<br>Ident.-Nr. (IČO): 29378362 · USt-IdNr.: CZ29378362<br>Eingetragen im Handelsregister beim Kreisgericht Brno (Krajský soud v Brně), Abteilung C, Einlage 76993<br>Vertreten durch die Geschäftsführer: Luboš Nedvědický (Vorsitzender der Geschäftsführung), David Skopal, Daniel Keliar, JESTART s.r.o.<br>E‑Mail: <a href=\"mailto:sales@dawell.cz\">sales@dawell.cz</a> · Web: <a href=\"https://www.dawell.cz\">www.dawell.cz</a></p>" +
+    "<h3 class=\"calc-h mt\">Datenschutz</h3><p>Diese Seite verwendet keine Cookies und keine Besucheranalyse und erhebt keine Daten über Formulare. Im Browser wird nur die gewählte Sprache gespeichert.</p><p>Zur Darstellung werden Schriften von Google Fonts und die 3D‑Grafikbibliothek von jsDelivr geladen; deren Server erhalten dabei technisch die IP‑Adresse des Besuchers. Die Seite wird bei Vercel gehostet, das übliche Server‑Logs führt.</p><p>Verantwortlicher ist die DAWELL CZ s.r.o. Datenschutzerklärung (auf Tschechisch): <a href=\"https://dawell.cz/ochrana-osobnich-udaju/\">dawell.cz/ochrana-osobnich-udaju</a>. Anfragen und Betroffenenrechte: <a href=\"mailto:sales@dawell.cz\">sales@dawell.cz</a>.</p>" +
+    "<h3 class=\"calc-h mt\">Angaben auf dieser Seite</h3><p>Die Werte in Animation, Vergleich und Rechner sind Richtwerte und typisch für die Schrumpftechnik. Sie sind kein verbindliches Angebot; verbindlich ist erst ein konkretes Angebot. Alle Preise zzgl. MwSt.</p>",
 },
 };

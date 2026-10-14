@@ -195,6 +195,7 @@ section{padding:96px 0}
 .sec-head{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:end;margin-bottom:40px}
 @media (max-width:900px){.sec-head{grid-template-columns:1fr}}
 .sec-head h2{margin-top:12px}
+.sec-side{display:grid;gap:20px;justify-items:start}   /* pravý sloupec hlavičky: úvodní text + tlačítko */
 
 /* ============ 3D STAGE ============ */
 .stage{border:1px solid var(--line-2);border-radius:22px;background:#0B0D10;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5)}
@@ -381,6 +382,16 @@ section{padding:96px 0}
 .contact div{display:flex;gap:12px;align-items:center;color:var(--muted)}
 .contact b{color:var(--text)}
 footer{padding:40px 0 60px;color:var(--dim);font-size:13px;border-top:1px solid var(--line)}
+.foot-top{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+/* povinné údaje podnikatele (§ 435 OZ) + odkaz na právní informace / Impressum */
+.foot-legal{margin:18px 0 0;padding-top:16px;border-top:1px solid var(--line);font-size:12px;line-height:1.6}
+.linkbtn{appearance:none;background:none;border:0;padding:0;font:inherit;color:var(--muted);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.linkbtn:hover{color:var(--text)}
+dialog.legal{width:min(760px,calc(100% - 32px))}
+.legal-body{margin-top:18px}
+.legal-body p{color:var(--muted);font-size:15px;line-height:1.65;margin:0 0 10px}
+.legal-body b{color:var(--text)}
+.legal-body a{color:var(--orange-2)}
 .rv{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
 .rv.in{opacity:1;transform:none}
 @media (prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}.hero-glow{animation:none}}
@@ -624,7 +635,14 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:13px;border-top:1px solid 
   <div class="wrap">
     <div class="sec-head">
       <div><span class="eyebrow" data-i18n="ben.eyebrow">Co to přinese zákazníkovi</span><h2 data-i18n="ben.title">Přesnost, kterou je vidět na dílu i na faktuře</h2></div>
-      <p class="lead" data-i18n="ben.lead">Shrink‑fit není jen další způsob upnutí. Je to přímý vliv na životnost nástrojů, kvalitu povrchu a prostoje stroje.</p>
+      <div class="sec-side">
+        <p class="lead" data-i18n="ben.lead">Shrink‑fit není jen další způsob upnutí. Je to přímý vliv na životnost nástrojů, kvalitu povrchu a prostoje stroje.</p>
+        <!-- otevře stejnou kalkulačku návratnosti jako tlačítko v horním panelu -->
+        <button class="btn btn-primary" id="benCalcBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18h8"/></svg>
+          <span data-i18n="ben.calc">Spočítat úsporu v kalkulačce</span>
+        </button>
+      </div>
     </div>
     <div class="benefits">
       <div class="card rv"><div class="big" data-i18n="ben.3b">~ 2 min</div><h3 data-i18n="ben.3h">Výměna nástroje</h3><p data-i18n="ben.3p">Ohřev v sekundách, zchladnutí do minuty. Místo seřizování kleštin a utahování momentovým klíčem jeden stisk tlačítka.</p></div>
@@ -704,11 +722,24 @@ footer{padding:40px 0 60px;color:var(--dim);font-size:13px;border-top:1px solid 
 </section>
 
 <footer>
-  <div class="wrap" style="display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap">
-    <span style="display:flex;align-items:center;gap:14px"><img src="logo-light.webp" alt="DAWELL CZ" style="height:26px;opacity:.85"><span>© <span id="year"></span> Dawell CZ s.r.o. · Třebíč · <a href="https://www.dawell.cz" style="color:var(--muted)">www.dawell.cz</a></span></span>
-    <span data-i18n="foot.note">Hodnoty v animaci a srovnání jsou typické pro technologii shrink‑fit; parametry konkrétního zařízení viz Technické údaje.</span>
+  <div class="wrap">
+    <div class="foot-top">
+      <span style="display:flex;align-items:center;gap:14px"><img src="logo-light.webp" alt="DAWELL CZ" style="height:26px;opacity:.85"><span>© <span id="year"></span> DAWELL CZ s.r.o. · <a href="https://www.dawell.cz" style="color:var(--muted)">www.dawell.cz</a></span></span>
+      <span data-i18n="foot.note">Hodnoty v animaci a srovnání jsou typické pro technologii shrink‑fit; parametry konkrétního zařízení viz Technické údaje.</span>
+    </div>
+    <!-- údaje z veřejného rejstříku (ARES, 2026-10-14); při změně ve firmě upravit i legal.* v i18n.js -->
+    <p class="foot-legal"><span data-i18n="legal.line">DAWELL CZ s.r.o., Budischowského 1073, Borovina, 674 01 Třebíč · IČO 29378362 · DIČ CZ29378362 · zapsaná v obchodním rejstříku vedeném Krajským soudem v Brně, oddíl C, vložka 76993</span> · <button type="button" class="linkbtn" id="legalBtn" data-i18n="legal.link">Právní informace a ochrana osobních údajů</button></p>
   </div>
 </footer>
+
+<!-- ============ PRÁVNÍ INFORMACE / IMPRESSUM (otevírá odkaz v patičce, přímý odkaz #impressum) ============ -->
+<dialog class="calc legal" id="legal" aria-labelledby="legalTitle">
+  <div class="calc-in">
+    <button class="calc-x" id="legalClose" type="button" data-i18n-title="calc.close" title="Zavřít"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <h2 id="legalTitle" data-i18n="legal.title">Právní informace</h2>
+    <div class="legal-body" data-i18n="legal.body"></div>
+  </div>
+</dialog>
 
 <!-- Three.js r147 (UMD) – funguje i při otevření souboru přímo z disku -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
@@ -909,6 +940,15 @@ calcDlg.querySelectorAll('.mtab input').forEach(i => i.addEventListener('input',
 document.querySelectorAll('#calcSeg button').forEach(b => b.addEventListener('click', () => calcSetMethod(b.dataset.m)));
 $('calcReset').addEventListener('click', calcDefaults);
 $('calcBtn').addEventListener('click', () => calcDlg.showModal());
+$('benCalcBtn').addEventListener('click', () => calcDlg.showModal());   // tlačítko v sekci přínosů
+
+/* právní informace / Impressum: odkaz v patičce, přímo i přes adresu …/#impressum */
+const legalDlg = $('legal');
+$('legalBtn').addEventListener('click', () => legalDlg.showModal());
+$('legalClose').addEventListener('click', () => legalDlg.close());
+legalDlg.addEventListener('click', e => { if (e.target === legalDlg) legalDlg.close(); });
+const legalFromHash = () => { if (/^#(impressum|pravni-informace|legal)$/i.test(location.hash) && !legalDlg.open) legalDlg.showModal(); };
+window.addEventListener('hashchange', legalFromHash); legalFromHash();
 $('calcClose').addEventListener('click', () => calcDlg.close());
 calcDlg.addEventListener('click', e => { if (e.target === calcDlg) calcDlg.close(); });   // klik na ztmavené pozadí
 calcDefaults();
@@ -1176,11 +1216,12 @@ function init3D() {
   lead(helix.getPoint(0), -1); lead(helix.getPoint(1), 1);
 
   /* teplotní čidlo hned za cívkou v ose upínače: černá patka a sloupek, bílá keramická hlava se šrouby
-     nakloněná čočkou na konec nosu. Vršek hlavy ~16,3 cm, aby nad ní prošel vytahovaný vrták i nová fréza. */
+     nakloněná ke konci nosu. Horní hrana hlavy se zespodu dotýká nástroje (vršek 16,96 cm = osa − poloměr frézy),
+     vrták i fréza po ní při vytahování a zasouvání kloužou. */
   const sensor = new THREE.Group(); scene.add(sensor); sensor.position.set(SENSOR_X, 11.4, 0);
   addBox(3.4, .45, 3.4, matBlack, 0, .22, 0, .12, sensor);                // patka s lemem
-  addBox(2.0, 2.5, 2.0, matBlack, 0, 1.7, 0, .1, sensor);                  // hranatý sloupek
-  const sHead = new THREE.Group(); sHead.position.set(-.1, 3.7, 0); sHead.rotation.z = -.32; sensor.add(sHead);   // nakloněná ke konci nosu
+  addBox(2.0, 3.28, 2.0, matBlack, 0, 2.09, 0, .1, sensor);                // hranatý sloupek
+  const sHead = new THREE.Group(); sHead.position.set(-.1, 4.48, 0); sHead.rotation.z = -.32; sensor.add(sHead);   // nakloněná ke konci nosu
   addBox(2.6, 1.5, 2.0, matCeramic, 0, 0, 0, .15, sHead);
   const matScrewDark = new THREE.MeshStandardMaterial({ color: 0x3a3f46, roughness: .4, metalness: .8 });
   [[-.55, .35], [.45, -.35]].forEach(([x, z]) => { const s = new THREE.Mesh(new THREE.CylinderGeometry(.24, .24, .08, 16), matScrewDark); s.position.set(x, .76, z); sHead.add(s); });
@@ -1299,7 +1340,7 @@ const LABELS = [
   { at: () => R.frontPanel.localToWorld(V3(-2.4, 2.1, 1.2)), show: t => t > .4 && t < 1.8 },
   { at: () => R.coil.localToWorld(V3(0, 3.6, 0)), show: t => t > 3.4 && t < 5.6 },
   { at: () => V3(9, 12.6, 1.4), show: t => t > 3.8 && t < 5.6 },
-  { at: () => R.sensor.localToWorld(V3(0, 5.2, 0)), show: t => t > 6.2 && t < 8.2 },
+  { at: () => R.sensor.localToWorld(V3(0, 6.6, 0)), show: t => t > 6.2 && t < 8.2 },
   { cls: 'hot', at: () => R.holder.localToWorld(V3(COIL_AT, 2.6, 0)), show: t => t > 8.2 && t < 11 },
   { at: () => R.drill.localToWorld(V3(27, 1.3, 0)), show: t => t > 11.4 && t < 13.2 },
   { at: () => R.tool.localToWorld(V3(28, 1.3, 0)), show: t => t > 15.0 && t < 16.8 },
@@ -1481,7 +1522,7 @@ function toggleFull() { if (document.fullscreenElement) document.exitFullscreen(
 $('btnFull').addEventListener('click', toggleFull);
 $('presentBtn').addEventListener('click', () => { stage.scrollIntoView({ behavior: 'smooth', block: 'center' }); seek(0); setPlaying(true); setTimeout(toggleFull, 300); });
 document.addEventListener('keydown', e => {
-  if (e.target.matches('input,textarea') || calcDlg.open) return;   // v kalkulačce nechat klávesy formuláři
+  if (e.target.matches('input,textarea') || calcDlg.open || legalDlg.open) return;   // v dialogu nechat klávesy jemu
   if (e.code === 'Space') { e.preventDefault(); setPlaying(!playing); }
   else if (e.key === 'ArrowRight') stepTo(1); else if (e.key === 'ArrowLeft') stepTo(-1);
   else if (e.key.toLowerCase() === 'r') { seek(0); setPlaying(true); }
