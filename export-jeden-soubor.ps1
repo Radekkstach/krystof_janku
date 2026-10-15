@@ -18,7 +18,7 @@ $html = $html -replace '<meta property="og:image"[^>]*>\r?\n', ''
 
 # obrázky → data URI
 $mime = @{ '.webp' = 'image/webp'; '.png' = 'image/png' }
-foreach ($f in 'logo-light.webp', 'logo-dark.webp', 'produkt.webp', 'favicon.png', 'apple-touch-icon.png') {
+foreach ($f in 'logo-light.webp', 'logo-dark.webp', 'produkt.webp', 'foto-dilna.webp', 'foto-dilna-detail.webp', 'foto-celek.webp', 'foto-detail.webp', 'foto-bez-upinace.webp', 'favicon.png', 'apple-touch-icon.png') {
   $b64 = [Convert]::ToBase64String([IO.File]::ReadAllBytes((Join-Path $root $f)))
   $html = $html.Replace($f, 'data:' + $mime[[IO.Path]::GetExtension($f)] + ';base64,' + $b64)
 }
