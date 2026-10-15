@@ -190,7 +190,7 @@ body:has(dialog.calc[open]){overflow:hidden}
 .kpi .kl{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 /* dlouhá slova (např. EINFÜHRUNGSPREIS) se na mobilu dělí, dlaždice nesmí rozšířit mřížku za okraj */
 .kpis>.kpi{min-width:0}
-.kpi .kl,.kpi .v{overflow-wrap:anywhere;-webkit-hyphens:auto;hyphens:auto}
+.kpi .kl,.kpi .v,.kpi .l{overflow-wrap:anywhere;-webkit-hyphens:auto;hyphens:auto}
 .kpi .v{font-size:clamp(22px,2.5vw,30px);font-weight:800;letter-spacing:-.02em;margin-top:6px;line-height:1.15}
 .kpi .l{font-size:13px;color:var(--muted);margin-top:6px}
 .kpi.price{border-color:rgba(255,112,43,.55);background:linear-gradient(135deg,rgba(255,112,43,.24),rgba(255,112,43,.06))}
@@ -338,16 +338,16 @@ dialog.gal{width:min(1100px,calc(100% - 32px))}
 .fact p{color:var(--muted);font-size:14px;margin-top:4px}
 
 /* BENEFITS */
-.benefits{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-@media (max-width:900px){.benefits{grid-template-columns:1fr 1fr}}
-@media (max-width:600px){.benefits{grid-template-columns:1fr}}
+/* přínosy: dvě široké a nízké karty vedle sebe (souměrně), na mobilu pod sebou */
+.benefits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:700px){.benefits{grid-template-columns:1fr}}
 .card{padding:26px;border-radius:var(--radius);border:1px solid var(--line);background:linear-gradient(180deg,var(--panel),var(--bg-2));position:relative;overflow:hidden;transition:transform .25s,border-color .25s}
 .card:hover{transform:translateY(-3px);border-color:rgba(232,101,28,.45)}
 .card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--orange),transparent);opacity:0;transition:opacity .25s}
 .card:hover::before{opacity:1}
 .card .big{font-family:var(--mono);font-size:30px;font-weight:600;color:var(--orange-2);letter-spacing:-.02em}
 /* přínosy: hodnota i krátké heslo stejným písmem; výška na dva řádky, aby nadpisy karet začínaly ve stejné výšce */
-.benefits .card .big{font-family:var(--font);font-weight:800;font-size:clamp(20px,1.9vw,24px);line-height:1.2;letter-spacing:-.01em;min-height:2.4em;display:flex;align-items:flex-end;text-wrap:balance}
+.benefits .card .big{font-family:var(--font);font-weight:800;font-size:clamp(20px,1.9vw,24px);line-height:1.2;letter-spacing:-.01em;text-wrap:balance}
 .card h3{margin-top:10px}
 .card p{color:var(--muted);font-size:14px;margin-top:8px}
 
@@ -511,7 +511,7 @@ dialog.legal{width:min(760px,calc(100% - 32px))}
       <span class="eyebrow" data-i18n="hero.eyebrow">Novinka · indukční technologie</span>
       <h1 style="margin-top:18px" data-i18n="hero.title">Nástroj upnutý <span class="accent">za pár sekund.</span><br>Malý a přenosný.</h1>
       <p class="hero-sub" data-i18n="hero.sub">Ohřát, vložit, zchladit – princip, který zvládne každý.</p>
-      <p class="lead" style="margin-top:16px" data-i18n="hero.lead">Stolní indukční ohřívač pro tepelné (shrink‑fit) upínání nástrojů. Cívka za 20–60 s bezkontaktně ohřeje nos upínače, karbidová stopka zajede dovnitř a po zchladnutí drží silou, které se kleština ani hydraulika nevyrovná. Žádné pohyblivé díly, žádné opotřebení, opakovatelnost pokaždé.</p>
+      <p class="lead" style="margin-top:16px" data-i18n="hero.lead">Stolní indukční ohřívač pro tepelné upínání nástrojů. Cívka za 20–60 sekund bezkontaktně ohřeje nos upínače, karbidová stopka zajede dovnitř a po zchladnutí drží silou, které se kleština ani hydraulika nevyrovná. Žádné přehřátí materiálu díky řízené teplotě, žádné opotřebení, opakovatelnost pokaždé.</p>
       <div class="actions">
         <a class="btn btn-primary" href="#jak"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span data-i18n="hero.cta1">Spustit 3D animaci</span></a>
         <a class="btn btn-ghost" href="#parametry" data-i18n="hero.cta2">Technické údaje</a>
@@ -546,7 +546,7 @@ dialog.legal{width:min(760px,calc(100% - 32px))}
   <div class="wrap">
     <div class="sec-head">
       <div><span class="eyebrow" data-i18n="anim.eyebrow">3D animace procesu</span><h2 data-i18n="anim.title">Jak to funguje – krok za krokem</h2></div>
-      <p class="lead" data-i18n="anim.lead">Celý cyklus upnutí od vložení upínače po hotový, změřitelně přesný nástroj. Kamera vede sama, scénu ale můžete kdykoli uchopit myší a otočit si ji.</p>
+      <p class="lead" data-i18n="anim.lead">Kompletní výměna nástroje od A do Z: od vyjmutí starého nástroje po upnutí nového. Kamera vede sama, scénu ale můžete kdykoli uchopit myší a otočit si ji.</p>
     </div>
 
     <div class="stage" id="stage">
@@ -661,10 +661,10 @@ dialog.legal{width:min(760px,calc(100% - 32px))}
         </svg>
       </div>
       <div class="facts">
-        <div class="fact rv"><div class="ic">1</div><div><h3 data-i18n="why.f1h">Teplo vzniká v upínači, ne okolo něj</h3><p data-i18n="why.f1p">Cívka se nedotýká dílu. Vířivé proudy ohřívají tenkou povrchovou vrstvu nosu a teplo během 20–60 s prostoupí ke stěně otvoru. Pec potřebuje desítky minut, horký vzduch je pomalý a nepřesný.</p></div></div>
+        <div class="fact rv"><div class="ic">1</div><div><h3 data-i18n="why.f1h">Teplo vzniká v upínači, ne okolo něj</h3><p data-i18n="why.f1p">Cívka se nedotýká dílu. Vířivé proudy ohřívají tenkou povrchovou vrstvu nosu a teplo během 20–60 sekund prostoupí ke stěně otvoru. Plynový hořák ohřívá nerovnoměrně a hrozí přehřátí, horký vzduch je pomalý a nepřesný.</p></div></div>
         <div class="fact rv"><div class="ic">2</div><div><h3 data-i18n="why.f2h">Přesně na teplotu, nikdy přepálit</h3><p data-i18n="why.f2p">Regulace teploty na panelu drží pracovní rozsah upínače. Nedochází k popouštění oceli ani k degradaci tvrdokovu nástroje; stopka se vkládá do již ohřátého otvoru a sama se nehřeje.</p></div></div>
-        <div class="fact rv"><div class="ic">3</div><div><h3 data-i18n="why.f3h">Roztažení ~40 µm stačí</h3><p data-i18n="why.f3p">Ocel se při ohřevu o ~280 K roztáhne o zhruba 12 µm na každý milimetr průměru a kelvin na tisíc. U otvoru Ø12 mm to je asi 40 µm, což hravě překoná přesah uložení, a po zchladnutí vznikne rovnoměrný radiální tlak po celém obvodu stopky.</p></div></div>
-        <div class="fact rv"><div class="ic">4</div><div><h3 data-i18n="why.f4h">Uvolnění nástroje stejným cyklem</h3><p data-i18n="why.f4p">Zajet upínačem do cívky, 20–60 s ohřát, nástroj vytáhnout. Upínač se neopotřebovává, nejsou tu žádné šrouby, kleštiny ani membrány, které by ztrácely sílu.</p></div></div>
+        <div class="fact rv"><div class="ic">3</div><div><h3 data-i18n="why.f3h">Roztažení ~40 µm stačí</h3><p data-i18n="why.f3p">Ocel se při ohřevu o ~280 °C roztáhne o zhruba 3,4 µm na každý milimetr průměru. U otvoru Ø12 mm to je asi 40 µm, což hravě překoná přesah uložení, a po zchladnutí vznikne rovnoměrný radiální tlak po celém obvodu stopky.</p></div></div>
+        <div class="fact rv"><div class="ic">4</div><div><h3 data-i18n="why.f4h">Uvolnění nástroje stejným cyklem</h3><p data-i18n="why.f4p">Zajet upínačem do cívky, 20–60 sekund ohřát, nástroj vytáhnout. Upínač se neopotřebovává, nejsou tu žádné šrouby, kleštiny ani membrány, které by ztrácely sílu.</p></div></div>
       </div>
     </div>
   </div>
@@ -676,7 +676,7 @@ dialog.legal{width:min(760px,calc(100% - 32px))}
     <div class="sec-head">
       <div><span class="eyebrow" data-i18n="ben.eyebrow">Co to přinese zákazníkovi</span><h2 data-i18n="ben.title">Přesnost, kterou je vidět na dílu i na faktuře</h2></div>
       <div class="sec-side">
-        <p class="lead" data-i18n="ben.lead">Shrink‑fit není jen další způsob upnutí. Je to přímý vliv na životnost nástrojů, kvalitu povrchu a prostoje stroje.</p>
+        <p class="lead" data-i18n="ben.lead">Upínání pomocí indukčního ohřevu má přímý vliv na životnost nástrojů, kvalitu povrchu i prostoje stroje.</p>
         <!-- otevře stejnou kalkulačku návratnosti jako tlačítko v horním panelu -->
         <button class="btn btn-primary" id="benCalcBtn" type="button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18h8"/></svg>
@@ -685,9 +685,8 @@ dialog.legal{width:min(760px,calc(100% - 32px))}
       </div>
     </div>
     <div class="benefits">
-      <div class="card rv"><div class="big" data-i18n="ben.3b">~ 2 min</div><h3 data-i18n="ben.3h">Výměna nástroje</h3><p data-i18n="ben.3p">Ohřev v sekundách, zchladnutí do minuty. Místo seřizování kleštin a utahování momentovým klíčem jeden stisk tlačítka.</p></div>
-      <div class="card rv"><div class="big" data-i18n="ben.5b">Jednoduchá a rychlá výměna</div><h3 data-i18n="ben.5h">Vyvážení pro vysoké otáčky</h3><p data-i18n="ben.5p">Symetrické, rotačně souměrné těleso bez drážek a šroubů. Nižší vibrace, tišší stroj, menší zatížení vřetene.</p></div>
-      <div class="card rv"><div class="big" data-i18n="ben.6b">Minimální náklady výměny a servisu</div><h3 data-i18n="ben.6h">Nic k opotřebení</h3><p data-i18n="ben.6p">Žádné kleštiny, matice, membrány ani těsnění. Upínač je jeden kus oceli, stačí ho udržovat čistý. Opakovatelnost stejná po tisíci cyklech.</p></div>
+      <div class="card rv"><div class="big" data-i18n="ben.3b">Jednoduchá a rychlá výměna nástroje</div><h3 data-i18n="ben.3h">2–3 minuty</h3><p data-i18n="ben.3p">Celá výměna nástroje za dvě až tři minuty. Místo seřizování kleštin a utahování momentovým klíčem jeden stisk tlačítka.</p></div>
+      <div class="card rv"><div class="big" data-i18n="ben.6b">Minimální náklady na výměnu a servis</div><h3 data-i18n="ben.6h">Nic k opotřebení</h3><p data-i18n="ben.6p">Žádné kleštiny, matice, membrány ani těsnění. Upínač je jeden kus oceli, stačí ho udržovat čistý. Opakovatelnost stejná po tisíci cyklech.</p></div>
     </div>
   </div>
 </section>
@@ -735,7 +734,7 @@ dialog.legal{width:min(760px,calc(100% - 32px))}
     <div class="about rv">
       <div class="about-l">
         <img src="logo-light.webp" alt="DAWELL CZ" style="height:40px">
-        <p class="lead" style="margin-top:16px;font-size:15px" data-i18n="about.lead">Český výrobce mobilních indukčních a odporových ohřevů z Třebíče. Od roku 2012 vyvíjí, vyrábí a exportuje ohřívací zařízení pro průmysl, servis a montáž. Shrink‑fit ohřívač staví na stejné indukční platformě, která už běží v tisících dílen.</p>
+        <p class="lead" style="margin-top:16px;font-size:15px" data-i18n="about.lead">Jsme český výrobce mobilních indukčních a odporových ohřevů z Třebíče. Od roku 2012 vyvíjíme, vyrábíme a exportujeme ohřívací zařízení pro průmysl, servis a montáž. Shrink‑fit ohřívač stavíme na stejné indukční platformě, která už běží v tisících dílen.</p>
       </div>
       <div class="about-r">
         <div class="stat"><div class="v">2012</div><div class="l" data-i18n="about.s1">rok založení</div></div>
@@ -752,9 +751,9 @@ dialog.legal{width:min(760px,calc(100% - 32px))}
   <div class="wrap">
     <div class="cta rv">
       <div>
-        <span class="eyebrow" data-i18n="cta.eyebrow">Předvedení u vás</span>
-        <h2 style="margin-top:12px" data-i18n="cta.title">Přivezeme zařízení</h2>
-        <p class="lead" style="margin-top:14px" data-i18n="cta.lead">Upneme váš nástroj před vámi a změříme házivost na vašem vřetenu. Technologie je ověřená v německém průmyslu, teď ji přinášíme na český trh.</p>
+        <span class="eyebrow" data-i18n="cta.eyebrow">Kontakt</span>
+        <h2 style="margin-top:12px" data-i18n="cta.title">Zaujala vás tato technologie? Kontaktujte nás</h2>
+        <p class="lead" style="margin-top:14px" data-i18n="cta.lead">Napište nám nebo zavolejte – rádi odpovíme na vaše dotazy a připravíme vám nabídku.</p>
       </div>
       <div class="contact" id="contact"></div>
     </div>
@@ -1214,15 +1213,29 @@ function init3D() {
     g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(20,20,20,.92)'; g.textBaseline = 'middle';
     g.font = `800 ${h * .42}px Inter, Arial`; g.fillText('°C', 4, h * .3); g.font = `700 ${h * .3}px Inter, Arial`; g.fillText('TEMPERATURE', 4 + h * .62, h * .3); g.fillText('CONTROL', 4 + h * .62, h * .72);
   }), 1.6, 2.1);
-  /* bílý štítek s logem DAWELL CZ (jako na fotce); nejdřív text, po načtení obrázku skutečné logo */
-  const drawPlate = (g, w, h, img) => {
-    g.clearRect(0, 0, w, h); g.fillStyle = '#f4f4f1'; g.beginPath(); g.roundRect ? g.roundRect(2, 2, w - 4, h - 4, h * .08) : g.rect(2, 2, w - 4, h - 4); g.fill();
-    if (img) { const lh = h * .78, lw = Math.min(w * .92, lh * img.naturalWidth / img.naturalHeight); g.drawImage(img, (w - lw) / 2, (h - lh) / 2, lw, lw * img.naturalHeight / img.naturalWidth); }
-    else { g.fillStyle = '#2b2b2b'; g.font = `800 ${h * .45}px Inter, Arial`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(PRODUCT.brand, w / 2, h / 2); }
+  /* černý pás přes spodní část šikmého čela (navazuje na černý spodek skříně), jako na fotkách přístroje */
+  const band = new THREE.Mesh(new THREE.PlaneGeometry(61.2, 4.35), new THREE.MeshStandardMaterial({ color: 0x0c0e11, roughness: .82, metalness: 0, envMapIntensity: .25 }));
+  band.receiveShadow = true; onFace(band, 23, -2.33, .33);
+  /* bílé logo DAWELL CZ na černém pásu; nejdřív text, po načtení obrázku skutečné logo */
+  const drawLogo = (g, w, h, img) => {
+    g.clearRect(0, 0, w, h);
+    if (img) { const lw = Math.min(w, h * img.naturalWidth / img.naturalHeight); g.drawImage(img, 0, (h - lw * img.naturalHeight / img.naturalWidth) / 2, lw, lw * img.naturalHeight / img.naturalWidth); }
+    else { g.fillStyle = '#f2f2ee'; g.font = `800 ${h * .5}px Inter, Arial`; g.textBaseline = 'middle'; g.fillText(PRODUCT.brand, 4, h / 2); }
   };
-  const brand = onFace(labelPlane(9, 2.7, (g, w, h) => drawPlate(g, w, h, null)), -2.6, -1.6);
-  const logoImg = new Image(); logoImg.onload = () => { const c = brand.material.map.image; drawPlate(c.getContext('2d'), c.width, c.height, logoImg); brand.material.map.needsUpdate = true; }; logoImg.src = 'logo-dark.webp';
-  onFace(labelPlane(9, .6, darkText('INDUCTION SHRINK‑FIT HEATER' + (PRODUCT.model ? ' · ' + PRODUCT.model : ''), 'center')), -2.6, -3.35);
+  const brand = onFace(labelPlane(9, 2.35, (g, w, h) => drawLogo(g, w, h, null)), -2.9, -2.3);
+  const logoImg = new Image(); logoImg.onload = () => { const c = brand.material.map.image; drawLogo(c.getContext('2d'), c.width, c.height, logoImg); brand.material.map.needsUpdate = true; }; logoImg.src = 'logo-light.webp';
+  /* značka designového studia FAKTUM DESIGN (bílý rámeček na černém pásu) */
+  onFace(labelPlane(2.1, 2.35, (g, w, h) => {
+    g.clearRect(0, 0, w, h); g.strokeStyle = '#f2f2ee'; g.lineWidth = w * .045; g.strokeRect(w * .04, h * .04, w * .92, h * .92);
+    g.fillStyle = '#f2f2ee'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `900 ${h * .25}px Inter, Arial`; g.fillText('FAKT', w / 2, h * .25); g.fillText('UM', w / 2, h * .5);
+    g.font = `700 ${h * .13}px Inter, Arial`; g.fillText('DESIGN', w / 2, h * .76);
+  }), 3.2, -2.3);
+  /* název přístroje na oranžovém čele */
+  onFace(labelPlane(14, 2.6, (g, w, h) => {
+    g.clearRect(0, 0, w, h); g.fillStyle = '#fbfbf8'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `italic 800 ${h * .72}px Inter, Arial`; g.fillText('ShrinkFit 16', w / 2, h * .54);
+  }), 21, 1.55);
   /* výstražný štítek na čele: žlutý trojúhelník s vykřičníkem (obecná výstraha) */
   onFace(labelPlane(2.8, 2.5, (g, w, h) => {
     const lw = w * .09, m = lw / 2 + 2;
@@ -1232,24 +1245,36 @@ function init3D() {
     g.fillStyle = '#111';
     g.beginPath(); g.moveTo(w * .465, h * .36); g.lineTo(w * .535, h * .36); g.lineTo(w * .515, h * .67); g.lineTo(w * .485, h * .67); g.closePath(); g.fill();
     g.beginPath(); g.arc(w / 2, h * .77, w * .042, 0, Math.PI * 2); g.fill();
-  }), 33, .6);
-  /* větrací mřížka na pravém čele */
-  const grille = labelPlane(7, 5, (g, w, h) => {
+  }), 33, 1.35);
+  /* větrací mřížka (oválné otvory) na obou čelech skříně + dva šrouby úhlopříčně, jako na fotkách */
+  const grilleDraw = (g, w, h) => {
     g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(0,0,0,.85)';
-    for (let y = 10; y < h; y += 14) for (let x = 10; x < w; x += 14) { g.beginPath(); g.arc(x, y, 4, 0, Math.PI * 2); g.fill(); }
-  }); grille.rotation.y = Math.PI / 2; grille.position.set(54.04, 7.3, -1.2); device.add(grille);
+    for (let y = 9, r = 0; y < h - 4; y += 11, r++) for (let x = 8 + (r % 2) * 6; x < w - 6; x += 12) { g.beginPath(); g.ellipse(x, y, 4.2, 2.6, 0, 0, Math.PI * 2); g.fill(); }
+  };
+  const matScrewHead = new THREE.MeshStandardMaterial({ color: 0x2a2e34, roughness: .35, metalness: .7 });
+  [[54.04, Math.PI / 2], [-8.04, -Math.PI / 2]].forEach(([x, ry]) => {
+    const gr = labelPlane(7, 5, grilleDraw); gr.rotation.y = ry; gr.position.set(x, 7.3, -1.2); device.add(gr);
+    [[10.3, -4.4], [4.3, 2.0]].forEach(([y, z]) => { const s = new THREE.Mesh(new THREE.CylinderGeometry(.26, .26, .1, 20), matScrewHead); s.rotation.z = Math.PI / 2; s.position.set(x + Math.sign(x) * .02, y, z); device.add(s); });
+  });
 
-  /* lineární vedení uprostřed horní plochy (pod upínačem) až k cívce: drážka, ocelová lišta se šrouby */
-  addBox(39.5, .12, 3.6, new THREE.MeshStandardMaterial({ color: 0x1a1d22, roughness: .8 }), 21.25, 11.42, 0, .04);
+  /* lineární vedení uprostřed horní plochy (pod upínačem) až k cívce: černá drážka ve víku, ocelová lišta se šrouby,
+     na obou koncích černé zarážky */
+  addBox(39.8, .14, 4.2, new THREE.MeshStandardMaterial({ color: 0x101215, roughness: .85 }), 21.25, 11.43, 0, .05);
   addBox(38.5, .9, 2.6, matRod, 21.25, 11.85, 0, .12);
   for (let x = 3.5; x <= 39.5; x += 3.1) { const h = new THREE.Mesh(new THREE.CircleGeometry(.3, 20), matBlack); h.rotation.x = -Math.PI / 2; h.position.set(x, 12.31, 0); device.add(h); }
+  [1.75, 40.75].forEach(x => addBox(.5, 1.2, 3.0, matBlack, x, 12.0, 0, .1));
 
-  /* pojízdný vozík: jezdec na liště + držák upínače (tvar V); jede společně s upínačem */
+  /* pojízdný vozík: černý jezdec na liště + nerezový držák upínače (základna a dva plechy s V-výřezem,
+     jako na fotkách) s černým rýhovaným šroubem; jede společně s upínačem */
   const sled = new THREE.Group(); scene.add(sled);
   addBox(4, .6, 3.4, matBlack, 7.65, 12.6, 0, .12, sled);
+  const matStainless = new THREE.MeshStandardMaterial({ color: 0xd2d5d9, roughness: .34, metalness: 1, envMap: envSteel });
   const vShape = new THREE.Shape(); [[-3.5, 0], [3.5, 0], [3.5, 4.4], [2.5, 4.4], [0, 1.9], [-2.5, 4.4], [-3.5, 4.4]].forEach((p, i) => i ? vShape.lineTo(p[0], p[1]) : vShape.moveTo(p[0], p[1]));
-  const cradle = new THREE.Mesh(new THREE.ExtrudeGeometry(vShape, { depth: 2.5, bevelEnabled: true, bevelThickness: .15, bevelSize: .15, bevelSegments: 2 }), matBlack);
-  cradle.rotation.y = Math.PI / 2; cradle.position.set(6.4, 12.9, 0); cradle.castShadow = true; cradle.receiveShadow = true; sled.add(cradle);
+  const vPlate = new THREE.ExtrudeGeometry(vShape, { depth: .3, bevelEnabled: true, bevelThickness: .05, bevelSize: .05, bevelSegments: 1 });
+  [6.4, 8.6].forEach(x => { const p = new THREE.Mesh(vPlate, matStainless); p.rotation.y = Math.PI / 2; p.position.set(x, 12.9, 0); p.castShadow = true; p.receiveShadow = true; sled.add(p); });
+  addBox(2.55, .3, 7.0, matStainless, 7.65, 13.05, 0, .08, sled);                                   // základna držáku
+  const clampKnob = new THREE.Mesh(new THREE.CylinderGeometry(.62, .62, .55, 18), new THREE.MeshStandardMaterial({ color: 0x17191d, roughness: .6, metalness: .2, flatShading: true }));
+  clampKnob.rotation.x = Math.PI / 2; clampKnob.position.set(6.0, 12.7, 2.0); clampKnob.castShadow = true; sled.add(clampKnob);   // rýhovaný šroub
 
   /* ruční ofukovací pistole na konci hadice se stlačeným vzduchem: při chlazení přejíždí podél nosu upínače.
      Počátek skupiny gun = hrot trysky, tryska míří po lokální ose +Z (natáčí se přes lookAt). */
@@ -1266,14 +1291,26 @@ function init3D() {
   const gunHoseAt = V3(0, -3 - 4.0 * Math.cos(.28), -10.6 - 4.0 * Math.sin(.28));     // spodek rukojeti
   const fit = new THREE.Mesh(new THREE.CylinderGeometry(.38, .38, 1.2, 20), matBrass); fit.rotation.x = .28;
   fit.position.set(0, -3 - 3.4 * Math.cos(.28), -10.6 - 3.4 * Math.sin(.28)); gun.add(fit);
-  /* hadice: od rukojeti dolů za skříň a po stole pryč ze záběru; přestavuje se podle polohy pistole */
+  /* hadice ke kompresoru: od rukojeti dolů za skříň, po stole dozadu a přes zadní okraj stolu (z = −200) dolů mimo
+     záběr – při otáčení scény nikde nekončí uprostřed stolu; přestavuje se podle polohy pistole */
   const hose = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshStandardMaterial({ color: 0x2f8fe0, roughness: .45, metalness: 0 }));
   hose.castShadow = true; hose.visible = false; scene.add(hose);
+  /* hladká křivka by se v místě dosednutí prohnula pod desku stolu (hadice by vypadala přerušená):
+     body na stole (z > −199,6) zvednout nejméně o poloměr, za okrajem stolu nechat volně viset */
+  const restOnTable = (curve, r, n) => new THREE.CatmullRomCurve3(curve.getPoints(n).map(p => { if (p.z > -199.6 && p.y < r) p.y = r; return p; }));
   const updateHose = () => {
     const p0 = gun.localToWorld(gunHoseAt.clone());
-    const c = new THREE.CatmullRomCurve3([p0, V3(p0.x, p0.y - 2.5, p0.z - 1.2), V3(p0.x - 1.5, 7, Math.min(p0.z - 5, -10)), V3(p0.x - 3, .35, Math.min(p0.z - 11, -16)), V3(p0.x - 8, .35, -60), V3(p0.x - 14, .35, -130)]);
-    hose.geometry.dispose(); hose.geometry = new THREE.TubeGeometry(c, 90, .32, 10, false);
+    const c = new THREE.CatmullRomCurve3([p0, V3(p0.x, p0.y - 2.5, p0.z - 1.2), V3(p0.x - 1.5, 7, Math.min(p0.z - 5, -10)), V3(p0.x - 3, .35, Math.min(p0.z - 11, -16)),
+      V3(p0.x - 8, .35, -60), V3(p0.x - 14, .35, -130), V3(p0.x - 17, .35, -185), V3(p0.x - 18, .3, -198), V3(p0.x - 18.4, -2.5, -201.2), V3(p0.x - 18.8, -30, -202.5), V3(p0.x - 19, -120, -203)]);
+    hose.geometry.dispose(); hose.geometry = new THREE.TubeGeometry(restOnTable(c, .34, 320), 320, .32, 10, false);
   };
+  /* napájecí kabel 230 V ze zadní stěny skříně (průchodka), po stole dozadu a přes okraj stolu dolů */
+  {
+    const gland = new THREE.Mesh(new THREE.CylinderGeometry(.62, .7, .9, 24), matBlack); gland.rotation.x = Math.PI / 2; gland.position.set(2, 6, -7.4); gland.castShadow = true; device.add(gland);
+    const cc = new THREE.CatmullRomCurve3([V3(2, 6, -7.7), V3(2, 5.6, -9.2), V3(1.6, 1.2, -11.5), V3(1, .3, -14), V3(-3, .3, -60), V3(-9, .3, -140), V3(-12, .3, -188), V3(-12.6, .25, -198.5), V3(-12.9, -2.5, -201.2), V3(-13.2, -30, -202.5), V3(-13.4, -120, -203)]);
+    const cable = new THREE.Mesh(new THREE.TubeGeometry(restOnTable(cc, .3, 320), 320, .28, 10, false), new THREE.MeshStandardMaterial({ color: 0x15171a, roughness: .55, metalness: .05 }));
+    cable.castShadow = true; cable.receiveShadow = true; device.add(cable);
+  }
   const airTip = V3(15, AXIS_Y + 3, -3.6), airDir = V3(0, -2.1, 3.6).normalize();
 
   /* ---------- holder (SK40 shrink-fit chuck) ---------- */
@@ -1283,7 +1320,7 @@ function init3D() {
   holder.add(lathe(bodyPts, matSteel));
   const nosePts = [[8.99, 0], [8.99, 2.0], [9.0, 1.6], [20.3, 1.18], [21, 1.0], [21, .62], [17, .62], [17, 0]];
   const nose = lathe(nosePts, matNose); holder.add(nose);
-  const hMark = labelPlane(6, 1, (g, w, h) => { g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(0,0,0,.55)'; g.font = `600 ${h * .5}px JetBrains Mono, monospace`; g.fillText('ISO40  SHRINK Ø12', 6, h * .68); }, { opacity: .9 });
+  const hMark = labelPlane(6, 1, (g, w, h) => { g.clearRect(0, 0, w, h); g.fillStyle = 'rgba(0,0,0,.55)'; g.font = `600 ${h * .5}px JetBrains Mono, monospace`; g.fillText('SHRINK Ø12', 6, h * .68); }, { opacity: .9 });
   hMark.position.set(12.2, 1.45, .5); hMark.rotation.x = -Math.PI / 2 + .35; holder.add(hMark);
 
   /* ---------- tool (carbide end mill) ---------- */
