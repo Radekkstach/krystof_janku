@@ -81,7 +81,7 @@ canvas.drag{cursor:grabbing}
 
   <h1>Indukční ohřev s <span>DHI-191 HD</span></h1>
   <div class="modes" role="tablist">
-    <button class="mode on" id="modePlate" role="tab">Rovnání plechu <small>fokusačka</small></button>
+    <button class="mode on" id="modePlate" role="tab">Rovnání plechu <small>fokus cívka</small></button>
     <button class="mode" id="modeBar" role="tab">Ohřev kulatiny <small>závitová cívka</small></button>
   </div>
   <p class="sub" id="sub"></p>
@@ -204,13 +204,13 @@ canvas.drag{cursor:grabbing}
 
   // ---------- úrovně ----------
   const LEVELS = [
-    { name: 'Jedna boule', bumps: [{ x: 400, y: 250, r: 60, h: 5 }] },
+    { name: 'Jedna promáčklina', bumps: [{ x: 400, y: 250, r: 60, h: 5 }] },
     { name: 'Prohnutý pás', bumps: [{ x: 250, y: 250, r: 45, h: 3.5 }, { x: 330, y: 250, r: 45, h: 4 }, { x: 410, y: 250, r: 45, h: 4.5 }, { x: 490, y: 250, r: 45, h: 4 }, { x: 570, y: 250, r: 45, h: 3.5 }] },
-    { name: 'Dvě boule', bumps: [{ x: 230, y: 170, r: 55, h: 5 }, { x: 570, y: 330, r: 65, h: 6 }] },
-    { name: 'Tři různé boule', bumps: [{ x: 200, y: 330, r: 40, h: 3 }, { x: 420, y: 150, r: 55, h: 5 }, { x: 610, y: 320, r: 70, h: 6.5 }] },
-    { name: 'Velká vyboulenina', bumps: [{ x: 400, y: 250, r: 105, h: 6 }] },
+    { name: 'Dvě promáčkliny', bumps: [{ x: 230, y: 170, r: 55, h: 5 }, { x: 570, y: 330, r: 65, h: 6 }] },
+    { name: 'Tři různé promáčkliny', bumps: [{ x: 200, y: 330, r: 40, h: 3 }, { x: 420, y: 150, r: 55, h: 5 }, { x: 610, y: 320, r: 70, h: 6.5 }] },
+    { name: 'Velká promáčklina', bumps: [{ x: 400, y: 250, r: 105, h: 6 }] },
     { name: 'Zvlněný okraj', bumps: [80, 180, 280, 380, 480, 580, 680].map((x, n) => ({ x: x + 20, y: 85, r: 45, h: 3 + (n % 2) * 1.5 })) },
-    { name: 'Promáčklina – otoč plech', bumps: [{ x: 400, y: 250, r: 70, h: -5 }] },
+    { name: 'Boule nahoru – otoč plech', bumps: [{ x: 400, y: 250, r: 70, h: -5 }] },
     { name: 'Nahoru i dolů', bumps: [{ x: 250, y: 190, r: 55, h: 4.5 }, { x: 550, y: 310, r: 60, h: -5 }] },
     { name: 'Dlouhý ohyb', bumps: [{ t: 'ridge', x0: 160, x1: 640, y: 250, w: 17, h: 4.5 }] },
   ];
@@ -238,7 +238,7 @@ canvas.drag{cursor:grabbing}
 
   const TEXTS = {
     plate: {
-      sub: '<b>Chyť fokusačku myší (nebo prstem) a ohřívej vyboulená místa.</b> Dokud ji držíš, soustředí pole do malé plochy a ocel tam rychle zčervená. Místo rozžhavené do třešňově červené (cca 600–800 °C) se při chladnutí smrští a boule se srovná. <b>Ohřívat se musí z vypouklé strany</b> – když je plech prohnutý dolů, <b>otoč ho</b>. Nad 900 °C plech spálíš.',
+      sub: '<b>Chyť fokus cívku myší (nebo prstem) a ohřívej nerovná místa.</b> Dokud ji držíš, soustředí pole do malé plochy a ocel tam rychle zčervená. Místo rozžhavené do třešňově červené (cca 600–800 °C) se při chladnutí smrští a plech se srovná. <b>Rovná se z druhé strany – z vyduté</b>: promáčklinu ohříváš rovnou, ale bouli nahoru musíš nejdřív <b>otočit</b>. Nad 900 °C plech spálíš.',
       help: 'Boule poznáš podle odlesků na plechu a podle pohledu z boku dole; tlačítkem Měřidlo boulí si zapneš vrstevnice po 1 mm. Po ohřevu zůstanou na oceli náběhové barvy – slámová, fialová, modrá – stejně jako ve skutečnosti. Úroveň splníš, když žádná nerovnost nebude větší než 1 mm. Skutečný Dawell DHI-191 HD má 19 kW a kapalinou chlazený induktor, takže může pracovat nepřetržitě.',
     },
     bar: {
@@ -266,13 +266,13 @@ canvas.drag{cursor:grabbing}
     D = new Float32Array(N); P = new Float32Array(N); Tmax = new Float32Array(N).fill(ROOM);
     for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
       const px = PX + i * CELL + CELL / 2, py = PY + j * CELL + CELL / 2; let h = 0;
-      for (const b of LEVELS[lvl].bumps) h += bumpAt(b, px, py);
+      for (const b of LEVELS[lvl].bumps) h -= bumpAt(b, px, py);   // kladné h v úrovni = promáčklina shora
       D[j * GW + i] = h;
     }
     D0max = 0; for (let k = 0; k < N; k++) D0max = Math.max(D0max, Math.abs(D[k]));
     coil = { x: 120, y: 400, tx: 120, ty: 400, on: 0, lift: 0 }; flipped = false;
     $('sideLbl').textContent = '(nahoře A)';
-    setMsg(`Úroveň ${lvl + 1}: <b>${LEVELS[lvl].name}</b>. Chyť fokusačku a vyrovnej plech.`);
+    setMsg(`Úroveň ${lvl + 1}: <b>${LEVELS[lvl].name}</b>. Chyť fokus cívku a vyrovnej plech – ohřívej z vyduté strany.`);
   }
   function setMsg(h, c) { $('msg').innerHTML = h; $('msg').className = 'msg' + (c ? ' ' + c : ''); }
 
@@ -307,7 +307,7 @@ canvas.drag{cursor:grabbing}
     mirror(D, true); mirror(P, true); mirror(T, false); mirror(Tmax, false);
     flipped = !flipped; smoke = []; drop();
     $('sideLbl').textContent = `(nahoře ${flipped ? 'B' : 'A'})`;
-    setMsg(`Plech otočen – nahoře je teď <b>strana ${flipped ? 'B' : 'A'}</b>. Co bylo promáčklé, je teď vypouklé.`);
+    setMsg(`Plech otočen – nahoře je teď <b>strana ${flipped ? 'B' : 'A'}</b>. Co bylo vypouklé, je teď promáčklé – a to se dá rovnat.`);
   }
   $('flip').addEventListener('click', flipPlate);
   addEventListener('keydown', e => { if (e.key === 'o' || e.key === 'O') flipPlate(); });
@@ -344,13 +344,13 @@ canvas.drag{cursor:grabbing}
         // nejlépe to stahuje v třešňové červené; přehřátá ocel jen měkne a stahuje se hůř
         // žhavé místo „nabírá“ smrštění; projeví se až při chladnutí
         const eff = t <= WORK_HI ? (t - WORK_LO) / (WORK_HI - WORK_LO) : Math.max(.25, 1 - (t - WORK_HI) / 160);
-        if (D[k] > 0) {
-          // ohřev z vypouklé strany: smrštění bouli stáhne
-          P[k] = Math.min(D[k], P[k] + (D[k] * SHRINK + 2.5) * eff * dt);
-        } else if (D[k] < -0.05 && HEATED[k] === stepId - 1) {
-          // ohřev z vyduté strany: smrštění prohnutí ještě zvětší
-          // (P je posun, o který se D po vychladnutí sníží – kladné P tu prohnutí prohloubí)
-          P[k] = Math.min(0.8, P[k] + (-D[k] * SHRINK * .05 + .3) * eff * dt);
+        // P = posun, o který se D po vychladnutí sníží (D -= P)
+        if (D[k] < 0) {
+          // ohřev z vyduté strany (promáčklina shora): smrštění plech vyrovná
+          P[k] = Math.max(D[k], P[k] - (-D[k] * SHRINK + 2.5) * eff * dt);
+        } else if (D[k] > 0.05 && HEATED[k] === stepId - 1) {
+          // ohřev z vypouklé strany: smrštění bouli ještě zvětší
+          P[k] = Math.max(-0.8, P[k] - (D[k] * SHRINK * .05 + .3) * eff * dt);
         }
       } else if (P[k] !== 0 && t < COOLED) {
         // pod cca 520 °C se ocel stahuje a tvar se změní: D -= P (po otočení plechu má P i D opačné znaménko)
@@ -663,7 +663,7 @@ canvas.drag{cursor:grabbing}
 
     // popisky
     pctx.font = '600 11px JetBrains Mono, monospace'; pctx.textAlign = 'left'; pctx.textBaseline = 'alphabetic';
-    pctx.fillStyle = '#9BA4B0'; pctx.fillText('POHLED Z BOKU · převýšeno 8× · pusť fokusačku = přiložit pravítko', PX, 16);
+    pctx.fillStyle = '#9BA4B0'; pctx.fillText('POHLED Z BOKU · převýšeno 8× · pusť fokus cívku = přiložit pravítko', PX, 16);
     pctx.textAlign = 'right';
     pctx.fillStyle = ok ? '#49D17D' : '#FF9254';
     pctx.fillText(ok ? 'ROVNÝ ✓' : `nerovnost ${Math.max(maxD, maxDn).toFixed(1).replace('.', ',')} mm`, PX + PW, 16);
@@ -703,7 +703,7 @@ canvas.drag{cursor:grabbing}
     if (!grab && time === 0) {
       ctx.font = '700 15px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
       ctx.fillStyle = 'rgba(14,16,19,.75)'; ctx.beginPath(); ctx.roundRect(coil.x - 92, coil.y - 92, 184, 28, 8); ctx.fill();
-      ctx.fillStyle = '#EEF0F3'; ctx.fillText('chyť fokusačku a táhni ↓', coil.x, coil.y - 73);
+      ctx.fillStyle = '#EEF0F3'; ctx.fillText('chyť fokus cívku a táhni ↓', coil.x, coil.y - 73);
     }
     drawProfile();
   }
@@ -738,14 +738,14 @@ canvas.drag{cursor:grabbing}
         const i = ci + a, j = cj + b;
         if (i >= 0 && i < GW && j >= 0 && j < GH) { const d = D[j * GW + i]; if (Math.abs(d) > Math.abs(under)) under = d; }
       }
-      if (under < -0.4 && tc > 400) setMsg('<b>Ohříváš z vyduté strany!</b> Prohnutí se tím ještě zvětší. Rovná se z vypouklé strany – <b>otoč plech</b>.', 'bad');
-      else if (tc > WORK_HI + 30) setMsg('<b>Pozor, moc žhavé!</b> Posuň fokusačku, ať plech nespálíš.', 'bad');
+      if (under > 0.4 && tc > 400) setMsg('<b>Ohříváš z vypouklé strany!</b> Boule se tím ještě zvětší. Rovná se z druhé, vyduté strany – <b>otoč plech</b>.', 'bad');
+      else if (tc > WORK_HI + 30) setMsg('<b>Pozor, moc žhavé!</b> Posuň fokus cívku, ať plech nespálíš.', 'bad');
       else if (tc >= WORK_LO) setMsg('<b>Třešňově červená</b> – ideální teplota. Popojeď dál; místo se stáhne, až vychladne.');
-      else setMsg('Ohříváš… drž fokusačku nad boulí, až ocel zčervená.');
+      else setMsg('Ohříváš… drž fokus cívku nad promáčklinou, až ocel zčervená.');
     }
     if (!done && !grab && time > 0) {
       let pend = 0; for (let k = 0; k < N; k++) pend += P[k];
-      if (pend > 0.5) setMsg('Ocel chladne a <b>stahuje se</b> – sleduj, jak boule klesá.');
+      if (Math.abs(pend) > 0.5) setMsg('Ocel chladne a <b>stahuje se</b> – sleduj, jak se plech rovná.');
     }
     if (!done && mx <= FLAT) win(nb);
   }
