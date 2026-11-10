@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rovnání plechu s DHI-191 HD – mini hra | Dawell</title>
+<title>Indukční ohřev s DHI-191 HD – mini hra | Dawell</title>
 <link rel="icon" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -44,8 +44,14 @@ canvas.drag{cursor:grabbing}
 .btn:hover{border-color:var(--muted)}
 .btn.pri{background:var(--orange);color:#1a0d05;border-color:transparent}
 .btn.on{border-color:var(--orange);color:var(--orange-2)}
-.levels{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px}
+.levels{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:14px}
 @media(max-width:760px){.levels{grid-template-columns:repeat(3,1fr)}}
+.controls + .controls{margin-top:10px}
+.modes{display:flex;gap:8px;margin:10px 0 14px;flex-wrap:wrap}
+.mode{padding:10px 16px;border-radius:12px;border:1px solid var(--line-2);background:var(--panel);color:var(--text);font-family:var(--font);font-weight:700;font-size:15px;cursor:pointer}
+.mode small{display:block;font-weight:500;font-size:12px;color:var(--dim);margin-top:2px}
+.mode.on{border-color:var(--orange);background:var(--orange-soft)}
+.mode.on small{color:var(--orange-2)}
 .lv{position:relative;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid var(--line-2);background:var(--panel);color:var(--text);cursor:pointer;font-family:var(--font)}
 .lv:hover{border-color:var(--muted)}
 .lv .n{font-family:var(--mono);font-size:12px;color:var(--dim)}
@@ -73,8 +79,12 @@ canvas.drag{cursor:grabbing}
     <span style="font-family:var(--mono);color:var(--dim);font-size:13px">mini hra · Dawell DHI-191 HD</span>
   </header>
 
-  <h1>Vyrovnej plech s <span>DHI-191 HD</span></h1>
-  <p class="sub"><b>Chyť induktor myší (nebo prstem) a jezdi s ním po vyboulených místech.</b> Dokud ho držíš, indukuje do oceli vířivé proudy a ohřívá ji. Místo rozžhavené do třešňově červené (cca 600–800 °C) se při chladnutí smrští a boule se srovná. Nad 900 °C ale plech spálíš.</p>
+  <h1>Indukční ohřev s <span>DHI-191 HD</span></h1>
+  <div class="modes" role="tablist">
+    <button class="mode on" id="modePlate" role="tab">Rovnání plechu <small>fokusačka</small></button>
+    <button class="mode" id="modeBar" role="tab">Ohřev kulatiny <small>závitová cívka</small></button>
+  </div>
+  <p class="sub" id="sub"></p>
 
   <div class="levels" id="levels" aria-label="Výběr úrovně"></div>
 
@@ -104,30 +114,31 @@ canvas.drag{cursor:grabbing}
         <div class="v"><span id="tc">22</span> <small>°C</small></div>
       </div>
       <div class="ro">
-        <div class="k">Největší boule</div>
-        <div class="v"><span id="mm">0,0</span> <small>mm</small></div>
+        <div class="k" id="k3">Největší boule</div>
+        <div class="v"><span id="mm">0,0</span> <small id="u3">mm</small></div>
         <div class="bar"><div class="fill" id="pctFill"></div></div>
       </div>
       <div class="ro">
-        <div class="k">Čas · spáleno</div>
+        <div class="k" id="k4">Čas · spáleno</div>
         <div class="v"><span id="time">0,0</span><small> s · </small><span id="burnt">0</span></div>
       </div>
       <div class="ro">
         <div class="k">Barva žáru</div>
         <div class="legend"></div>
-        <div class="legend-k"><span>20</span><span>600–800</span><span>900 °C</span></div>
+        <div class="legend-k"><span>20</span><span id="legMid">600–800</span><span>900 °C</span></div>
       </div>
     </div>
   </div>
 
   <div class="controls">
+    <button class="btn pri" id="flip" title="Také klávesa O">⇅ Otočit plech <span id="sideLbl" style="font-family:var(--mono);font-size:12px;opacity:.75">(nahoře A)</span></button>
     <button class="btn" id="gauge">📏 Měřidlo boulí: vypnuto</button>
     <button class="btn on" id="field">⚡ Ukázat indukci: zapnuto</button>
     <button class="btn" id="restart">Začít úroveň znovu</button>
     <button class="btn" id="next">Další úroveň →</button>
   </div>
   <div class="msg" id="msg"></div>
-  <p class="help">Boule poznáš podle odlesků na plechu a podle profilu pod pravítkem dole; tlačítkem Měřidlo boulí si můžeš zapnout vrstevnice po 1 mm. Po ohřevu zůstanou na oceli náběhové barvy – slámová, fialová, modrá – stejně jako ve skutečnosti. Úroveň splníš, když žádná boule nebude vyšší než 1 mm. Skutečný Dawell DHI-191 HD má 19 kW a kapalinou chlazený induktor, takže může pracovat nepřetržitě.</p>
+  <p class="help" id="help"></p>
 </div>
 
 <script>
@@ -199,27 +210,69 @@ canvas.drag{cursor:grabbing}
     { name: 'Tři různé boule', bumps: [{ x: 200, y: 330, r: 40, h: 3 }, { x: 420, y: 150, r: 55, h: 5 }, { x: 610, y: 320, r: 70, h: 6.5 }] },
     { name: 'Velká vyboulenina', bumps: [{ x: 400, y: 250, r: 105, h: 6 }] },
     { name: 'Zvlněný okraj', bumps: [80, 180, 280, 380, 480, 580, 680].map((x, n) => ({ x: x + 20, y: 85, r: 45, h: 3 + (n % 2) * 1.5 })) },
+    { name: 'Promáčklina – otoč plech', bumps: [{ x: 400, y: 250, r: 70, h: -5 }] },
+    { name: 'Nahoru i dolů', bumps: [{ x: 250, y: 190, r: 55, h: 4.5 }, { x: 550, y: 310, r: 60, h: -5 }] },
+    { name: 'Dlouhý ohyb', bumps: [{ t: 'ridge', x0: 160, x1: 640, y: 250, w: 17, h: 4.5 }] },
   ];
+  // kulatina: průměr (px ≈ mm), úseky k ohřevu na teplotu pro ohýbání
+  const BAR_LEVELS = [
+    { name: 'Krátký úsek', d: 40, zones: [[340, 460]] },
+    { name: 'Dlouhý úsek', d: 40, zones: [[230, 570]] },
+    { name: 'Silná kulatina', d: 70, zones: [[330, 470]] },
+    { name: 'Dva úseky', d: 40, zones: [[170, 280], [520, 630]] },
+  ];
+  let mode = 'plate';
+  const LV = () => (mode === 'bar' ? BAR_LEVELS : LEVELS);
+
+  // h > 0 = boule nahoru (vypouklá shora), h < 0 = prohnutí dolů (vypouklé zespodu)
+  function bumpAt(b, px, py) {
+    if (b.t === 'ridge') {
+      const s = Math.min(1, Math.max(0, (px - b.x0) / 50), Math.max(0, (b.x1 - px) / 50));
+      return b.h * s * s * (3 - 2 * s) * Math.exp(-((py - b.y) ** 2) / (2 * b.w * b.w));
+    }
+    return b.h * Math.exp(-((px - b.x) ** 2 + (py - b.y) ** 2) / (2 * (b.r / 1.6) ** 2));
+  }
 
   let T, T2, D, P, Tmax, D0max, lvl = 0, time, done, coil, grab, last, showGauge = false, tcNow = ROOM;
-  let smoke = [];
+  let smoke = [], flipped = false;
+
+  const TEXTS = {
+    plate: {
+      sub: '<b>Chyť fokusačku myší (nebo prstem) a ohřívej vyboulená místa.</b> Dokud ji držíš, soustředí pole do malé plochy a ocel tam rychle zčervená. Místo rozžhavené do třešňově červené (cca 600–800 °C) se při chladnutí smrští a boule se srovná. <b>Ohřívat se musí z vypouklé strany</b> – když je plech prohnutý dolů, <b>otoč ho</b>. Nad 900 °C plech spálíš.',
+      help: 'Boule poznáš podle odlesků na plechu a podle pohledu z boku dole; tlačítkem Měřidlo boulí si zapneš vrstevnice po 1 mm. Po ohřevu zůstanou na oceli náběhové barvy – slámová, fialová, modrá – stejně jako ve skutečnosti. Úroveň splníš, když žádná nerovnost nebude větší než 1 mm. Skutečný Dawell DHI-191 HD má 19 kW a kapalinou chlazený induktor, takže může pracovat nepřetržitě.',
+    },
+    bar: {
+      sub: '<b>Chyť závitovou cívku a posouvej ji po kulatině.</b> Cívka obepíná kulatinu dokola a ohřívá ji celým průřezem. Ohřej vyznačené úseky na <b>750–900 °C</b> (oranžový žár) – na tuhle teplotu se kulatina ohýbá. Úsek delší než cívka musíš prohřát postupně, posouváním tam a zpět. Silnější kulatina se ohřívá pomaleji. Nad 1000 °C materiál přehřeješ.',
+      help: 'Graf dole ukazuje teplotu po celé délce kulatiny, zelený pás je cílových 750–900 °C. Úsek se odškrtne, když je skoro celý v tomto rozmezí najednou. Teplo se po kulatině rozlévá do stran a pomalu chladne.',
+    },
+  };
 
   function startLevel() {
     if (typeof autoTimer !== 'undefined' && autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+    time = 0; done = false; grab = false; smoke = [];
+    $('over').classList.remove('show');
+    $('lvl').textContent = lvl + 1; $('lvlName').textContent = LV()[lvl].name;
+    $('lvlCount').textContent = LV().length;
+    $('sub').innerHTML = TEXTS[mode].sub; $('help').textContent = TEXTS[mode].help;
+    $('modePlate').classList.toggle('on', mode === 'plate'); $('modeBar').classList.toggle('on', mode === 'bar');
+    $('flip').style.display = $('gauge').style.display = mode === 'plate' ? '' : 'none';
+    $('k3').textContent = mode === 'plate' ? 'Největší nerovnost' : 'Úseky ohřáté';
+    $('u3').textContent = mode === 'plate' ? 'mm' : '';
+    $('k4').textContent = mode === 'plate' ? 'Čas · spáleno' : 'Čas · přehřáto';
+    $('legMid').textContent = mode === 'plate' ? '600–800' : '750–900';
+    if (typeof renderLevels === 'function') renderLevels();
+    if (mode === 'bar') { barStart(); return; }
     T = new Float32Array(N).fill(ROOM); T2 = new Float32Array(N);
     D = new Float32Array(N); P = new Float32Array(N); Tmax = new Float32Array(N).fill(ROOM);
     for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
       const px = PX + i * CELL + CELL / 2, py = PY + j * CELL + CELL / 2; let h = 0;
-      for (const b of LEVELS[lvl].bumps) h += b.h * Math.exp(-((px - b.x) ** 2 + (py - b.y) ** 2) / (2 * (b.r / 1.6) ** 2));
+      for (const b of LEVELS[lvl].bumps) h += bumpAt(b, px, py);
       D[j * GW + i] = h;
     }
-    D0max = Math.max(...D);
-    coil = { x: 120, y: 400, tx: 120, ty: 400, on: 0, lift: 0 }; grab = false; smoke = [];
-    time = 0; done = false;
-    $('over').classList.remove('show');
-    $('lvl').textContent = lvl + 1; $('lvlName').textContent = LEVELS[lvl].name;
-    if (typeof renderLevels === 'function') renderLevels();
-    setMsg(`Úroveň ${lvl + 1}: <b>${LEVELS[lvl].name}</b>. Chyť induktor a vyrovnej plech.`);
+    D0max = 0; for (let k = 0; k < N; k++) D0max = Math.max(D0max, Math.abs(D[k]));
+    coil = { x: 120, y: 400, tx: 120, ty: 400, on: 0, lift: 0 }; flipped = false;
+    $('sideLbl').textContent = '(nahoře A)';
+    setMsg(`Úroveň ${lvl + 1}: <b>${LEVELS[lvl].name}</b>. Chyť fokusačku a vyrovnej plech.`);
   }
   function setMsg(h, c) { $('msg').innerHTML = h; $('msg').className = 'msg' + (c ? ' ' + c : ''); }
 
@@ -228,28 +281,58 @@ canvas.drag{cursor:grabbing}
   cv.addEventListener('pointerdown', e => {
     if (done) return;
     const p = pos(e);
-    if (Math.hypot(p.x - coil.x, p.y - coil.y) < 90 || e.pointerType === 'touch') {
-      grab = true; cv.setPointerCapture(e.pointerId); cv.classList.add('drag');
-      coil.tx = p.x; coil.ty = p.y;
+    const near = mode === 'bar' ? Math.abs(p.x - coil.x) < 80 && Math.abs(p.y - coil.y) < 140 : Math.hypot(p.x - coil.x, p.y - coil.y) < 90;
+    if (near || e.pointerType === 'touch') {
+      grab = true; try { cv.setPointerCapture(e.pointerId); } catch (_) {} cv.classList.add('drag');
+      moveTo(p);
     }
   });
-  cv.addEventListener('pointermove', e => { if (grab) { const p = pos(e); coil.tx = Math.max(PX, Math.min(PX + PW, p.x)); coil.ty = Math.max(PY, Math.min(PY + PH, p.y)); } });
+  function moveTo(p) {
+    if (mode === 'bar') { coil.tx = Math.max(BAR_X0 + 30, Math.min(BAR_X1 - 30, p.x)); return; }
+    coil.tx = Math.max(PX, Math.min(PX + PW, p.x)); coil.ty = Math.max(PY, Math.min(PY + PH, p.y));
+  }
+  cv.addEventListener('pointermove', e => { if (grab) moveTo(pos(e)); });
   const drop = () => { grab = false; cv.classList.remove('drag'); };
   cv.addEventListener('pointerup', drop); cv.addEventListener('pointercancel', drop); addEventListener('blur', drop);
 
+  // otočení plechu (překlopení kolem vodorovné osy): boule nahoru ↔ dolů, nahoře je druhá strana
+  function flipPlate() {
+    if (done || mode !== 'plate') return;
+    const mirror = (a, neg) => {
+      for (let j = 0; j < GH / 2; j++) for (let i = 0; i < GW; i++) {
+        const k = j * GW + i, k2 = (GH - 1 - j) * GW + i, t = a[k]; a[k] = a[k2]; a[k2] = t;
+      }
+      if (neg) for (let k = 0; k < N; k++) a[k] = -a[k];
+    };
+    mirror(D, true); mirror(P, true); mirror(T, false); mirror(Tmax, false);
+    flipped = !flipped; smoke = []; drop();
+    $('sideLbl').textContent = `(nahoře ${flipped ? 'B' : 'A'})`;
+    setMsg(`Plech otočen – nahoře je teď <b>strana ${flipped ? 'B' : 'A'}</b>. Co bylo promáčklé, je teď vypouklé.`);
+  }
+  $('flip').addEventListener('click', flipPlate);
+  addEventListener('keydown', e => { if (e.key === 'o' || e.key === 'O') flipPlate(); });
+  $('modePlate').addEventListener('click', () => { if (mode !== 'plate') { mode = 'plate'; lvl = 0; startLevel(); } });
+  $('modeBar').addEventListener('click', () => { if (mode !== 'bar') { mode = 'bar'; lvl = 0; startLevel(); } });
+
   // ---------- fyzika ----------
+  const HEATED = new Uint32Array(N); let stepId = 1;
+  const FOC_R = 20, FOC_Q = 1.9;
   const R0 = 24, SIG = 14, COOLED = 520, Q = 240, COOL = 0.04, DIFF = 110, SHRINK = 18; // DIFF v px²/s
   function step(dt) {
     coil.on += ((grab ? 1 : 0) - coil.on) * Math.min(1, dt / 0.1);
     if (coil.on > 0.01) {
-      const reach = R0 + SIG * 3;
+      // fokusačka: feritový koncentrátor soustředí pole do malé skvrny pod hrotem
+      const reach = FOC_R * 3;
       const i0 = Math.max(0, ((coil.x - PX - reach) / CELL) | 0), i1 = Math.min(GW - 1, ((coil.x - PX + reach) / CELL) | 0);
       const j0 = Math.max(0, ((coil.y - PY - reach) / CELL) | 0), j1 = Math.min(GH - 1, ((coil.y - PY + reach) / CELL) | 0);
       for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
-        const d = Math.hypot(PX + i * CELL + 2.5 - coil.x, PY + j * CELL + 2.5 - coil.y);
-        T[j * GW + i] += Q * coil.on * (Math.exp(-((d - R0) ** 2) / (2 * SIG * SIG)) + 0.75 * Math.exp(-(d * d) / (2 * 16 * 16))) * dt;
+        const dx = PX + i * CELL + 2.5 - coil.x, dy = PY + j * CELL + 2.5 - coil.y;
+        const q = FOC_Q * Math.exp(-(dx * dx + dy * dy) / (2 * FOC_R * FOC_R));
+        T[j * GW + i] += Q * coil.on * q * dt;
+        if (q > .08) HEATED[j * GW + i] = stepId;          // místo ohřívané teď z horní strany
       }
     }
+    stepId++;
     const c = DIFF / (CELL * CELL) * dt;
     for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
       const k = j * GW + i, t = T[k];
@@ -261,11 +344,18 @@ canvas.drag{cursor:grabbing}
         // nejlépe to stahuje v třešňové červené; přehřátá ocel jen měkne a stahuje se hůř
         // žhavé místo „nabírá“ smrštění; projeví se až při chladnutí
         const eff = t <= WORK_HI ? (t - WORK_LO) / (WORK_HI - WORK_LO) : Math.max(.25, 1 - (t - WORK_HI) / 160);
-        P[k] = Math.min(D[k], P[k] + (D[k] * SHRINK + 2.5) * eff * dt);
-      } else if (P[k] > 0 && t < COOLED) {
-        // pod cca 450 °C se ocel stahuje a boule klesá
-        const x = Math.min(P[k], (P[k] * 3 + 0.1) * dt);
-        P[k] -= x; D[k] = Math.max(0, D[k] - x);
+        if (D[k] > 0) {
+          // ohřev z vypouklé strany: smrštění bouli stáhne
+          P[k] = Math.min(D[k], P[k] + (D[k] * SHRINK + 2.5) * eff * dt);
+        } else if (D[k] < -0.05 && HEATED[k] === stepId - 1) {
+          // ohřev z vyduté strany: smrštění prohnutí ještě zvětší
+          // (P je posun, o který se D po vychladnutí sníží – kladné P tu prohnutí prohloubí)
+          P[k] = Math.min(0.8, P[k] + (-D[k] * SHRINK * .05 + .3) * eff * dt);
+        }
+      } else if (P[k] !== 0 && t < COOLED) {
+        // pod cca 520 °C se ocel stahuje a tvar se změní: D -= P (po otočení plechu má P i D opačné znaménko)
+        const x = P[k] > 0 ? Math.min(P[k], (P[k] * 3 + 0.1) * dt) : Math.max(P[k], (P[k] * 3 - 0.1) * dt);
+        P[k] -= x; D[k] = Math.max(-9, Math.min(9, D[k] - x));
       }
     }
     const s = T; T = T2; T2 = s;
@@ -323,7 +413,7 @@ canvas.drag{cursor:grabbing}
       // měřidlo – vrstevnice po 1 mm
       let on = 0;
       if (showGauge && i < GW - 1 && j < GH - 1) {
-        const a = D[k], b = D[k + 1], e = D[k + GW];
+        const a = Math.abs(D[k]), b = Math.abs(D[k + 1]), e = Math.abs(D[k + GW]);
         for (let lv = 1; lv < 8; lv++) if ((a - lv) * (b - lv) < 0 || (a - lv) * (e - lv) < 0) { on = 1; break; }
       }
       md[p] = 110; md[p + 1] = 190; md[p + 2] = 255; md[p + 3] = on ? 120 : 0;
@@ -362,7 +452,7 @@ canvas.drag{cursor:grabbing}
     ctx.save(); ctx.translate(cx + so, cy + so * 1.25); ctx.rotate(ang);
     if (FILTER) ctx.filter = `blur(${5 + lift * 5}px)`;
     ctx.fillStyle = `rgba(0,0,0,${.5 - lift * .15})`;
-    ctx.beginPath(); ctx.arc(0, 0, 44, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(-24, -20, 46, 40, 9); ctx.fill();
     ctx.beginPath(); ctx.roundRect(40, -20, 145, 40, 14); ctx.fill();
     ctx.restore();
 
@@ -378,12 +468,18 @@ canvas.drag{cursor:grabbing}
       ctx.save(); ctx.translate(.9, 1.1); ctx.strokeStyle = 'rgba(70,28,8,.55)'; ctx.lineWidth = w * .45; ctx.stroke(); ctx.restore();
       ctx.save(); ctx.translate(-.9, -1.1); ctx.strokeStyle = `rgba(255,${215 - hot * 40},${175 - hot * 70},.85)`; ctx.lineWidth = w * .25; ctx.stroke(); ctx.restore();
     };
-    // spirála (plochý induktor – „pancake“)
-    const sp = [];
-    for (let a = 0; a <= Math.PI * 2 * 4; a += 0.07) { const r = 9 + a * 1.25; sp.push([Math.cos(a) * r, Math.sin(a) * r]); }
-    tube(sp, 4.6);
-    tube([[sp[sp.length - 1][0], sp[sp.length - 1][1]], [52, -7], [64, -7]], 4.6);   // vnější konec
-    tube([[9, 0], [30, 4], [52, 7], [64, 7]], 4.6);                                    // vnitřní konec přes závity
+    // fokusačka – feritový koncentrátor s měděnými závity, hrot míří do plechu
+    tube([[16, -6], [40, -7], [64, -7]], 4.6);
+    tube([[16, 6], [40, 7], [64, 7]], 4.6);
+    const fer = ctx.createLinearGradient(0, -18, 0, 18);
+    fer.addColorStop(0, '#4a4e55'); fer.addColorStop(.45, '#2a2d32'); fer.addColorStop(1, '#141518');
+    ctx.fillStyle = fer; ctx.beginPath(); ctx.roundRect(-22, -18, 42, 36, 7); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,.6)'; ctx.lineWidth = 1; ctx.stroke();
+    for (let n = 0; n < 14; n++) { ctx.fillStyle = 'rgba(255,255,255,.05)'; ctx.fillRect(-20 + (n * 37) % 38, -16 + (n * 23) % 32, 2, 2); }  // zrnitost feritu
+    for (const x of [-13, -5, 3, 11]) tube([[x, -19], [x + 1.5, 19]], 4.2);                                          // závity přes ferit
+    // hrot koncentrátoru (místo, kam míří pole)
+    ctx.beginPath(); ctx.arc(-1, 0, 5, 0, Math.PI * 2);
+    ctx.fillStyle = hot > .2 ? `rgba(255,${150 - hot * 60},60,${.5 + hot * .4})` : '#1c1d20'; ctx.fill();
     // šroubení hadic vzadu na rukojeti
     for (const yy of [-9, 0, 9]) {
       const fg = ctx.createLinearGradient(0, yy - 4, 0, yy + 4);
@@ -408,17 +504,21 @@ canvas.drag{cursor:grabbing}
     ctx.beginPath(); ctx.arc(138, 10, 3, 0, Math.PI * 2);
     ctx.fillStyle = on > .5 ? '#7dff9a' : '#2f3a33'; ctx.fill();
     if (on > .5) { ctx.beginPath(); ctx.arc(138, 10, 7, 0, Math.PI * 2); ctx.fillStyle = 'rgba(125,255,154,.25)'; ctx.fill(); }
-    if (grab) { ctx.strokeStyle = 'rgba(255,146,84,.9)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 47, 0, Math.PI * 2); ctx.stroke(); }
+    if (grab) {
+      ctx.strokeStyle = 'rgba(255,146,84,.9)'; ctx.lineWidth = 2; ctx.beginPath();
+      ctx.roundRect(-27, -23, 52, 46, 11);
+      ctx.stroke();
+    }
     ctx.restore();
   }
 
   function drawInduction(now) {
     const { x: cx, y: cy, on } = coil;
     if (on < .05) return;
-    // vířivé proudy v plechu
-    ctx.save(); ctx.translate(cx, cy); ctx.rotate(now / 160);
-    ctx.strokeStyle = `rgba(150,215,255,${.2 * on})`; ctx.lineWidth = 1.1;
-    for (const r of [14, 26, 38]) for (let a = 0; a < 3; a++) {
+    // vířivé proudy v plechu – soustředěné pod hrotem fokusačky
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(now / 140);
+    ctx.strokeStyle = `rgba(150,215,255,${.22 * on})`; ctx.lineWidth = 1.1;
+    for (const r of [9, 18, 27]) for (let a = 0; a < 3; a++) {
       const a0 = a * 2.094, a1 = a0 + 1.3;
       ctx.beginPath(); ctx.arc(0, 0, r, a0, a1); ctx.stroke();
       const ex = Math.cos(a1) * r, ey = Math.sin(a1) * r;
@@ -428,7 +528,7 @@ canvas.drag{cursor:grabbing}
     // střídavé magnetické pole
     for (let n = 0; n < 3; n++) {
       const ph = ((now / 520) + n / 3) % 1;
-      ctx.beginPath(); ctx.arc(cx, cy, 50 + ph * 55, 0, Math.PI * 2);
+      ctx.beginPath(); ctx.arc(cx, cy, 34 + ph * 45, 0, Math.PI * 2);
       ctx.strokeStyle = `rgba(150,215,255,${(1 - ph) * .14 * on})`; ctx.lineWidth = 1.2; ctx.stroke();
     }
   }
@@ -448,52 +548,65 @@ canvas.drag{cursor:grabbing}
   }
 
   // ---------- pohled z boku: plech na stole, ocelové pravítko a světlo pod ním ----------
-  const colD = new Float32Array(GW), colT = new Float32Array(GW);
+  const colD = new Float32Array(GW), colDn = new Float32Array(GW), colT = new Float32Array(GW);
   function drawProfile() {
-    const PHt = 190, BASE = 150, THICK = 12, SC = 12;              // převýšení boulí 12×
+    const PHt = 190, BASE = 98, THICK = 12, SC = 8, TABLE = 176;    // převýšení boulí 8×
     for (let i = 0; i < GW; i++) {
-      let dm = 0, tm = 0;
-      for (let j = 0; j < GH; j++) { const k = j * GW + i; if (D[k] > dm) dm = D[k]; if (T[k] > tm) tm = T[k]; }
-      colD[i] = dm; colT[i] = tm;
+      let up = 0, dn = 0, tm = 0;
+      for (let j = 0; j < GH; j++) { const k = j * GW + i, d = D[k]; if (d > up) up = d; if (d < dn) dn = d; if (T[k] > tm) tm = T[k]; }
+      colD[i] = up; colDn[i] = dn; colT[i] = tm;
     }
-    let maxD = 0, maxI = 0; for (let i = 0; i < GW; i++) if (colD[i] > maxD) { maxD = colD[i]; maxI = i; }
-    const xAt = i => PX + i * CELL + 2.5, yTop = i => BASE - colD[i] * SC;
+    let maxD = 0, maxI = 0, maxDn = 0, dnI = 0;
+    for (let i = 0; i < GW; i++) { if (colD[i] > maxD) { maxD = colD[i]; maxI = i; } if (-colDn[i] > maxDn) { maxDn = -colDn[i]; dnI = i; } }
+    const xAt = i => PX + i * CELL + 2.5, yTop = i => BASE - colD[i] * SC, yBot = i => BASE + THICK - colDn[i] * SC;
 
     // dílna v pozadí
     const bgG = pctx.createLinearGradient(0, 0, 0, PHt);
     bgG.addColorStop(0, '#1b1f25'); bgG.addColorStop(1, '#0f1114');
     pctx.fillStyle = bgG; pctx.fillRect(0, 0, W, PHt);
-    // deska stolu
-    const tb = pctx.createLinearGradient(0, BASE + THICK, 0, PHt);
-    tb.addColorStop(0, '#3a3e44'); tb.addColorStop(.15, '#26292e'); tb.addColorStop(1, '#16181b');
-    pctx.fillStyle = tb; pctx.fillRect(0, BASE + THICK, W, PHt - BASE - THICK);
-    pctx.fillStyle = 'rgba(255,255,255,.12)'; pctx.fillRect(0, BASE + THICK, W, 1);
+    // deska stolu a dvě podložky pod plechem
+    const tb = pctx.createLinearGradient(0, TABLE, 0, PHt);
+    tb.addColorStop(0, '#3a3e44'); tb.addColorStop(.3, '#26292e'); tb.addColorStop(1, '#16181b');
+    pctx.fillStyle = tb; pctx.fillRect(0, TABLE, W, PHt - TABLE);
+    pctx.fillStyle = 'rgba(255,255,255,.12)'; pctx.fillRect(0, TABLE, W, 1);
+    for (const sx of [PX + 40, PX + PW - 70]) {
+      const sg = pctx.createLinearGradient(sx, 0, sx + 30, 0);
+      sg.addColorStop(0, '#4a4e55'); sg.addColorStop(.5, '#6a6f77'); sg.addColorStop(1, '#3a3e44');
+      pctx.fillStyle = sg; pctx.fillRect(sx, BASE + THICK, 30, TABLE - BASE - THICK);
+    }
 
-    // plech z boku: horní hrana kopíruje boule, spodní leží na stole
-    pctx.beginPath(); pctx.moveTo(PX, BASE + THICK);
-    for (let i = 0; i < GW; i++) pctx.lineTo(xAt(i), yTop(i));
-    pctx.lineTo(PX + PW, BASE + THICK); pctx.closePath();
-    const side = pctx.createLinearGradient(0, BASE - 60, 0, BASE + THICK);
-    side.addColorStop(0, '#b9bfc6'); side.addColorStop(.6, '#8d939b'); side.addColorStop(1, '#5d6268');
+    // plech z boku: horní hrana = boule nahoru, spodní hrana = prohnutí dolů
+    pctx.beginPath(); pctx.moveTo(xAt(0), yTop(0));
+    for (let i = 1; i < GW; i++) pctx.lineTo(xAt(i), yTop(i));
+    for (let i = GW - 1; i >= 0; i--) pctx.lineTo(xAt(i), yBot(i));
+    pctx.closePath();
+    const side = pctx.createLinearGradient(0, BASE - 50, 0, BASE + THICK + 50);
+    side.addColorStop(0, '#b9bfc6'); side.addColorStop(.5, '#8d939b'); side.addColorStop(1, '#5d6268');
     pctx.fillStyle = side; pctx.fill();
     // žár na hraně plechu
     pctx.save(); pctx.clip();
     pctx.globalCompositeOperation = 'lighter';
     for (let i = 0; i < GW; i++) {
       const gc = GLOW[Math.max(0, Math.min(1200, colT[i] | 0))];
-      if (gc[3] > .02) { pctx.fillStyle = `rgba(${gc[0] | 0},${gc[1] | 0},${gc[2] | 0},${gc[3] * .9})`; pctx.fillRect(xAt(i) - 3, yTop(i) - 2, 6, BASE + THICK - yTop(i) + 2); }
+      if (gc[3] > .02) { pctx.fillStyle = `rgba(${gc[0] | 0},${gc[1] | 0},${gc[2] | 0},${gc[3] * .9})`; pctx.fillRect(xAt(i) - 3, yTop(i) - 2, 6, yBot(i) - yTop(i) + 4); }
     }
     pctx.restore();
-    // lesklá horní hrana
+    // lesklá horní hrana, tmavší spodní
     pctx.beginPath(); for (let i = 0; i < GW; i++) i ? pctx.lineTo(xAt(i), yTop(i)) : pctx.moveTo(xAt(i), yTop(i));
     pctx.strokeStyle = 'rgba(255,255,255,.55)'; pctx.lineWidth = 1.2; pctx.stroke();
+    pctx.beginPath(); for (let i = 0; i < GW; i++) i ? pctx.lineTo(xAt(i), yBot(i)) : pctx.moveTo(xAt(i), yBot(i));
+    pctx.strokeStyle = 'rgba(0,0,0,.45)'; pctx.stroke();
+    // označení stran
+    pctx.font = '700 11px JetBrains Mono, monospace'; pctx.textAlign = 'left';
+    pctx.fillStyle = '#EEF0F3'; pctx.fillText(`strana ${flipped ? 'B' : 'A'} ↑ (ohříváš)`, PX + 4, BASE - 6);
+    pctx.fillStyle = '#9BA4B0'; pctx.fillText(`strana ${flipped ? 'A' : 'B'} ↓`, PX + 4, BASE + THICK + 13);
 
-    // zelená čára = dokonalá rovina
+    // zelené čáry = dokonalá rovina
     pctx.strokeStyle = 'rgba(73,209,125,.5)'; pctx.setLineDash([6, 6]); pctx.lineWidth = 1;
-    pctx.beginPath(); pctx.moveTo(PX, BASE); pctx.lineTo(PX + PW, BASE); pctx.stroke(); pctx.setLineDash([]);
+    pctx.beginPath(); pctx.moveTo(PX, BASE); pctx.lineTo(PX + PW, BASE); pctx.moveTo(PX, BASE + THICK); pctx.lineTo(PX + PW, BASE + THICK); pctx.stroke(); pctx.setLineDash([]);
 
     // ocelové pravítko – položí se na plech, když induktor pustíš (leží na nejvyšším místě)
-    const ruler = coil.lift, ry = BASE - maxD * SC, ok = maxD <= FLAT;
+    const ruler = coil.lift, ry = BASE - maxD * SC, ok = Math.max(maxD, maxDn) <= FLAT;
     if (ruler > .05) {
       pctx.save(); pctx.globalAlpha = ruler;
       // světlo prosvítající mezerou pod pravítkem
@@ -512,29 +625,34 @@ canvas.drag{cursor:grabbing}
       pctx.restore();
     }
 
-    // kóta největší výšky boule
-    if (maxD > 0.15) {
-      const mx = xAt(maxI) - 10, y1 = ry + 2, y2 = BASE - 2;
-      pctx.strokeStyle = ok ? '#49D17D' : '#FF9254'; pctx.lineWidth = 1.5;
+    // kóty: boule nahoru (nad horní rovinou) a prohnutí dolů (pod spodní rovinou)
+    const dim = (mx, y1, y2, val, good) => {
+      pctx.strokeStyle = good ? '#49D17D' : '#FF9254'; pctx.lineWidth = 1.5;
       pctx.beginPath(); pctx.moveTo(mx, y1); pctx.lineTo(mx, y2); pctx.stroke();
       pctx.beginPath(); pctx.moveTo(mx - 4, y1 + 5); pctx.lineTo(mx, y1); pctx.lineTo(mx + 4, y1 + 5); pctx.stroke();
       pctx.beginPath(); pctx.moveTo(mx - 4, y2 - 5); pctx.lineTo(mx, y2); pctx.lineTo(mx + 4, y2 - 5); pctx.stroke();
-      pctx.font = '600 11px JetBrains Mono, monospace'; pctx.textAlign = 'right'; pctx.fillStyle = ok ? '#49D17D' : '#FF9254';
-      pctx.fillText(maxD.toFixed(1).replace('.', ',') + ' mm', mx - 6, (y1 + y2) / 2 + 4);
-    }
+      pctx.font = '600 11px JetBrains Mono, monospace'; pctx.textAlign = 'right'; pctx.fillStyle = good ? '#49D17D' : '#FF9254';
+      pctx.fillText(val.toFixed(1).replace('.', ',') + ' mm', mx - 6, (y1 + y2) / 2 + 4);
+    };
+    if (maxD > 0.15) dim(xAt(maxI) - 10, ry + 2, BASE - 2, maxD, maxD <= FLAT);
+    if (maxDn > 0.15) dim(xAt(dnI) - 10, BASE + THICK + 2, BASE + THICK + maxDn * SC - 2, maxDn, maxDn <= FLAT);
 
     // induktor z boku nad plechem (když ho držíš)
-    const ix = coil.x, lift = 4 + coil.lift * 14, iy = BASE - (colD[Math.max(0, Math.min(GW - 1, ((ix - PX) / CELL) | 0))] || 0) * SC - lift;
+    const ix = coil.x, lift = 4 + coil.lift * 14, iy = Math.max(62, BASE - (colD[Math.max(0, Math.min(GW - 1, ((ix - PX) / CELL) | 0))] || 0) * SC - lift);
     pctx.save(); pctx.globalAlpha = 1 - coil.lift;
     if (coil.on > .05) {
       const hg = pctx.createRadialGradient(ix, iy + lift, 2, ix, iy + lift, 60);
       hg.addColorStop(0, `rgba(255,130,50,${.35 * coil.on})`); hg.addColorStop(1, 'rgba(255,130,50,0)');
       pctx.fillStyle = hg; pctx.fillRect(ix - 60, iy - 50, 120, 110);
     }
-    pctx.fillStyle = '#7a3a14'; pctx.fillRect(ix - 40, iy - 7, 80, 7);                          // měděná spirála z boku
-    for (let x = -38; x <= 34; x += 8) { pctx.fillStyle = '#d98a52'; pctx.fillRect(ix + x, iy - 7, 5, 3); }
-    pctx.fillStyle = '#b5622c'; pctx.fillRect(ix + 30, iy - 26, 5, 20);                        // přívody nahoru
-    pctx.save(); pctx.translate(ix + 32, iy - 26); pctx.rotate(-0.35);
+    // fokusačka z boku: feritový blok se závity a hrot nad plechem
+    const fg2 = pctx.createLinearGradient(ix - 20, 0, ix + 20, 0);
+    fg2.addColorStop(0, '#2a2d32'); fg2.addColorStop(.5, '#4a4e55'); fg2.addColorStop(1, '#1a1c1f');
+    pctx.fillStyle = fg2; pctx.beginPath(); pctx.roundRect(ix - 20, iy - 30, 40, 26, 4); pctx.fill();
+    pctx.beginPath(); pctx.moveTo(ix - 10, iy - 4); pctx.lineTo(ix + 10, iy - 4); pctx.lineTo(ix + 4, iy + 2); pctx.lineTo(ix - 4, iy + 2); pctx.closePath(); pctx.fill();
+    for (const x of [-14, -6, 2, 10]) { pctx.fillStyle = '#b5622c'; pctx.fillRect(ix + x, iy - 31, 4, 28); pctx.fillStyle = 'rgba(255,210,170,.6)'; pctx.fillRect(ix + x, iy - 31, 1.3, 28); }
+    pctx.fillStyle = '#b5622c'; pctx.fillRect(ix + 18, iy - 26, 16, 5);                        // přívody k pistoli
+    pctx.save(); pctx.translate(ix + 32, iy - 26); pctx.rotate(-0.15);
     const bg2 = pctx.createLinearGradient(0, -12, 0, 12);
     bg2.addColorStop(0, '#ffa066'); bg2.addColorStop(1, '#c94e10');
     pctx.fillStyle = '#121315'; pctx.fillRect(0, -9, 14, 18);
@@ -545,10 +663,10 @@ canvas.drag{cursor:grabbing}
 
     // popisky
     pctx.font = '600 11px JetBrains Mono, monospace'; pctx.textAlign = 'left'; pctx.textBaseline = 'alphabetic';
-    pctx.fillStyle = '#9BA4B0'; pctx.fillText('POHLED Z BOKU · boule převýšeny 12× · pusť induktor = přiložit pravítko', PX, 16);
+    pctx.fillStyle = '#9BA4B0'; pctx.fillText('POHLED Z BOKU · převýšeno 8× · pusť fokusačku = přiložit pravítko', PX, 16);
     pctx.textAlign = 'right';
     pctx.fillStyle = ok ? '#49D17D' : '#FF9254';
-    pctx.fillText(ok ? 'ROVNÝ ✓' : `nerovnost ${maxD.toFixed(1).replace('.', ',')} mm`, PX + PW, 16);
+    pctx.fillText(ok ? 'ROVNÝ ✓' : `nerovnost ${Math.max(maxD, maxDn).toFixed(1).replace('.', ',')} mm`, PX + PW, 16);
   }
 
   function draw(now, dt) {
@@ -585,7 +703,7 @@ canvas.drag{cursor:grabbing}
     if (!grab && time === 0) {
       ctx.font = '700 15px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
       ctx.fillStyle = 'rgba(14,16,19,.75)'; ctx.beginPath(); ctx.roundRect(coil.x - 92, coil.y - 92, 184, 28, 8); ctx.fill();
-      ctx.fillStyle = '#EEF0F3'; ctx.fillText('chyť induktor a táhni ↓', coil.x, coil.y - 73);
+      ctx.fillStyle = '#EEF0F3'; ctx.fillText('chyť fokusačku a táhni ↓', coil.x, coil.y - 73);
     }
     drawProfile();
   }
@@ -599,7 +717,7 @@ canvas.drag{cursor:grabbing}
     if (grab || time > 0) time += dt;
 
     let nb = 0, mx = 0, tc = 0;
-    for (let k = 0; k < N; k++) { if (Tmax[k] > BURN) nb++; if (D[k] > mx) mx = D[k]; }
+    for (let k = 0; k < N; k++) { if (Tmax[k] > BURN) nb++; const ad = Math.abs(D[k]); if (ad > mx) mx = ad; }
     const ci = ((coil.x - PX) / CELL) | 0, cj = ((coil.y - PY) / CELL) | 0;
     for (let b = -6; b <= 6; b++) for (let a = -6; a <= 6; a++) {
       const i = ci + a, j = cj + b;
@@ -615,9 +733,15 @@ canvas.drag{cursor:grabbing}
     $('burnt').textContent = nb; $('burnt').style.color = nb ? 'var(--bad)' : '';
 
     if (!done && grab) {
-      if (tc > WORK_HI + 30) setMsg('<b>Pozor, moc žhavé!</b> Posuň induktor, ať plech nespálíš.', 'bad');
+      let under = 0;
+      for (let b = -3; b <= 3; b++) for (let a = -3; a <= 3; a++) {
+        const i = ci + a, j = cj + b;
+        if (i >= 0 && i < GW && j >= 0 && j < GH) { const d = D[j * GW + i]; if (Math.abs(d) > Math.abs(under)) under = d; }
+      }
+      if (under < -0.4 && tc > 400) setMsg('<b>Ohříváš z vyduté strany!</b> Prohnutí se tím ještě zvětší. Rovná se z vypouklé strany – <b>otoč plech</b>.', 'bad');
+      else if (tc > WORK_HI + 30) setMsg('<b>Pozor, moc žhavé!</b> Posuň fokusačku, ať plech nespálíš.', 'bad');
       else if (tc >= WORK_LO) setMsg('<b>Třešňově červená</b> – ideální teplota. Popojeď dál; místo se stáhne, až vychladne.');
-      else setMsg('Ohříváš… drž induktor nad boulí, až ocel zčervená.');
+      else setMsg('Ohříváš… drž fokusačku nad boulí, až ocel zčervená.');
     }
     if (!done && !grab && time > 0) {
       let pend = 0; for (let k = 0; k < N; k++) pend += P[k];
@@ -626,25 +750,265 @@ canvas.drag{cursor:grabbing}
     if (!done && mx <= FLAT) win(nb);
   }
 
+  // ================= KULATINA + ZÁVITOVÁ CÍVKA =================
+  const BAR_X0 = 50, BAR_X1 = 750, BAR_Y = 235, BC = 5, BN = (BAR_X1 - BAR_X0) / BC;
+  const BAR_LO = 750, BAR_HI = 920, BAR_BURN = 1000, COIL_HALF = 42;
+  const BT = new Float32Array(BN), BT2 = new Float32Array(BN), BTmax = new Float32Array(BN);
+  let bar = BAR_LEVELS[0], zoneDone = [], zoneFrac = [];
+  const barBg = mk(W, H);
+  (function buildBarBackground() {
+    const b = barBg.getContext('2d');
+    b.drawImage(bgCv, 0, 0);                                        // stůl s otvory
+    b.fillStyle = '#24272b'; b.fillRect(PX - 2, PY - 2, PW + 12, PH + 14);  // bez plechu
+    for (let y = 12; y < H; y += 50) for (let x = 12; x < W; x += 50) {
+      b.beginPath(); b.arc(x, y, 7, 0, Math.PI * 2); b.fillStyle = '#121416'; b.fill();
+      b.beginPath(); b.arc(x, y + 1, 7, 0.1, Math.PI - 0.1); b.strokeStyle = 'rgba(255,255,255,.07)'; b.stroke();
+    }
+  })();
+  function barStart() {
+    bar = BAR_LEVELS[lvl]; BT.fill(ROOM); BTmax.fill(ROOM);
+    zoneDone = bar.zones.map(() => false); zoneFrac = bar.zones.map(() => 0);
+    coil = { x: 130, y: BAR_Y, tx: 130, ty: BAR_Y, on: 0, lift: 0 };
+    setMsg(`Úroveň ${lvl + 1}: <b>${bar.name}</b> (Ø ${bar.d} mm). Chyť závitovou cívku a ohřej vyznačené úseky na 750–900 °C.`);
+  }
+  function barStep(dt) {
+    coil.on += ((grab ? 1 : 0) - coil.on) * Math.min(1, dt / 0.1);
+    const k = 40 / bar.d, rate = 130 * Math.pow(k, 1.3);           // silnější kulatina = víc materiálu = pomalejší ohřev
+    for (let i = 0; i < BN; i++) {
+      const u = Math.abs(BAR_X0 + i * BC + 2.5 - coil.x);
+      const q = Math.max(0, Math.min(1, (COIL_HALF + 6 - u) / 12));
+      if (q > 0) BT[i] += rate * coil.on * q * dt;
+    }
+    const c = 45 / (BC * BC) * dt;
+    for (let i = 0; i < BN; i++) {
+      const t = BT[i], l = i ? BT[i - 1] : t, r = i < BN - 1 ? BT[i + 1] : t;
+      const loss = (0.003 + 0.000007 * (t - ROOM)) * k * (t - ROOM);   // vyzařování roste s teplotou (pár °C/s)
+      BT2[i] = t + c * (l + r - 2 * t) - loss * dt;
+      if (BT2[i] > BTmax[i]) BTmax[i] = BT2[i];
+    }
+    BT.set(BT2);
+  }
+  function barUpdate(dt) {
+    coil.x += (coil.tx - coil.x) * Math.min(1, dt * 12);
+    coil.lift += ((grab ? 0 : 1) - coil.lift) * Math.min(1, dt * 8);
+    const sub = 3; for (let s = 0; s < sub; s++) barStep(dt / sub);
+    if (grab || time > 0) time += dt;
+    let tc = 0, nb = 0;
+    for (let i = 0; i < BN; i++) {
+      if (BTmax[i] > BAR_BURN) nb++;
+      if (Math.abs(BAR_X0 + i * BC + 2.5 - coil.x) < COIL_HALF) tc = Math.max(tc, BT[i]);
+    }
+    tcNow = tc;
+    bar.zones.forEach(([x0, x1], z) => {
+      let n = 0, ok = 0;
+      for (let i = 0; i < BN; i++) { const x = BAR_X0 + i * BC + 2.5; if (x >= x0 && x <= x1) { n++; if (BT[i] >= BAR_LO && BT[i] <= BAR_HI) ok++; } }
+      zoneFrac[z] = ok / n;
+      if (!zoneDone[z] && zoneFrac[z] >= 0.92) { zoneDone[z] = true; if (bar.zones.length > 1) setMsg(`<b>Úsek ${z + 1} prohřátý ✓</b> – teď ten další.`, 'good'); }
+    });
+    const nd = zoneDone.filter(Boolean).length;
+    $('tc').textContent = Math.round(tc);
+    $('tc').style.color = tc >= BAR_LO && tc <= BAR_HI ? 'var(--ok)' : tc > BAR_HI ? 'var(--bad)' : '';
+    $('mm').textContent = `${nd} / ${bar.zones.length}`;
+    $('mm').style.color = nd === bar.zones.length ? 'var(--ok)' : '';
+    const prog = bar.zones.reduce((a, _, z) => a + (zoneDone[z] ? 1 : zoneFrac[z]), 0) / bar.zones.length;
+    $('pctFill').style.width = Math.round(prog * 100) + '%';
+    $('time').textContent = time.toFixed(1).replace('.', ',');
+    $('burnt').textContent = nb; $('burnt').style.color = nb ? 'var(--bad)' : '';
+    if (!done && grab) {
+      if (tc > BAR_BURN - 50) setMsg('<b>Pozor, přehříváš!</b> Posuň cívku dál po kulatině.', 'bad');
+      else if (tc >= BAR_LO) setMsg('<b>Oranžový žár</b> – správná teplota. Posouvej cívku po celém úseku, ať je prohřátý celý.');
+      else setMsg('Ohříváš… kulatina se prohřívá celým průřezem, chvíli to trvá.');
+    }
+    if (!done && nd === bar.zones.length) win(nb);
+  }
+
+  function barDraw(now, dt) {
+    const R = bar.d / 2, Rc = R + 10, top = BAR_Y - R, cx = coil.x, on = coil.on;
+    const blur = px => { if (FILTER) ctx.filter = px ? `blur(${px}px)` : 'none'; };
+    ctx.drawImage(barBg, 0, 0);
+    // podpěry pod kulatinou
+    for (const sx of [120, 680]) {
+      const g = ctx.createLinearGradient(sx - 30, 0, sx + 30, 0);
+      g.addColorStop(0, '#3e4248'); g.addColorStop(.5, '#6a6f77'); g.addColorStop(1, '#2e3136');
+      ctx.fillStyle = 'rgba(0,0,0,.4)'; ctx.fillRect(sx - 26, BAR_Y + R - 4, 62, H - BAR_Y - R - 30);
+      ctx.fillStyle = g; ctx.beginPath();
+      ctx.moveTo(sx - 32, BAR_Y + R - 6); ctx.lineTo(sx - 10, BAR_Y + R + 8); ctx.lineTo(sx + 10, BAR_Y + R + 8); ctx.lineTo(sx + 32, BAR_Y + R - 6);
+      ctx.lineTo(sx + 32, H - 40); ctx.lineTo(sx - 32, H - 40); ctx.closePath(); ctx.fill();
+    }
+    // stín kulatiny
+    ctx.save(); blur(8); ctx.fillStyle = 'rgba(0,0,0,.5)'; ctx.fillRect(BAR_X0 + 10, BAR_Y + R + 4, BAR_X1 - BAR_X0, 16); ctx.restore();
+
+    // cívka – zadní půlky závitů (za kulatinou)
+    const turns = 8, tube = (draw, w, col) => {
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#2a1206'; ctx.lineWidth = w + 2.2; draw(); ctx.stroke();
+      ctx.strokeStyle = col; ctx.lineWidth = w; draw(); ctx.stroke();
+    };
+    const hot = Math.max(0, Math.min(1, (tcNow - 500) / 400));
+    for (let n = 0; n < turns; n++) {
+      const x = cx - COIL_HALF + n * (2 * COIL_HALF / (turns - 1));
+      tube(() => { ctx.beginPath(); ctx.ellipse(x, BAR_Y, 5, Rc, 0.14, -Math.PI / 2, Math.PI / 2); }, 4.2, '#7a3d18');
+    }
+
+    // kulatina – válec se světlem shora
+    ctx.save(); ctx.beginPath(); ctx.rect(BAR_X0, top, BAR_X1 - BAR_X0, 2 * R); ctx.clip();
+    const cg = ctx.createLinearGradient(0, top, 0, top + 2 * R);
+    cg.addColorStop(0, '#4b5057'); cg.addColorStop(.22, '#d5d9de'); cg.addColorStop(.38, '#a4aab2');
+    cg.addColorStop(.75, '#5f646c'); cg.addColorStop(1, '#2c2f34');
+    ctx.fillStyle = cg; ctx.fillRect(BAR_X0, top, BAR_X1 - BAR_X0, 2 * R);
+    for (let i = 0; i < 60; i++) { ctx.fillStyle = `rgba(255,255,255,${.03 + (i % 5) * .01})`; ctx.fillRect(BAR_X0, top + (i * 7.3) % (2 * R), BAR_X1 - BAR_X0, .6); }
+    // náběhové barvy a okuje podle nejvyšší teploty
+    for (let i = 0; i < BN; i++) {
+      const tc = TEMPER[Math.min(1200, BTmax[i] | 0)];
+      if (tc[3] > .01) { ctx.fillStyle = `rgba(${tc[0] | 0},${tc[1] | 0},${tc[2] | 0},${tc[3] * .85})`; ctx.fillRect(BAR_X0 + i * BC, top, BC + .5, 2 * R); }
+    }
+    // žár
+    ctx.globalCompositeOperation = 'lighter';
+    const drawGlow = () => {
+      for (let i = 0; i < BN; i++) {
+        const gc = GLOW[Math.max(0, Math.min(1200, BT[i] | 0))];
+        if (gc[3] > .01) {
+          const gg = ctx.createLinearGradient(0, top, 0, top + 2 * R);
+          const c = `${gc[0] | 0},${gc[1] | 0},${gc[2] | 0}`;
+          gg.addColorStop(0, `rgba(${c},${gc[3] * .55})`); gg.addColorStop(.3, `rgba(${c},${gc[3]})`); gg.addColorStop(1, `rgba(${c},${gc[3] * .6})`);
+          ctx.fillStyle = gg; ctx.fillRect(BAR_X0 + i * BC - .5, top, BC + 1, 2 * R);
+        }
+      }
+    };
+    blur(2); drawGlow(); blur(0);
+    ctx.restore();
+    // záře kolem žhavé kulatiny
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; blur(14); ctx.globalAlpha = .55;
+    for (let i = 0; i < BN; i += 2) {
+      const gc = GLOW[Math.max(0, Math.min(1200, BT[i] | 0))];
+      if (gc[3] > .05) { ctx.fillStyle = `rgba(${gc[0] | 0},${gc[1] | 0},${gc[2] | 0},${gc[3] * .6})`; ctx.fillRect(BAR_X0 + i * BC - 4, top - 10, BC * 2 + 8, 2 * R + 20); }
+    }
+    ctx.restore();
+    // čelo kulatiny vpravo
+    ctx.fillStyle = '#8b9199'; ctx.beginPath(); ctx.ellipse(BAR_X1, BAR_Y, 6, R, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.stroke();
+
+    // úseky k ohřevu – křídové značky
+    bar.zones.forEach(([x0, x1], z) => {
+      const okz = zoneDone[z];
+      ctx.strokeStyle = okz ? 'rgba(73,209,125,.95)' : 'rgba(245,245,240,.85)'; ctx.lineWidth = 2.5; ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.moveTo(x0, top - 16); ctx.lineTo(x0, top + 2 * R + 16); ctx.moveTo(x1, top - 16); ctx.lineTo(x1, top + 2 * R + 16); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '700 13px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = okz ? '#49D17D' : '#EEF0F3';
+      ctx.fillText(`úsek ${z + 1}${okz ? ' ✓' : ` · ${Math.round(zoneFrac[z] * 100)} %`}`, (x0 + x1) / 2, top + 2 * R + 36);
+    });
+
+    // indukce: siločáry solenoidu a vířivé proudy po obvodu kulatiny
+    if (showField && on > .05) {
+      ctx.save(); ctx.setLineDash([8, 7]); ctx.lineDashOffset = -now / 30; ctx.lineWidth = 1.2;
+      ctx.strokeStyle = `rgba(150,215,255,${.22 * on})`;
+      for (const s of [1, 1.6]) { ctx.beginPath(); ctx.ellipse(cx, BAR_Y, COIL_HALF * s + 20, Rc * s + 14, 0, 0, Math.PI * 2); ctx.stroke(); }
+      ctx.lineDashOffset = -now / 25; ctx.strokeStyle = `rgba(150,215,255,${.3 * on})`;
+      for (let x = cx - COIL_HALF + 6; x <= cx + COIL_HALF - 6; x += 12) { ctx.beginPath(); ctx.moveTo(x, top + 3); ctx.lineTo(x, top + 2 * R - 3); ctx.stroke(); }
+      ctx.restore();
+    }
+
+    // cívka – přední půlky závitů, přívody a pistole
+    const cop = `rgb(${170 + hot * 55},${90 + hot * 30},${45})`;
+    for (let n = 0; n < turns; n++) {
+      const x = cx - COIL_HALF + n * (2 * COIL_HALF / (turns - 1));
+      tube(() => { ctx.beginPath(); ctx.ellipse(x, BAR_Y, 5, Rc, 0.14, Math.PI / 2, Math.PI * 1.5); }, 4.6, cop);
+      ctx.strokeStyle = 'rgba(255,215,175,.8)'; ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.ellipse(x - 1, BAR_Y, 5, Rc, 0.14, Math.PI * 1.05, Math.PI * 1.35); ctx.stroke();
+    }
+    const gy = BAR_Y - Rc - 70;
+    tube(() => { ctx.beginPath(); ctx.moveTo(cx - COIL_HALF, BAR_Y - Rc); ctx.lineTo(cx - COIL_HALF, gy + 6); ctx.lineTo(cx - 10, gy + 6); }, 4.6, cop);
+    tube(() => { ctx.beginPath(); ctx.moveTo(cx + COIL_HALF, BAR_Y - Rc); ctx.lineTo(cx + COIL_HALF, gy + 16); ctx.lineTo(cx - 10, gy + 16); }, 4.6, cop);
+    // hadice
+    const rearX = cx + 160;
+    for (const off of [-8, 0, 8]) {
+      ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(rearX, gy + 11 + off); ctx.bezierCurveTo(rearX + 80, gy + off, W - 60, 40, W + 40, 20 + off);
+      ctx.strokeStyle = '#08090a'; ctx.lineWidth = off ? 11 : 13; ctx.stroke();
+      ctx.strokeStyle = '#1c1e21'; ctx.lineWidth = off ? 9.5 : 11.5; ctx.stroke();
+    }
+    ctx.save(); ctx.translate(cx - 22, gy + 11);
+    ctx.fillStyle = '#121315'; ctx.beginPath(); ctx.roundRect(0, -14, 22, 28, 4); ctx.fill();
+    const body = ctx.createLinearGradient(0, -18, 0, 18);
+    body.addColorStop(0, '#ffa066'); body.addColorStop(.35, '#ff7a33'); body.addColorStop(1, '#c94e10');
+    ctx.fillStyle = body; ctx.beginPath(); ctx.roundRect(20, -18, 76, 36, 10); ctx.fill();
+    const grip = ctx.createLinearGradient(0, -16, 0, 16);
+    grip.addColorStop(0, '#3a3d42'); grip.addColorStop(.4, '#24262a'); grip.addColorStop(1, '#0f1012');
+    ctx.fillStyle = grip; ctx.beginPath(); ctx.roundRect(92, -16, 90, 32, 9); ctx.fill();
+    ctx.fillStyle = '#1b1c1f'; ctx.fillRect(20, -3, 76, 6);
+    ctx.fillStyle = '#fff'; ctx.font = '800 9px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('DAWELL', 56, -9.5); ctx.textBaseline = 'alphabetic';
+    ctx.beginPath(); ctx.arc(84, 10, 3, 0, Math.PI * 2); ctx.fillStyle = on > .5 ? '#7dff9a' : '#2f3a33'; ctx.fill();
+    ctx.restore();
+    if (grab) { ctx.strokeStyle = 'rgba(255,146,84,.9)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.roundRect(cx - COIL_HALF - 12, BAR_Y - Rc - 8, 2 * COIL_HALF + 24, 2 * Rc + 16, 12); ctx.stroke(); }
+
+    drawSmoke(dt);
+    const vg = ctx.createRadialGradient(W * .45, H * .4, 120, W * .5, H * .5, 560);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.42)');
+    ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+    if (!grab && time === 0) {
+      ctx.font = '700 15px Inter, sans-serif'; ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(14,16,19,.8)'; ctx.beginPath(); ctx.roundRect(cx - 110, BAR_Y + Rc + 44, 220, 28, 8); ctx.fill();
+      ctx.fillStyle = '#EEF0F3'; ctx.fillText('↑ chyť cívku a posouvej ↔', cx, BAR_Y + Rc + 63);
+    }
+    barProfile();
+  }
+
+  // graf teploty podél kulatiny
+  function barProfile() {
+    const PHt = 190, Y0 = 172, SCY = 140 / 1100, yT = t => Y0 - Math.max(0, t) * SCY;
+    const bgG = pctx.createLinearGradient(0, 0, 0, PHt);
+    bgG.addColorStop(0, '#1b1f25'); bgG.addColorStop(1, '#0f1114');
+    pctx.fillStyle = bgG; pctx.fillRect(0, 0, W, PHt);
+    // cílový pás a hranice přehřátí
+    pctx.fillStyle = 'rgba(73,209,125,.16)'; pctx.fillRect(BAR_X0, yT(BAR_HI), BAR_X1 - BAR_X0, yT(BAR_LO) - yT(BAR_HI));
+    pctx.strokeStyle = 'rgba(255,90,90,.6)'; pctx.setLineDash([5, 5]);
+    pctx.beginPath(); pctx.moveTo(BAR_X0, yT(BAR_BURN)); pctx.lineTo(BAR_X1, yT(BAR_BURN)); pctx.stroke(); pctx.setLineDash([]);
+    // úseky
+    bar.zones.forEach(([x0, x1], z) => { pctx.fillStyle = zoneDone[z] ? 'rgba(73,209,125,.12)' : 'rgba(255,255,255,.05)'; pctx.fillRect(x0, 24, x1 - x0, Y0 - 24); });
+    // osa
+    pctx.fillStyle = '#6B7482'; pctx.font = '500 10px JetBrains Mono, monospace'; pctx.textAlign = 'right';
+    for (const t of [0, 500, 1000]) { pctx.fillText(t + ' °C', BAR_X0 - 4, yT(t) + 3); pctx.fillStyle = 'rgba(255,255,255,.06)'; pctx.fillRect(BAR_X0, yT(t), BAR_X1 - BAR_X0, 1); pctx.fillStyle = '#6B7482'; }
+    // křivka teploty
+    pctx.beginPath(); pctx.moveTo(BAR_X0, Y0);
+    for (let i = 0; i < BN; i++) pctx.lineTo(BAR_X0 + i * BC + 2.5, yT(BT[i]));
+    pctx.lineTo(BAR_X1, Y0); pctx.closePath();
+    const g = pctx.createLinearGradient(0, yT(1100), 0, Y0);
+    g.addColorStop(0, '#ffe678'); g.addColorStop(.25, '#ff8c1e'); g.addColorStop(.45, '#d23c14'); g.addColorStop(.62, '#7a2a20'); g.addColorStop(1, '#3a3e44');
+    pctx.fillStyle = g; pctx.fill();
+    pctx.beginPath(); for (let i = 0; i < BN; i++) { const x = BAR_X0 + i * BC + 2.5; i ? pctx.lineTo(x, yT(BT[i])) : pctx.moveTo(x, yT(BT[i])); }
+    pctx.strokeStyle = 'rgba(255,255,255,.7)'; pctx.lineWidth = 1.2; pctx.stroke();
+    // poloha cívky
+    pctx.fillStyle = 'rgba(255,146,84,.18)'; pctx.fillRect(coil.x - COIL_HALF, 24, 2 * COIL_HALF, Y0 - 24);
+    pctx.font = '600 11px JetBrains Mono, monospace'; pctx.textAlign = 'left'; pctx.fillStyle = '#9BA4B0';
+    pctx.fillText('TEPLOTA PODÉL KULATINY · zelený pás = 750–900 °C · červená = přehřátí', BAR_X0, 16);
+    const nd = zoneDone.filter(Boolean).length;
+    pctx.textAlign = 'right'; pctx.fillStyle = nd === bar.zones.length ? '#49D17D' : '#FF9254';
+    pctx.fillText(`úseky ${nd} / ${bar.zones.length}`, BAR_X1, 16);
+  }
+
+  // ================= VÝHRA, ÚROVNĚ, REKORDY =================
   function win(nb) {
     done = true; grab = false; cv.classList.remove('drag');
-    const pts = Math.max(0, Math.round(1000 - time * 4 - nb * 0.6));
-    const prev = best[lvl] || 0, rec = pts > prev;
-    if (rec) { best[lvl] = pts; saveBest(); }
-    const last = lvl === LEVELS.length - 1, sum = best.reduce((a, b) => a + (b || 0), 0);
-    $('overTitle').textContent = last && best.every(b => b) ? 'Všechny úrovně hotové! 🏆' : nb === 0 ? 'Rovný jako stůl! 🔥' : 'Vyrovnáno!';
+    const pts = Math.max(0, Math.round(1000 - time * (mode === 'bar' ? 3 : 4) - nb * (mode === 'bar' ? 5 : 0.6)));
+    const key = mode[0] + lvl, prev = best[key] || 0, rec = pts > prev;
+    if (rec) { best[key] = pts; saveBest(); }
+    const list = LV(), last = lvl === list.length - 1;
+    const sum = list.reduce((a, _, n) => a + (best[mode[0] + n] || 0), 0);
+    const all = list.every((_, n) => best[mode[0] + n]);
+    $('overTitle').textContent = last && all ? 'Všechny úrovně hotové! 🏆' : mode === 'bar' ? (nb === 0 ? 'Prohřáto akorát! 🔥' : 'Ohřáto!') : (nb === 0 ? 'Rovný jako stůl! 🔥' : 'Vyrovnáno!');
     $('overScore').textContent = pts;
-    $('overText').innerHTML = `Čas ${time.toFixed(1).replace('.', ',')} s · spáleno ${nb} míst<br>` +
+    $('overText').innerHTML = `Čas ${time.toFixed(1).replace('.', ',')} s · ${mode === 'bar' ? 'přehřáto' : 'spáleno'} ${nb} míst<br>` +
       (rec ? 'Nový rekord úrovně!' : `Rekord úrovně: ${prev}`) + ` · celkem ${sum} bodů`;
     $('overBtn').textContent = last ? 'Znovu od 1. úrovně' : 'Pokračovat hned →';
     $('over').classList.add('show');
     renderLevels();
-    setMsg('<b>Plech je rovný!</b>', 'good');
+    setMsg(mode === 'bar' ? '<b>Kulatina je prohřátá a připravená k ohýbání!</b>' : '<b>Plech je rovný!</b>', 'good');
     // samo přejde na další úroveň
     if (!last) {
       let left = AUTO_NEXT;
       const tick = () => {
-        $('autoNext').textContent = `Další úroveň „${LEVELS[lvl + 1].name}“ začne za ${left} s…`;
+        $('autoNext').textContent = `Další úroveň „${list[lvl + 1].name}“ začne za ${left} s…`;
         if (left-- <= 0) { lvl++; startLevel(); return; }
         autoTimer = setTimeout(tick, 1000);
       };
@@ -654,25 +1018,31 @@ canvas.drag{cursor:grabbing}
   const AUTO_NEXT = 5;
   let autoTimer = null;
 
-  // výběr úrovní + rekordy
-  let best = [];
-  try { best = JSON.parse(localStorage.getItem('dawell-dhi191-urovne') || '[]'); } catch (e) {}
-  function saveBest() { try { localStorage.setItem('dawell-dhi191-urovne', JSON.stringify(best)); } catch (e) {} }
+  let best = {};
+  try {
+    best = JSON.parse(localStorage.getItem('dawell-dhi191-v2') || 'null') || {};
+    if (!localStorage.getItem('dawell-dhi191-v2')) {                     // převzít rekordy ze starší verze
+      const old = JSON.parse(localStorage.getItem('dawell-dhi191-urovne') || '[]');
+      old.forEach((v, n) => { if (v) best['p' + n] = v; });
+    }
+  } catch (e) {}
+  function saveBest() { try { localStorage.setItem('dawell-dhi191-v2', JSON.stringify(best)); } catch (e) {} }
   function renderLevels() {
-    $('levels').innerHTML = LEVELS.map((L, n) =>
-      `<button class="lv${n === lvl ? ' cur' : ''}${best[n] ? ' done' : ''}" data-l="${n}">
+    $('levels').innerHTML = LV().map((L, n) => {
+      const b = best[mode[0] + n];
+      return `<button class="lv${n === lvl ? ' cur' : ''}${b ? ' done' : ''}" data-l="${n}">
         <span class="n">Úroveň ${n + 1}</span><span class="t">${L.name}</span>
-        <span class="s">${best[n] ? '✓ ' + best[n] + ' b.' : '—'}</span></button>`).join('');
+        <span class="s">${b ? '✓ ' + b + ' b.' : '—'}</span></button>`;
+    }).join('');
   }
   $('levels').addEventListener('click', e => {
     const b = e.target.closest('.lv'); if (!b) return;
     lvl = +b.dataset.l; startLevel();
   });
-  $('lvlCount').textContent = LEVELS.length;
 
-  $('overBtn').addEventListener('click', () => { lvl = (lvl + 1) % LEVELS.length; startLevel(); });
+  $('overBtn').addEventListener('click', () => { lvl = (lvl + 1) % LV().length; startLevel(); });
   $('restart').addEventListener('click', startLevel);
-  $('next').addEventListener('click', () => { lvl = (lvl + 1) % LEVELS.length; startLevel(); });
+  $('next').addEventListener('click', () => { lvl = (lvl + 1) % LV().length; startLevel(); });
   $('gauge').addEventListener('click', () => {
     showGauge = !showGauge;
     $('gauge').textContent = '📏 Měřidlo boulí: ' + (showGauge ? 'zapnuto' : 'vypnuto');
@@ -686,8 +1056,8 @@ canvas.drag{cursor:grabbing}
 
   function loop(now) {
     const dt = Math.min(0.04, (now - (last || now)) / 1000); last = now;
-    if (!done) update(dt);
-    draw(now, dt);
+    if (mode === 'bar') { if (!done) barUpdate(dt); barDraw(now, dt); }
+    else { if (!done) update(dt); draw(now, dt); }
     requestAnimationFrame(loop);
   }
   startLevel();
