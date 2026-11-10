@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ohřej na 191 °C – mini hra | ShrinkFit DTI-16</title>
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orange:#FF702B; --orange-2:#FF9254; --orange-soft:rgba(255,112,43,.16);
+  --bg:#0E1013; --panel:#1A1E24; --panel-2:#20252C; --line:#2A3039; --line-2:#363D48;
+  --text:#EEF0F3; --muted:#9BA4B0; --dim:#6B7482; --cold:#5EC4F2; --ok:#49D17D; --bad:#FF5A5A;
+  --font:Inter,system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);-webkit-font-smoothing:antialiased;min-height:100vh;user-select:none;-webkit-user-select:none}
+.wrap{max-width:900px;margin:0 auto;padding:24px 16px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+header a{color:var(--muted);text-decoration:none;font-size:14px}
+header a:hover{color:var(--text)}
+h1{font-size:clamp(24px,4vw,34px);margin:0 0 6px;letter-spacing:-.02em}
+h1 span{color:var(--orange-2)}
+.sub{color:var(--muted);margin:0 0 20px;font-size:15px;line-height:1.5}
+.game{display:grid;grid-template-columns:1fr 220px;gap:16px}
+@media(max-width:700px){.game{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px}
+.stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:360px}
+svg{width:100%;max-width:420px;height:auto;display:block}
+.side{display:flex;flex-direction:column;gap:12px}
+.ro{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.ro .k{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+.ro .v{font-family:var(--mono);font-size:30px;font-weight:600;margin-top:2px}
+.ro .v small{font-size:15px;color:var(--muted)}
+.ro.small .v{font-size:20px}
+.bar{position:relative;height:14px;border-radius:7px;background:#0b0d10;border:1px solid var(--line-2);overflow:hidden;margin-top:8px}
+.bar .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--cold),#d9c58a,var(--orange));}
+.bar .target{position:absolute;top:-2px;bottom:-2px;border-left:2px solid var(--ok);border-right:2px solid var(--ok);background:rgba(73,209,125,.18)}
+.controls{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.btn{flex:1;min-width:200px;padding:18px 22px;border-radius:14px;font-weight:800;font-size:17px;border:1px solid transparent;cursor:pointer;font-family:var(--font);transition:transform .1s,box-shadow .2s,background .2s;touch-action:none}
+.btn.heat{background:var(--orange);color:#1a0d05;box-shadow:0 8px 24px rgba(255,112,43,.25)}
+.btn.heat.on{transform:scale(.97);background:var(--orange-2);box-shadow:0 0 0 6px var(--orange-soft),0 8px 30px rgba(255,112,43,.5)}
+.btn.heat:disabled{opacity:.4;cursor:default;box-shadow:none}
+.btn.ghost{background:transparent;color:var(--text);border-color:var(--line-2);flex:0 1 auto;min-width:0}
+.btn.ghost:hover{border-color:var(--muted)}
+.msg{min-height:52px;margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line);font-size:15px;line-height:1.45}
+.msg b{color:var(--orange-2)}
+.msg.good{border-color:rgba(73,209,125,.5)} .msg.good b{color:var(--ok)}
+.msg.bad{border-color:rgba(255,90,90,.5)} .msg.bad b{color:var(--bad)}
+.rounds{display:flex;gap:6px;margin-top:8px}
+.rounds i{flex:1;height:8px;border-radius:4px;background:var(--line-2)}
+.rounds i.done{background:var(--ok)} .rounds i.cur{background:var(--orange)} .rounds i.miss{background:var(--bad)}
+kbd{font-family:var(--mono);font-size:12px;border:1px solid var(--line-2);border-bottom-width:2px;padding:1px 6px;border-radius:5px;color:var(--muted)}
+.help{color:var(--dim);font-size:13px;margin-top:14px;line-height:1.5}
+.field{opacity:0;transition:opacity .25s}
+.field.on{opacity:1}
+.field path{stroke-dasharray:6 8;animation:flow .6s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-14}}
+.overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:rgba(14,16,19,.88);border-radius:16px;text-align:center;padding:20px}
+.overlay.show{display:flex}
+.overlay h2{margin:0 0 8px;font-size:28px}
+.overlay .score{font-family:var(--mono);font-size:56px;color:var(--orange-2);font-weight:600}
+.overlay p{color:var(--muted);margin:6px 0 18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a href="./">← Zpět na ShrinkFit DTI-16</a>
+    <span style="font-family:var(--mono);color:var(--dim);font-size:13px">mini hra</span>
+  </header>
+
+  <h1>Ohřej upínač na <span>191 °C</span></h1>
+  <p class="sub">Drž tlačítko <b>Ohřívat</b> a pusť ho ve správnou chvíli. Pozor – materiál se kvůli setrvačnosti ohřívá ještě chvíli po vypnutí cívky. Každý upínač se navíc ohřívá jinak rychle. Máš 5 pokusů.</p>
+
+  <div class="game">
+    <div class="panel stage" id="stage">
+      <svg viewBox="0 0 400 360" aria-label="Upínač v indukční cívce">
+        <defs>
+          <linearGradient id="shine" x1="0" x2="1">
+            <stop offset="0" stop-color="#000" stop-opacity=".45"/>
+            <stop offset=".35" stop-color="#fff" stop-opacity=".28"/>
+            <stop offset=".55" stop-color="#fff" stop-opacity="0"/>
+            <stop offset="1" stop-color="#000" stop-opacity=".5"/>
+          </linearGradient>
+          <radialGradient id="glow" cx=".5" cy=".5" r=".5">
+            <stop offset="0" stop-color="#FF702B" stop-opacity=".55"/>
+            <stop offset="1" stop-color="#FF702B" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- záře cívky -->
+        <ellipse id="coilGlow" cx="200" cy="120" rx="150" ry="90" fill="url(#glow)" opacity="0"/>
+
+        <!-- upínač: kužel + příruba -->
+        <g id="holder">
+          <rect x="120" y="250" width="160" height="22" rx="4" fill="#8a9099"/>
+          <rect x="105" y="272" width="190" height="34" rx="5" fill="#7b818a"/>
+          <rect x="140" y="306" width="120" height="40" rx="4" fill="#6c727b"/>
+          <path id="cone" d="M172 40 L228 40 L262 250 L138 250 Z" fill="#9aa1aa"/>
+          <path d="M172 40 L228 40 L262 250 L138 250 Z" fill="url(#shine)"/>
+          <rect x="105" y="272" width="190" height="34" rx="5" fill="url(#shine)"/>
+          <ellipse cx="200" cy="40" rx="28" ry="6" fill="#2a2f36"/>
+          <ellipse cx="200" cy="40" rx="15" ry="3.5" fill="#0b0d10"/>
+        </g>
+
+        <!-- pole -->
+        <g class="field" id="field" fill="none" stroke="#FF9254" stroke-width="1.6" opacity=".8">
+          <path d="M120 60 C60 90 60 170 120 200"/>
+          <path d="M280 60 C340 90 340 170 280 200"/>
+          <path d="M135 80 C95 105 95 155 135 180"/>
+          <path d="M265 80 C305 105 305 155 265 180"/>
+        </g>
+
+        <!-- cívka (bílá opletená) -->
+        <g id="coil">
+          <rect x="128" y="62" width="144" height="118" rx="14" fill="#1b1f25" stroke="#363D48"/>
+          <g id="turns" stroke="#e9e6df" stroke-width="7" stroke-linecap="round">
+            <line x1="134" y1="76" x2="266" y2="76"/><line x1="134" y1="92" x2="266" y2="92"/>
+            <line x1="134" y1="108" x2="266" y2="108"/><line x1="134" y1="124" x2="266" y2="124"/>
+            <line x1="134" y1="140" x2="266" y2="140"/><line x1="134" y1="156" x2="266" y2="156"/>
+            <line x1="134" y1="172" x2="266" y2="172"/>
+          </g>
+          <text x="200" y="200" text-anchor="middle" fill="#6B7482" font-family="JetBrains Mono,monospace" font-size="11">INDUKČNÍ CÍVKA</text>
+        </g>
+      </svg>
+
+      <div class="overlay" id="over">
+        <div>
+          <h2 id="overTitle">Hotovo!</h2>
+          <div class="score" id="overScore">0</div>
+          <p id="overText">bodů z 500</p>
+          <button class="btn heat" id="again" style="min-width:220px">Hrát znovu</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="ro">
+        <div class="k">Teplota upínače</div>
+        <div class="v"><span id="temp">22</span> <small>°C</small></div>
+        <div class="bar"><div class="fill" id="fill"></div><div class="target" id="target"></div></div>
+      </div>
+      <div class="ro small">
+        <div class="k">Cíl</div>
+        <div class="v" style="color:var(--ok)">191 °C <small>± 5</small></div>
+      </div>
+      <div class="ro small">
+        <div class="k">Body</div>
+        <div class="v"><span id="score">0</span> <small>/ 500</small></div>
+        <div class="rounds" id="rounds"><i></i><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="ro small">
+        <div class="k">Rekord</div>
+        <div class="v"><span id="best">–</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn heat" id="heat">🔥 Ohřívat (drž)</button>
+    <button class="btn ghost" id="restart">Začít znovu</button>
+  </div>
+  <div class="msg" id="msg">Pokus 1 z 5. Drž <b>Ohřívat</b> (nebo mezerník <kbd>Space</kbd>).</div>
+  <p class="help">Skutečný ShrinkFit DTI-16 hlídá teplotu sám čidlem – tady to musíš odhadnout ty. 😉</p>
+</div>
+
+<script>
+(() => {
+  const TARGET = 191, TOL = 5, ROUNDS = 5, MAXT = 320, ROOM = 22;
+  const $ = id => document.getElementById(id);
+  const el = { temp:$('temp'), fill:$('fill'), target:$('target'), score:$('score'), best:$('best'),
+    msg:$('msg'), heat:$('heat'), cone:$('cone'), field:$('field'), glow:$('coilGlow'),
+    rounds:[...$('rounds').children], over:$('over'), overTitle:$('overTitle'), overScore:$('overScore'), overText:$('overText') };
+
+  // značka cíle na stupnici
+  el.target.style.left = ((TARGET - TOL - ROOM) / (MAXT - ROOM) * 100) + '%';
+  el.target.style.width = (2 * TOL / (MAXT - ROOM) * 100) + '%';
+
+  let best = null;
+  try { const b = localStorage.getItem('dawell-hra-rekord'); if (b) best = +b; } catch (e) {}
+  const showBest = () => el.best.textContent = best == null ? '–' : best;
+  showBest();
+
+  let round, total, T, power, rate, holding, phase, peak, last;
+  // phase: ready | heating | coast | result | end
+
+  function newGame() {
+    round = 0; total = 0;
+    el.rounds.forEach(r => r.className = '');
+    el.over.classList.remove('show');
+    el.score.textContent = 0;
+    newRound();
+  }
+  function newRound() {
+    T = ROOM; power = 0; holding = false; peak = ROOM;
+    rate = 28 + Math.random() * 30;          // °C/s – každý upínač jinak
+    phase = 'ready';
+    el.heat.disabled = false;
+    el.rounds.forEach((r, i) => { if (i === round) r.className = 'cur'; });
+    setMsg(`Pokus ${round + 1} z ${ROUNDS}. Drž <b>Ohřívat</b> (nebo mezerník <kbd>Space</kbd>).`);
+  }
+  function setMsg(html, cls) { el.msg.innerHTML = html; el.msg.className = 'msg' + (cls ? ' ' + cls : ''); }
+
+  function press() {
+    if (phase === 'ready' || phase === 'heating') {
+      phase = 'heating'; holding = true; el.heat.classList.add('on');
+      setMsg('Ohřívám… pusť ve správnou chvíli!');
+    }
+  }
+  function release() {
+    if (!holding) return;
+    holding = false; el.heat.classList.remove('on');
+    if (phase === 'heating') { phase = 'coast'; el.heat.disabled = true; setMsg('Cívka vypnuta – teplo ještě dobíhá…'); }
+  }
+
+  function finishRound() {
+    phase = 'result';
+    const p = Math.round(peak), diff = Math.abs(p - TARGET);
+    let pts, text, cls;
+    if (p > 260) { pts = 0; text = `<b>Přehřáto!</b> ${p} °C – to by materiálu neprospělo.`; cls = 'bad'; }
+    else if (diff <= TOL) {
+      pts = Math.round(100 - diff * 6);
+      text = diff === 0 ? `<b>Přesně 191 °C!</b> Nástroj jde dovnitř jako po másle. +${pts}` : `<b>Výborně!</b> ${p} °C – nástroj vložen. +${pts}`;
+      cls = 'good';
+    } else if (p < TARGET) {
+      pts = Math.max(0, Math.round(60 - diff * 2));
+      text = `<b>Málo!</b> ${p} °C – otvor se ještě dost neroztáhl. +${pts}`; cls = 'bad';
+    } else {
+      pts = Math.max(0, Math.round(60 - diff * 2));
+      text = `<b>Moc!</b> ${p} °C – zbytečně přetopeno. +${pts}`; cls = 'bad';
+    }
+    total += pts;
+    el.score.textContent = total;
+    el.rounds[round].className = cls === 'good' ? 'done' : 'miss';
+    round++;
+    if (round >= ROUNDS) {
+      setMsg(text, cls);
+      setTimeout(endGame, 1300);
+    } else {
+      setMsg(text + ' <span style="color:var(--dim)">Další upínač za chvíli…</span>', cls);
+      setTimeout(newRound, 2200);
+    }
+  }
+  function endGame() {
+    phase = 'end';
+    if (best == null || total > best) {
+      best = total; showBest();
+      try { localStorage.setItem('dawell-hra-rekord', best); } catch (e) {}
+    }
+    el.overTitle.textContent = total >= 450 ? 'Mistr indukce! 🏆' : total >= 300 ? 'Dobrá práce!' : 'Zkus to znovu';
+    el.overScore.textContent = total;
+    el.overText.textContent = 'bodů z 500 · rekord ' + best;
+    el.over.classList.add('show');
+  }
+
+  // barva oceli podle teploty (náběhové barvy: šedá → slámová → bronzová → fialová → modrá)
+  const stops = [[22,[154,161,170]],[150,[170,168,160]],[191,[214,196,140]],[230,[196,150,80]],[270,[150,80,120]],[310,[70,90,170]]];
+  function steel(t) {
+    for (let i = 1; i < stops.length; i++) {
+      if (t <= stops[i][0]) {
+        const [t0, c0] = stops[i - 1], [t1, c1] = stops[i], k = (t - t0) / (t1 - t0);
+        return `rgb(${c0.map((v, j) => Math.round(v + (c1[j] - v) * k)).join(',')})`;
+      }
+    }
+    return `rgb(${stops[stops.length - 1][1].join(',')})`;
+  }
+
+  function loop(now) {
+    const dt = Math.min(0.05, (now - (last || now)) / 1000); last = now;
+    // výkon cívky náběh/doběh → setrvačnost
+    const goal = holding ? 1 : 0;
+    power += (goal - power) * Math.min(1, dt / (holding ? 0.15 : 0.45));
+    T += rate * power * dt;
+    if (phase !== 'heating' && phase !== 'coast') T -= (T - ROOM) * 0.04 * dt; // pomalé chladnutí
+    if (phase === 'heating' || phase === 'coast') peak = Math.max(peak, T);
+    if (phase === 'coast' && power < 0.01) finishRound();
+    if (T > MAXT) T = MAXT;
+
+    el.temp.textContent = Math.round(T);
+    el.temp.style.color = Math.abs(T - TARGET) <= TOL ? 'var(--ok)' : T > TARGET + TOL ? 'var(--bad)' : '';
+    el.fill.style.width = ((T - ROOM) / (MAXT - ROOM) * 100) + '%';
+    el.cone.setAttribute('fill', steel(T));
+    el.field.classList.toggle('on', power > 0.2);
+    el.glow.setAttribute('opacity', (power * 0.9).toFixed(2));
+    requestAnimationFrame(loop);
+  }
+
+  // ovládání: myš, dotyk, mezerník
+  el.heat.addEventListener('pointerdown', e => { e.preventDefault(); el.heat.setPointerCapture?.(e.pointerId); press(); });
+  el.heat.addEventListener('pointerup', release);
+  el.heat.addEventListener('pointercancel', release);
+  el.heat.addEventListener('lostpointercapture', release);
+  el.heat.addEventListener('contextmenu', e => e.preventDefault());
+  addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); if (!e.repeat) press(); } });
+  addEventListener('keyup', e => { if (e.code === 'Space') release(); });
+  addEventListener('blur', release);
+  $('restart').addEventListener('click', newGame);
+  $('again').addEventListener('click', newGame);
+
+  newGame();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
