@@ -81,7 +81,7 @@ canvas.drag{cursor:grabbing}
   <div class="game">
     <div class="panel">
       <canvas id="cv" width="800" height="500" aria-label="Ocelový plech na pracovním stole a induktor"></canvas>
-      <canvas id="prof" width="800" height="90" aria-label="Profil plechu pod pravítkem"></canvas>
+      <canvas id="prof" width="800" height="190" aria-label="Plech z boku s pravítkem"></canvas>
       <div class="overlay" id="over">
         <div>
           <h2 id="overTitle">Hotovo!</h2>
@@ -447,30 +447,108 @@ canvas.drag{cursor:grabbing}
     }
   }
 
+  // ---------- pohled z boku: plech na stole, ocelové pravítko a světlo pod ním ----------
+  const colD = new Float32Array(GW), colT = new Float32Array(GW);
   function drawProfile() {
-    const cy = coil.y, row = Math.max(0, Math.min(GH - 1, ((cy - PY) / CELL) | 0));
-    pctx.fillStyle = '#14171B'; pctx.fillRect(0, 0, W, 90);
-    // plech v řezu
-    const base = 66, sc = 8;
-    pctx.beginPath(); pctx.moveTo(PX, base + 8);
-    for (let i = 0; i < GW; i++) pctx.lineTo(PX + i * CELL + 2.5, base - D[row * GW + i] * sc);
-    for (let i = GW - 1; i >= 0; i--) pctx.lineTo(PX + i * CELL + 2.5, base + 6 - D[row * GW + i] * sc);
-    pctx.closePath();
-    const g = pctx.createLinearGradient(PX, 0, PX + PW, 0);
-    for (let i = 0; i < GW; i += 6) {
-      const t = T[row * GW + i], gc = GLOW[Math.max(0, Math.min(1200, t | 0))], a = gc[3];
-      g.addColorStop(i / GW, `rgb(${(150 * (1 - a) + gc[0] * a) | 0},${(155 * (1 - a) + gc[1] * a) | 0},${(162 * (1 - a) + gc[2] * a) | 0})`);
+    const PHt = 190, BASE = 150, THICK = 12, SC = 12;              // převýšení boulí 12×
+    for (let i = 0; i < GW; i++) {
+      let dm = 0, tm = 0;
+      for (let j = 0; j < GH; j++) { const k = j * GW + i; if (D[k] > dm) dm = D[k]; if (T[k] > tm) tm = T[k]; }
+      colD[i] = dm; colT[i] = tm;
     }
-    pctx.fillStyle = g; pctx.fill();
-    // ocelové pravítko
-    pctx.fillStyle = '#c9ccd1'; pctx.fillRect(PX, base - 52, PW, 6);
-    pctx.fillStyle = '#5c6068';
-    for (let x = PX; x <= PX + PW; x += 10) pctx.fillRect(x, base - 46, 1, x % 50 === PX % 50 ? 5 : 3);
-    pctx.strokeStyle = 'rgba(73,209,125,.55)'; pctx.setLineDash([5, 5]);
-    pctx.beginPath(); pctx.moveTo(PX, base); pctx.lineTo(PX + PW, base); pctx.stroke(); pctx.setLineDash([]);
-    pctx.fillStyle = '#6B7482'; pctx.font = '500 11px JetBrains Mono, monospace'; pctx.textAlign = 'left';
-    pctx.fillText('PROFIL PLECHU POD INDUKTOREM · zelená = rovina', PX, 12);
-    pctx.strokeStyle = 'rgba(255,146,84,.7)'; pctx.beginPath(); pctx.moveTo(coil.x, 20); pctx.lineTo(coil.x, 90); pctx.stroke();
+    let maxD = 0, maxI = 0; for (let i = 0; i < GW; i++) if (colD[i] > maxD) { maxD = colD[i]; maxI = i; }
+    const xAt = i => PX + i * CELL + 2.5, yTop = i => BASE - colD[i] * SC;
+
+    // dílna v pozadí
+    const bgG = pctx.createLinearGradient(0, 0, 0, PHt);
+    bgG.addColorStop(0, '#1b1f25'); bgG.addColorStop(1, '#0f1114');
+    pctx.fillStyle = bgG; pctx.fillRect(0, 0, W, PHt);
+    // deska stolu
+    const tb = pctx.createLinearGradient(0, BASE + THICK, 0, PHt);
+    tb.addColorStop(0, '#3a3e44'); tb.addColorStop(.15, '#26292e'); tb.addColorStop(1, '#16181b');
+    pctx.fillStyle = tb; pctx.fillRect(0, BASE + THICK, W, PHt - BASE - THICK);
+    pctx.fillStyle = 'rgba(255,255,255,.12)'; pctx.fillRect(0, BASE + THICK, W, 1);
+
+    // plech z boku: horní hrana kopíruje boule, spodní leží na stole
+    pctx.beginPath(); pctx.moveTo(PX, BASE + THICK);
+    for (let i = 0; i < GW; i++) pctx.lineTo(xAt(i), yTop(i));
+    pctx.lineTo(PX + PW, BASE + THICK); pctx.closePath();
+    const side = pctx.createLinearGradient(0, BASE - 60, 0, BASE + THICK);
+    side.addColorStop(0, '#b9bfc6'); side.addColorStop(.6, '#8d939b'); side.addColorStop(1, '#5d6268');
+    pctx.fillStyle = side; pctx.fill();
+    // žár na hraně plechu
+    pctx.save(); pctx.clip();
+    pctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < GW; i++) {
+      const gc = GLOW[Math.max(0, Math.min(1200, colT[i] | 0))];
+      if (gc[3] > .02) { pctx.fillStyle = `rgba(${gc[0] | 0},${gc[1] | 0},${gc[2] | 0},${gc[3] * .9})`; pctx.fillRect(xAt(i) - 3, yTop(i) - 2, 6, BASE + THICK - yTop(i) + 2); }
+    }
+    pctx.restore();
+    // lesklá horní hrana
+    pctx.beginPath(); for (let i = 0; i < GW; i++) i ? pctx.lineTo(xAt(i), yTop(i)) : pctx.moveTo(xAt(i), yTop(i));
+    pctx.strokeStyle = 'rgba(255,255,255,.55)'; pctx.lineWidth = 1.2; pctx.stroke();
+
+    // zelená čára = dokonalá rovina
+    pctx.strokeStyle = 'rgba(73,209,125,.5)'; pctx.setLineDash([6, 6]); pctx.lineWidth = 1;
+    pctx.beginPath(); pctx.moveTo(PX, BASE); pctx.lineTo(PX + PW, BASE); pctx.stroke(); pctx.setLineDash([]);
+
+    // ocelové pravítko – položí se na plech, když induktor pustíš (leží na nejvyšším místě)
+    const ruler = coil.lift, ry = BASE - maxD * SC, ok = maxD <= FLAT;
+    if (ruler > .05) {
+      pctx.save(); pctx.globalAlpha = ruler;
+      // světlo prosvítající mezerou pod pravítkem
+      pctx.beginPath(); pctx.moveTo(PX, ry);
+      for (let i = 0; i < GW; i++) pctx.lineTo(xAt(i), yTop(i));
+      pctx.lineTo(PX + PW, ry); pctx.closePath();
+      const lg = pctx.createLinearGradient(0, ry, 0, ry + 26);
+      lg.addColorStop(0, 'rgba(255,244,210,.55)'); lg.addColorStop(1, 'rgba(255,244,210,0)');
+      pctx.fillStyle = lg; pctx.fill();
+      pctx.fillStyle = 'rgba(255,248,225,.95)'; pctx.fillRect(PX, ry, PW, 1.5);
+      const rg = pctx.createLinearGradient(0, ry - 16, 0, ry);
+      rg.addColorStop(0, '#eef0f2'); rg.addColorStop(.5, '#b6bbc2'); rg.addColorStop(1, '#7d838b');
+      pctx.fillStyle = rg; pctx.fillRect(PX - 10, ry - 16, PW + 20, 16);
+      pctx.fillStyle = '#3d4249';
+      for (let x = PX; x <= PX + PW; x += 10) pctx.fillRect(x, ry - 16, 1, (x - PX) % 50 === 0 ? 7 : 4);
+      pctx.restore();
+    }
+
+    // kóta největší výšky boule
+    if (maxD > 0.15) {
+      const mx = xAt(maxI) - 10, y1 = ry + 2, y2 = BASE - 2;
+      pctx.strokeStyle = ok ? '#49D17D' : '#FF9254'; pctx.lineWidth = 1.5;
+      pctx.beginPath(); pctx.moveTo(mx, y1); pctx.lineTo(mx, y2); pctx.stroke();
+      pctx.beginPath(); pctx.moveTo(mx - 4, y1 + 5); pctx.lineTo(mx, y1); pctx.lineTo(mx + 4, y1 + 5); pctx.stroke();
+      pctx.beginPath(); pctx.moveTo(mx - 4, y2 - 5); pctx.lineTo(mx, y2); pctx.lineTo(mx + 4, y2 - 5); pctx.stroke();
+      pctx.font = '600 11px JetBrains Mono, monospace'; pctx.textAlign = 'right'; pctx.fillStyle = ok ? '#49D17D' : '#FF9254';
+      pctx.fillText(maxD.toFixed(1).replace('.', ',') + ' mm', mx - 6, (y1 + y2) / 2 + 4);
+    }
+
+    // induktor z boku nad plechem (když ho držíš)
+    const ix = coil.x, lift = 4 + coil.lift * 14, iy = BASE - (colD[Math.max(0, Math.min(GW - 1, ((ix - PX) / CELL) | 0))] || 0) * SC - lift;
+    pctx.save(); pctx.globalAlpha = 1 - coil.lift;
+    if (coil.on > .05) {
+      const hg = pctx.createRadialGradient(ix, iy + lift, 2, ix, iy + lift, 60);
+      hg.addColorStop(0, `rgba(255,130,50,${.35 * coil.on})`); hg.addColorStop(1, 'rgba(255,130,50,0)');
+      pctx.fillStyle = hg; pctx.fillRect(ix - 60, iy - 50, 120, 110);
+    }
+    pctx.fillStyle = '#7a3a14'; pctx.fillRect(ix - 40, iy - 7, 80, 7);                          // měděná spirála z boku
+    for (let x = -38; x <= 34; x += 8) { pctx.fillStyle = '#d98a52'; pctx.fillRect(ix + x, iy - 7, 5, 3); }
+    pctx.fillStyle = '#b5622c'; pctx.fillRect(ix + 30, iy - 26, 5, 20);                        // přívody nahoru
+    pctx.save(); pctx.translate(ix + 32, iy - 26); pctx.rotate(-0.35);
+    const bg2 = pctx.createLinearGradient(0, -12, 0, 12);
+    bg2.addColorStop(0, '#ffa066'); bg2.addColorStop(1, '#c94e10');
+    pctx.fillStyle = '#121315'; pctx.fillRect(0, -9, 14, 18);
+    pctx.fillStyle = bg2; pctx.beginPath(); pctx.roundRect(14, -12, 60, 24, 7); pctx.fill();
+    pctx.fillStyle = '#1d1f23'; pctx.beginPath(); pctx.roundRect(72, -10, 32, 20, 6); pctx.fill();
+    pctx.restore();
+    pctx.restore();
+
+    // popisky
+    pctx.font = '600 11px JetBrains Mono, monospace'; pctx.textAlign = 'left'; pctx.textBaseline = 'alphabetic';
+    pctx.fillStyle = '#9BA4B0'; pctx.fillText('POHLED Z BOKU · boule převýšeny 12× · pusť induktor = přiložit pravítko', PX, 16);
+    pctx.textAlign = 'right';
+    pctx.fillStyle = ok ? '#49D17D' : '#FF9254';
+    pctx.fillText(ok ? 'ROVNÝ ✓' : `nerovnost ${maxD.toFixed(1).replace('.', ',')} mm`, PX + PW, 16);
   }
 
   function draw(now, dt) {
