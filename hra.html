@@ -200,13 +200,13 @@ canvas.drag{cursor:grabbing}
     { name: 'Zvlněný okraj', bumps: [80, 180, 280, 380, 480, 580, 680].map((x, n) => ({ x: x + 20, y: 85, r: 45, h: 3 + (n % 2) * 1.5 })) },
   ];
 
-  let T, T2, D, Tmax, D0max, lvl = 0, time, done, coil, grab, last, showGauge = false, tcNow = ROOM;
+  let T, T2, D, P, Tmax, D0max, lvl = 0, time, done, coil, grab, last, showGauge = false, tcNow = ROOM;
   let smoke = [];
 
   function startLevel() {
     if (typeof autoTimer !== 'undefined' && autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
     T = new Float32Array(N).fill(ROOM); T2 = new Float32Array(N);
-    D = new Float32Array(N); Tmax = new Float32Array(N).fill(ROOM);
+    D = new Float32Array(N); P = new Float32Array(N); Tmax = new Float32Array(N).fill(ROOM);
     for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
       const px = PX + i * CELL + CELL / 2, py = PY + j * CELL + CELL / 2; let h = 0;
       for (const b of LEVELS[lvl].bumps) h += b.h * Math.exp(-((px - b.x) ** 2 + (py - b.y) ** 2) / (2 * (b.r / 1.6) ** 2));
@@ -237,7 +237,7 @@ canvas.drag{cursor:grabbing}
   cv.addEventListener('pointerup', drop); cv.addEventListener('pointercancel', drop); addEventListener('blur', drop);
 
   // ---------- fyzika ----------
-  const R0 = 24, SIG = 14, Q = 1700, COOL = 0.3, DIFF = 800, SHRINK = 0.55; // DIFF v px²/s
+  const R0 = 24, SIG = 14, COOLED = 520, Q = 240, COOL = 0.04, DIFF = 110, SHRINK = 18; // DIFF v px²/s
   function step(dt) {
     coil.on += ((grab ? 1 : 0) - coil.on) * Math.min(1, dt / 0.1);
     if (coil.on > 0.01) {
@@ -246,7 +246,7 @@ canvas.drag{cursor:grabbing}
       const j0 = Math.max(0, ((coil.y - PY - reach) / CELL) | 0), j1 = Math.min(GH - 1, ((coil.y - PY + reach) / CELL) | 0);
       for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
         const d = Math.hypot(PX + i * CELL + 2.5 - coil.x, PY + j * CELL + 2.5 - coil.y);
-        T[j * GW + i] += Q * coil.on * Math.exp(-((d - R0) ** 2) / (2 * SIG * SIG)) * dt;
+        T[j * GW + i] += Q * coil.on * (Math.exp(-((d - R0) ** 2) / (2 * SIG * SIG)) + 0.75 * Math.exp(-(d * d) / (2 * 16 * 16))) * dt;
       }
     }
     const c = DIFF / (CELL * CELL) * dt;
@@ -258,8 +258,13 @@ canvas.drag{cursor:grabbing}
       if (nt > Tmax[k]) Tmax[k] = nt;
       if (t > WORK_LO) {
         // nejlépe to stahuje v třešňové červené; přehřátá ocel jen měkne a stahuje se hůř
+        // žhavé místo „nabírá“ smrštění; projeví se až při chladnutí
         const eff = t <= WORK_HI ? (t - WORK_LO) / (WORK_HI - WORK_LO) : Math.max(.25, 1 - (t - WORK_HI) / 160);
-        D[k] = Math.max(0, D[k] - (D[k] * SHRINK + 0.1) * eff * dt);
+        P[k] = Math.min(D[k], P[k] + (D[k] * SHRINK + 2.5) * eff * dt);
+      } else if (P[k] > 0 && t < COOLED) {
+        // pod cca 450 °C se ocel stahuje a boule klesá
+        const x = Math.min(P[k], (P[k] * 3 + 0.1) * dt);
+        P[k] -= x; D[k] = Math.max(0, D[k] - x);
       }
     }
     const s = T; T = T2; T2 = s;
@@ -489,15 +494,19 @@ canvas.drag{cursor:grabbing}
 
     if (!done && grab) {
       if (tc > WORK_HI + 30) setMsg('<b>Pozor, moc žhavé!</b> Posuň induktor, ať plech nespálíš.', 'bad');
-      else if (tc >= WORK_LO) setMsg('<b>Třešňově červená</b> – ideální teplota, boule se stahuje.');
+      else if (tc >= WORK_LO) setMsg('<b>Třešňově červená</b> – ideální teplota. Popojeď dál; místo se stáhne, až vychladne.');
       else setMsg('Ohříváš… drž induktor nad boulí, až ocel zčervená.');
+    }
+    if (!done && !grab && time > 0) {
+      let pend = 0; for (let k = 0; k < N; k++) pend += P[k];
+      if (pend > 0.5) setMsg('Ocel chladne a <b>stahuje se</b> – sleduj, jak boule klesá.');
     }
     if (!done && mx <= FLAT) win(nb);
   }
 
   function win(nb) {
     done = true; grab = false; cv.classList.remove('drag');
-    const pts = Math.max(0, Math.round(1000 - time * 0.8 - nb * 0.6));
+    const pts = Math.max(0, Math.round(1000 - time * 4 - nb * 0.6));
     const prev = best[lvl] || 0, rec = pts > prev;
     if (rec) { best[lvl] = pts; saveBest(); }
     const last = lvl === LEVELS.length - 1, sum = best.reduce((a, b) => a + (b || 0), 0);
