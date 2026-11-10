@@ -122,6 +122,7 @@ canvas.drag{cursor:grabbing}
 
   <div class="controls">
     <button class="btn" id="gauge">📏 Měřidlo boulí: vypnuto</button>
+    <button class="btn on" id="field">⚡ Ukázat indukci: zapnuto</button>
     <button class="btn" id="restart">Začít úroveň znovu</button>
     <button class="btn" id="next">Další úroveň →</button>
   </div>
@@ -290,6 +291,14 @@ canvas.drag{cursor:grabbing}
   const Hh = (() => { const v = [L[0], L[1], L[2] + 1], n = Math.hypot(...v); return v.map(x => x / n); })();
   const flatDiff = L[2], flatSpec = Math.pow(Hh[2], 40);
   const EXAG = 9;
+  // jemná nerovnoměrnost žáru a okují (skutečná ocel nežhne úplně rovnoměrně)
+  const NOISE = new Float32Array(N);
+  { let s = 11; const r = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    for (let k = 0; k < N; k++) NOISE[k] = r();
+    for (let pass = 0; pass < 2; pass++) for (let k = GW + 1; k < N - GW - 1; k++)
+      NOISE[k] = (NOISE[k] * 2 + NOISE[k - 1] + NOISE[k + 1] + NOISE[k - GW] + NOISE[k + GW]) / 6; }
+  const FILTER = typeof ctx.filter === 'string';
+  let showField = true;
 
   function buildLayers() {
     const sd = shadeImg.data, td = tintImg.data, gd = glowImg.data, md = gaugeImg.data;
@@ -304,10 +313,12 @@ canvas.drag{cursor:grabbing}
       const v = 128 + (diff - flatDiff) * 240 + (spec - flatSpec) * 120;
       sd[p] = sd[p + 1] = sd[p + 2] = v; sd[p + 3] = 255;
       // náběhové barvy
-      const tc = TEMPER[Math.min(1200, Tmax[k] | 0)];
-      td[p] = tc[0]; td[p + 1] = tc[1]; td[p + 2] = tc[2]; td[p + 3] = tc[3] * 255;
+      const nz2 = NOISE[k] - .5;
+      const tc = TEMPER[Math.min(1200, (Tmax[k] + nz2 * 30) | 0)];
+      const sc = Tmax[k] > 600 ? 1 - nz2 * .5 : 1;                       // okuje: skvrnitější
+      td[p] = tc[0] * sc; td[p + 1] = tc[1] * sc; td[p + 2] = tc[2] * sc; td[p + 3] = tc[3] * 255;
       // žár
-      const gc = GLOW[Math.max(0, Math.min(1200, T[k] | 0))];
+      const gc = GLOW[Math.max(0, Math.min(1200, (T[k] * (1 + nz2 * .06)) | 0))];
       gd[p] = gc[0]; gd[p + 1] = gc[1]; gd[p + 2] = gc[2]; gd[p + 3] = gc[3] * 255;
       // měřidlo – vrstevnice po 1 mm
       let on = 0;
@@ -328,32 +339,44 @@ canvas.drag{cursor:grabbing}
     const glowAmt = Math.max(0, Math.min(1, (tcNow - 500) / 350));
     // hadice + kabel k přístroji (k pravému dolnímu rohu)
     const rear = [cx + Math.cos(ang) * 178, cy + Math.sin(ang) * 178];
-    const hose = (off, col, w) => {
-      ctx.lineCap = 'round';
+    const hosePath = off => {
       ctx.beginPath(); ctx.moveTo(rear[0] + off * .4, rear[1] - off);
       ctx.bezierCurveTo(rear[0] + 90, rear[1] + 20 - off, W - 80, H + 30, W + 40, H - 50 - off);
-      ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.lineWidth = w + 6; ctx.stroke();
-      ctx.strokeStyle = col; ctx.lineWidth = w; ctx.stroke();
-      ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 1.5; ctx.stroke();
     };
-    hose(-9, '#15171a', 10); hose(0, '#1d2024', 12); hose(9, '#15171a', 10);
+    const hose = (off, w) => {
+      ctx.lineCap = 'round';
+      // stín hadice na plechu
+      ctx.save(); ctx.translate(5, 8); if (FILTER) ctx.filter = 'blur(4px)';
+      hosePath(off); ctx.strokeStyle = 'rgba(0,0,0,.45)'; ctx.lineWidth = w + 2; ctx.stroke(); ctx.restore();
+      // pryž: tmavý okraj, tělo, matný odlesk
+      hosePath(off);
+      ctx.strokeStyle = '#08090a'; ctx.lineWidth = w + 1.5; ctx.stroke();
+      ctx.strokeStyle = '#1c1e21'; ctx.lineWidth = w; ctx.stroke();
+      ctx.save(); ctx.translate(-w * .18, -w * .22);
+      ctx.strokeStyle = 'rgba(255,255,255,.13)'; ctx.lineWidth = w * .28; ctx.stroke(); ctx.restore();
+    };
+    hose(-9, 10); hose(9, 10); hose(0, 12);
 
-    // stín celého induktoru na plechu (výše = větší posun)
-    const so = 10 + lift * 10;
-    ctx.save(); ctx.translate(cx + so, cy + so * 1.2); ctx.rotate(ang);
-    ctx.fillStyle = `rgba(0,0,0,${.32 - lift * .08})`;
+    // měkký stín induktoru na plechu (výše = větší a rozmazanější)
+    const so = 8 + lift * 12;
+    ctx.save(); ctx.translate(cx + so, cy + so * 1.25); ctx.rotate(ang);
+    if (FILTER) ctx.filter = `blur(${5 + lift * 5}px)`;
+    ctx.fillStyle = `rgba(0,0,0,${.5 - lift * .15})`;
     ctx.beginPath(); ctx.arc(0, 0, 44, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.roundRect(40, -20, 140, 40, 14); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(40, -20, 145, 40, 14); ctx.fill();
     ctx.restore();
 
     ctx.save(); ctx.translate(cx, cy); ctx.rotate(ang);
     // měděné přívody (trubky chlazené vodou) z cívky do pistole
+    // měď: tmavý okraj, tělo, stín na spodní straně trubky a lesklý odlesk nahoře
+    const hot = glowAmt;
     const tube = (pts, w) => {
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       ctx.beginPath(); pts.forEach((p, n) => n ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]));
-      ctx.strokeStyle = '#3d1c0b'; ctx.lineWidth = w + 2.5; ctx.stroke();
-      ctx.strokeStyle = '#b5622c'; ctx.lineWidth = w; ctx.stroke();
-      ctx.save(); ctx.translate(-.8, -.9); ctx.strokeStyle = 'rgba(255,205,160,.75)'; ctx.lineWidth = w * .3; ctx.stroke(); ctx.restore();
+      ctx.strokeStyle = '#2a1206'; ctx.lineWidth = w + 2.2; ctx.stroke();
+      ctx.strokeStyle = `rgb(${165 + hot * 60},${88 + hot * 30},${45 + hot * 5})`; ctx.lineWidth = w; ctx.stroke();
+      ctx.save(); ctx.translate(.9, 1.1); ctx.strokeStyle = 'rgba(70,28,8,.55)'; ctx.lineWidth = w * .45; ctx.stroke(); ctx.restore();
+      ctx.save(); ctx.translate(-.9, -1.1); ctx.strokeStyle = `rgba(255,${215 - hot * 40},${175 - hot * 70},.85)`; ctx.lineWidth = w * .25; ctx.stroke(); ctx.restore();
     };
     // spirála (plochý induktor – „pancake“)
     const sp = [];
@@ -361,8 +384,12 @@ canvas.drag{cursor:grabbing}
     tube(sp, 4.6);
     tube([[sp[sp.length - 1][0], sp[sp.length - 1][1]], [52, -7], [64, -7]], 4.6);   // vnější konec
     tube([[9, 0], [30, 4], [52, 7], [64, 7]], 4.6);                                    // vnitřní konec přes závity
-    // odraz žáru v mědi
-    if (glowAmt > 0) { ctx.beginPath(); ctx.arc(0, 0, 42, 0, Math.PI * 2); ctx.fillStyle = `rgba(255,110,30,${glowAmt * .25})`; ctx.fill(); }
+    // šroubení hadic vzadu na rukojeti
+    for (const yy of [-9, 0, 9]) {
+      const fg = ctx.createLinearGradient(0, yy - 4, 0, yy + 4);
+      fg.addColorStop(0, '#e9ecef'); fg.addColorStop(.5, '#9aa0a8'); fg.addColorStop(1, '#4b5058');
+      ctx.fillStyle = fg; ctx.fillRect(180, yy - 4, 9, 8);
+    }
 
     // pistole – izolační blok, oranžové tělo Dawell, černá rukojeť
     ctx.fillStyle = '#121315'; ctx.beginPath(); ctx.roundRect(60, -14, 20, 28, 4); ctx.fill();
@@ -390,7 +417,7 @@ canvas.drag{cursor:grabbing}
     if (on < .05) return;
     // vířivé proudy v plechu
     ctx.save(); ctx.translate(cx, cy); ctx.rotate(now / 160);
-    ctx.strokeStyle = `rgba(120,200,255,${.35 * on})`; ctx.lineWidth = 1.4;
+    ctx.strokeStyle = `rgba(150,215,255,${.2 * on})`; ctx.lineWidth = 1.1;
     for (const r of [14, 26, 38]) for (let a = 0; a < 3; a++) {
       const a0 = a * 2.094, a1 = a0 + 1.3;
       ctx.beginPath(); ctx.arc(0, 0, r, a0, a1); ctx.stroke();
@@ -402,7 +429,7 @@ canvas.drag{cursor:grabbing}
     for (let n = 0; n < 3; n++) {
       const ph = ((now / 520) + n / 3) % 1;
       ctx.beginPath(); ctx.arc(cx, cy, 50 + ph * 55, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(120,200,255,${(1 - ph) * .28 * on})`; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.strokeStyle = `rgba(150,215,255,${(1 - ph) * .14 * on})`; ctx.lineWidth = 1.2; ctx.stroke();
     }
   }
 
@@ -450,16 +477,33 @@ canvas.drag{cursor:grabbing}
     buildLayers();
     ctx.drawImage(bgCv, 0, 0);
     ctx.imageSmoothingEnabled = true;
-    ctx.globalCompositeOperation = 'overlay'; ctx.drawImage(shadeCv, PX, PY, PW, PH);
-    ctx.globalCompositeOperation = 'source-over'; ctx.drawImage(tintCv, PX, PY, PW, PH);
-    ctx.drawImage(gaugeCv, PX, PY, PW, PH);
+    const blur = px => { if (FILTER) ctx.filter = px ? `blur(${px}px)` : 'none'; };
+    ctx.save();
+    ctx.beginPath(); ctx.rect(PX, PY, PW, PH); ctx.clip();               // nic nepřeteče mimo plech
+    ctx.globalCompositeOperation = 'overlay'; blur(2); ctx.drawImage(shadeCv, PX, PY, PW, PH);
+    ctx.globalCompositeOperation = 'source-over'; blur(3.5); ctx.drawImage(tintCv, PX, PY, PW, PH);
+    blur(1.5); ctx.drawImage(gaugeCv, PX, PY, PW, PH);
     ctx.globalCompositeOperation = 'lighter';
-    ctx.drawImage(glowCv, PX, PY, PW, PH);
-    ctx.globalAlpha = .7; ctx.drawImage(bloomCv, PX - 12, PY - 12, PW + 24, PH + 24); ctx.globalAlpha = 1;
-    ctx.globalCompositeOperation = 'source-over';
-    drawInduction(now);
+    blur(2.5); ctx.drawImage(glowCv, PX, PY, PW, PH);
+    if (FILTER) { blur(18); ctx.globalAlpha = .75; ctx.drawImage(glowCv, PX, PY, PW, PH); }
+    else { ctx.globalAlpha = .7; ctx.drawImage(bloomCv, PX - 12, PY - 12, PW + 24, PH + 24); }
+    ctx.globalAlpha = 1; blur(0);
+    ctx.restore();
+    // žár prosvítí i okolí (záře na stole a na induktoru)
+    if (tcNow > 520) {
+      const a = Math.min(1, (tcNow - 520) / 400) * .22;
+      const g = ctx.createRadialGradient(coil.x, coil.y, 10, coil.x, coil.y, 160);
+      g.addColorStop(0, `rgba(255,120,40,${a})`); g.addColorStop(1, 'rgba(255,120,40,0)');
+      ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = g; ctx.fillRect(coil.x - 160, coil.y - 160, 320, 320);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    if (showField) drawInduction(now);
     drawInductor(now);
     drawSmoke(dt);
+    // vinětace – dílenské světlo shora
+    const vg = ctx.createRadialGradient(W * .45, H * .4, 120, W * .5, H * .5, 560);
+    vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.42)');
+    ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
     if (!grab && time === 0) {
       ctx.font = '700 15px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
       ctx.fillStyle = 'rgba(14,16,19,.75)'; ctx.beginPath(); ctx.roundRect(coil.x - 92, coil.y - 92, 184, 28, 8); ctx.fill();
@@ -555,6 +599,11 @@ canvas.drag{cursor:grabbing}
     showGauge = !showGauge;
     $('gauge').textContent = '📏 Měřidlo boulí: ' + (showGauge ? 'zapnuto' : 'vypnuto');
     $('gauge').classList.toggle('on', showGauge);
+  });
+  $('field').addEventListener('click', () => {
+    showField = !showField;
+    $('field').textContent = '⚡ Ukázat indukci: ' + (showField ? 'zapnuto' : 'vypnuto');
+    $('field').classList.toggle('on', showField);
   });
 
   function loop(now) {
