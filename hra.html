@@ -37,12 +37,13 @@ canvas.drag{cursor:grabbing}
 .ro .v small{font-size:14px;color:var(--muted)}
 .bar{position:relative;height:10px;border-radius:5px;background:#0b0d10;border:1px solid var(--line-2);overflow:hidden;margin-top:8px}
 .bar .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--ok);transition:width .15s}
-.legend{display:flex;height:10px;border-radius:5px;overflow:hidden;margin-top:8px;background:linear-gradient(90deg,#787f88 0%,#5a3a36 45%,#9a1e14 58%,#d23c14 72%,#ff8c1e 86%,#ffe678)}
+.legend{display:flex;height:10px;border-radius:5px;overflow:hidden;margin-top:8px;background:linear-gradient(90deg,#787f88 0%,#5a3a36 40%,#9a1e14 55%,#d23c14 70%,#ff8c1e 85%,#ffe678)}
 .legend-k{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:4px}
 .controls{display:flex;gap:12px;margin-top:14px;flex-wrap:wrap}
 .btn{padding:14px 20px;border-radius:12px;font-weight:700;font-size:15px;border:1px solid var(--line-2);cursor:pointer;font-family:var(--font);background:transparent;color:var(--text)}
 .btn:hover{border-color:var(--muted)}
 .btn.pri{background:var(--orange);color:#1a0d05;border-color:transparent}
+.btn.on{border-color:var(--orange);color:var(--orange-2)}
 .msg{min-height:50px;margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line);font-size:15px;line-height:1.45}
 .msg b{color:var(--orange-2)}
 .msg.good{border-color:rgba(73,209,125,.5)} .msg.good b{color:var(--ok)}
@@ -63,12 +64,12 @@ canvas.drag{cursor:grabbing}
   </header>
 
   <h1>Vyrovnej plech s <span>DHI-191 HD</span></h1>
-  <p class="sub"><b>Chyť induktor myší (nebo prstem) a jezdi s ním po vyboulených místech.</b> Dokud ho držíš, indukuje do plechu vířivé proudy a ohřívá ho. Místo rozehřáté do třešňově červené (cca 600–800 °C) se při chladnutí smrští a boule se srovná. Nezůstávej ale moc dlouho na jednom místě – nad 900 °C plech spálíš.</p>
+  <p class="sub"><b>Chyť induktor myší (nebo prstem) a jezdi s ním po vyboulených místech.</b> Dokud ho držíš, indukuje do oceli vířivé proudy a ohřívá ji. Místo rozžhavené do třešňově červené (cca 600–800 °C) se při chladnutí smrští a boule se srovná. Nad 900 °C ale plech spálíš.</p>
 
   <div class="game">
     <div class="panel">
-      <canvas id="cv" width="800" height="480" aria-label="Plech a induktor"></canvas>
-      <canvas id="prof" width="800" height="90" aria-label="Profil plechu"></canvas>
+      <canvas id="cv" width="800" height="500" aria-label="Ocelový plech na pracovním stole a induktor"></canvas>
+      <canvas id="prof" width="800" height="90" aria-label="Profil plechu pod pravítkem"></canvas>
       <div class="overlay" id="over">
         <div>
           <h2 id="overTitle">Hotovo!</h2>
@@ -107,42 +108,95 @@ canvas.drag{cursor:grabbing}
   </div>
 
   <div class="controls">
+    <button class="btn" id="gauge">📏 Měřidlo boulí: vypnuto</button>
     <button class="btn" id="restart">Začít úroveň znovu</button>
     <button class="btn" id="newGame">Nová hra</button>
   </div>
   <div class="msg" id="msg"></div>
-  <p class="help">Modré stínování a čáry ukazují, kde je plech vyboulený; dole vidíš jeho profil z boku. Úroveň splníš, když žádná boule nebude vyšší než 1 mm. Skutečný Dawell DHI-191 HD má 19 kW a kapalinou chlazený induktor, takže vydrží pracovat nepřetržitě. 😉</p>
+  <p class="help">Boule poznáš podle odlesků na plechu a podle profilu pod pravítkem dole; tlačítkem Měřidlo boulí si můžeš zapnout vrstevnice po 1 mm. Po ohřevu zůstanou na oceli náběhové barvy – slámová, fialová, modrá – stejně jako ve skutečnosti. Úroveň splníš, když žádná boule nebude vyšší než 1 mm. Skutečný Dawell DHI-191 HD má 19 kW a kapalinou chlazený induktor, takže může pracovat nepřetržitě.</p>
 </div>
 
 <script>
 (() => {
-  const W = 800, H = 480, CELL = 10, GW = W / CELL, GH = H / CELL;
+  const W = 800, H = 500;
+  const PX = 30, PY = 25, PW = 740, PH = 450;          // plech na stole
+  const CELL = 5, GW = PW / CELL, GH = PH / CELL, N = GW * GH;
   const ROOM = 22, WORK_LO = 600, WORK_HI = 820, BURN = 900, FLAT = 1.0;
+  const $ = id => document.getElementById(id);
   const cv = $('cv'), ctx = cv.getContext('2d');
   const pv = $('prof'), pctx = pv.getContext('2d');
-  const heatCv = document.createElement('canvas'); heatCv.width = GW; heatCv.height = GH;
-  const hctx = heatCv.getContext('2d'), img = hctx.createImageData(GW, GH);
-  function $(id) { return document.getElementById(id); }
+  const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
 
-  // boule: x, y, poloměr (px), výška (mm)
+  // vrstvy v rozlišení mřížky
+  const shadeCv = mk(GW, GH), shadeCtx = shadeCv.getContext('2d'), shadeImg = shadeCtx.createImageData(GW, GH);
+  const tintCv = mk(GW, GH), tintCtx = tintCv.getContext('2d'), tintImg = tintCtx.createImageData(GW, GH);
+  const glowCv = mk(GW, GH), glowCtx = glowCv.getContext('2d'), glowImg = glowCtx.createImageData(GW, GH);
+  const gaugeCv = mk(GW, GH), gaugeCtx = gaugeCv.getContext('2d'), gaugeImg = gaugeCtx.createImageData(GW, GH);
+  const bloomCv = mk(GW / 5 | 0, GH / 5 | 0), bloomCtx = bloomCv.getContext('2d');
+
+  // ---------- statické pozadí: svařovací stůl + broušený plech ----------
+  const bgCv = mk(W, H), bg = bgCv.getContext('2d');
+  (function buildBackground() {
+    bg.fillStyle = '#24272b'; bg.fillRect(0, 0, W, H);
+    for (let y = 12; y < H; y += 50) for (let x = 12; x < W; x += 50) {      // otvory v desce stolu
+      bg.beginPath(); bg.arc(x, y, 7, 0, Math.PI * 2); bg.fillStyle = '#121416'; bg.fill();
+      bg.beginPath(); bg.arc(x, y + 1, 7, 0.1, Math.PI - 0.1); bg.strokeStyle = 'rgba(255,255,255,.07)'; bg.stroke();
+    }
+    // stín plechu
+    bg.fillStyle = 'rgba(0,0,0,.55)'; bg.fillRect(PX + 6, PY + 8, PW, PH);
+    // textura oceli
+    const img = bg.createImageData(PW, PH), d = img.data;
+    let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    for (let y = 0; y < PH; y++) {
+      const row = (rnd() - .5) * 10;
+      let run = 0;
+      for (let x = 0; x < PW; x++) {
+        run = run * 0.93 + (rnd() - .5) * 7;
+        const mott = 7 * Math.sin(x / 95 + y / 150) + 5 * Math.sin(x / 41 - y / 67) + 3 * Math.sin((x + y) / 19);
+        const v = 150 + row + run + mott + (rnd() - .5) * 6;
+        const k = (y * PW + x) * 4;
+        d[k] = v - 5; d[k + 1] = v; d[k + 2] = v + 6; d[k + 3] = 255;
+      }
+    }
+    bg.putImageData(img, PX, PY);
+    // odlesk (dílenské světlo)
+    const g = bg.createLinearGradient(PX, PY, PX + PW, PY + PH);
+    g.addColorStop(0, 'rgba(255,255,255,.10)'); g.addColorStop(.35, 'rgba(255,255,255,.02)');
+    g.addColorStop(.5, 'rgba(255,255,255,.16)'); g.addColorStop(.62, 'rgba(255,255,255,0)'); g.addColorStop(1, 'rgba(0,0,0,.18)');
+    bg.fillStyle = g; bg.fillRect(PX, PY, PW, PH);
+    // škrábance
+    for (let i = 0; i < 40; i++) {
+      const x = PX + rnd() * PW, y = PY + rnd() * PH, l = 20 + rnd() * 90, a = (rnd() - .5) * .5;
+      bg.strokeStyle = `rgba(255,255,255,${.04 + rnd() * .07})`; bg.lineWidth = .7;
+      bg.beginPath(); bg.moveTo(x, y); bg.lineTo(x + Math.cos(a) * l, y + Math.sin(a) * l); bg.stroke();
+    }
+    // hrany plechu (tloušťka)
+    bg.fillStyle = '#5d6168'; bg.fillRect(PX, PY + PH, PW, 4);
+    bg.fillStyle = '#6c7078'; bg.fillRect(PX + PW, PY, 4, PH + 4);
+    bg.strokeStyle = 'rgba(255,255,255,.35)'; bg.lineWidth = 1;
+    bg.beginPath(); bg.moveTo(PX, PY + PH); bg.lineTo(PX, PY + .5); bg.lineTo(PX + PW, PY + .5); bg.stroke();
+  })();
+
+  // ---------- úrovně ----------
   const LEVELS = [
-    { name: 'Jedna boule', bumps: [{ x: 400, y: 240, r: 60, h: 5 }] },
-    { name: 'Prohnutý pás', bumps: [{ x: 250, y: 240, r: 45, h: 3.5 }, { x: 330, y: 240, r: 45, h: 4 }, { x: 410, y: 240, r: 45, h: 4.5 }, { x: 490, y: 240, r: 45, h: 4 }, { x: 570, y: 240, r: 45, h: 3.5 }] },
-    { name: 'Dvě boule', bumps: [{ x: 230, y: 170, r: 55, h: 5 }, { x: 570, y: 320, r: 65, h: 6 }] },
+    { name: 'Jedna boule', bumps: [{ x: 400, y: 250, r: 60, h: 5 }] },
+    { name: 'Prohnutý pás', bumps: [{ x: 250, y: 250, r: 45, h: 3.5 }, { x: 330, y: 250, r: 45, h: 4 }, { x: 410, y: 250, r: 45, h: 4.5 }, { x: 490, y: 250, r: 45, h: 4 }, { x: 570, y: 250, r: 45, h: 3.5 }] },
+    { name: 'Dvě boule', bumps: [{ x: 230, y: 170, r: 55, h: 5 }, { x: 570, y: 330, r: 65, h: 6 }] },
   ];
 
-  let T, T2, D, D0max, burnt, lvl = 0, total = 0, time, done, coil, grab, last;
+  let T, T2, D, Tmax, D0max, lvl = 0, total = 0, time, done, coil, grab, last, showGauge = false, tcNow = ROOM;
+  let smoke = [];
 
   function startLevel() {
-    T = new Float32Array(GW * GH).fill(ROOM); T2 = new Float32Array(GW * GH);
-    D = new Float32Array(GW * GH); burnt = new Uint8Array(GW * GH);
+    T = new Float32Array(N).fill(ROOM); T2 = new Float32Array(N);
+    D = new Float32Array(N); Tmax = new Float32Array(N).fill(ROOM);
     for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
-      const px = i * CELL + 5, py = j * CELL + 5; let h = 0;
+      const px = PX + i * CELL + CELL / 2, py = PY + j * CELL + CELL / 2; let h = 0;
       for (const b of LEVELS[lvl].bumps) h += b.h * Math.exp(-((px - b.x) ** 2 + (py - b.y) ** 2) / (2 * (b.r / 1.6) ** 2));
       D[j * GW + i] = h;
     }
     D0max = Math.max(...D);
-    coil = { x: 100, y: 390, tx: 100, ty: 390, on: 0 }; grab = false;
+    coil = { x: 120, y: 400, tx: 120, ty: 400, on: 0, lift: 0 }; grab = false; smoke = [];
     time = 0; done = false;
     $('over').classList.remove('show');
     $('lvl').textContent = lvl + 1; $('lvlName').textContent = LEVELS[lvl].name;
@@ -150,159 +204,263 @@ canvas.drag{cursor:grabbing}
   }
   function setMsg(h, c) { $('msg').innerHTML = h; $('msg').className = 'msg' + (c ? ' ' + c : ''); }
 
-  // --- ovládání ---
+  // ---------- ovládání ----------
   function pos(e) { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height }; }
   cv.addEventListener('pointerdown', e => {
     if (done) return;
     const p = pos(e);
-    if (Math.hypot(p.x - coil.x, p.y - coil.y) < 80 || e.pointerType === 'touch') {
+    if (Math.hypot(p.x - coil.x, p.y - coil.y) < 90 || e.pointerType === 'touch') {
       grab = true; cv.setPointerCapture(e.pointerId); cv.classList.add('drag');
       coil.tx = p.x; coil.ty = p.y;
     }
   });
-  cv.addEventListener('pointermove', e => { if (grab) { const p = pos(e); coil.tx = Math.max(0, Math.min(W, p.x)); coil.ty = Math.max(0, Math.min(H, p.y)); } });
+  cv.addEventListener('pointermove', e => { if (grab) { const p = pos(e); coil.tx = Math.max(PX, Math.min(PX + PW, p.x)); coil.ty = Math.max(PY, Math.min(PY + PH, p.y)); } });
   const drop = () => { grab = false; cv.classList.remove('drag'); };
   cv.addEventListener('pointerup', drop); cv.addEventListener('pointercancel', drop); addEventListener('blur', drop);
 
-  // --- fyzika ---
-  const R0 = 24, SIG = 14, Q = 1700, COOL = 0.3, DIFF = 8, SHRINK = 3.5;
+  // ---------- fyzika ----------
+  const R0 = 24, SIG = 14, Q = 1700, COOL = 0.3, DIFF = 800, SHRINK = 3.5; // DIFF v px²/s
   function step(dt) {
     coil.on += ((grab ? 1 : 0) - coil.on) * Math.min(1, dt / 0.1);
     if (coil.on > 0.01) {
       const reach = R0 + SIG * 3;
-      const i0 = Math.max(0, ((coil.x - reach) / CELL) | 0), i1 = Math.min(GW - 1, ((coil.x + reach) / CELL) | 0);
-      const j0 = Math.max(0, ((coil.y - reach) / CELL) | 0), j1 = Math.min(GH - 1, ((coil.y + reach) / CELL) | 0);
+      const i0 = Math.max(0, ((coil.x - PX - reach) / CELL) | 0), i1 = Math.min(GW - 1, ((coil.x - PX + reach) / CELL) | 0);
+      const j0 = Math.max(0, ((coil.y - PY - reach) / CELL) | 0), j1 = Math.min(GH - 1, ((coil.y - PY + reach) / CELL) | 0);
       for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
-        const d = Math.hypot(i * CELL + 5 - coil.x, j * CELL + 5 - coil.y);
+        const d = Math.hypot(PX + i * CELL + 2.5 - coil.x, PY + j * CELL + 2.5 - coil.y);
         T[j * GW + i] += Q * coil.on * Math.exp(-((d - R0) ** 2) / (2 * SIG * SIG)) * dt;
       }
     }
-    const c = DIFF * dt;
+    const c = DIFF / (CELL * CELL) * dt;
     for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
       const k = j * GW + i, t = T[k];
-      const l = i ? T[k - 1] : t, r = i < GW - 1 ? T[k + 1] : t, u = j ? T[k - GW] : t, d = j < GH - 1 ? T[k + GW] : t;
-      T2[k] = t + c * (l + r + u + d - 4 * t) - COOL * (t - ROOM) * dt;
-      if (T2[k] > BURN) burnt[k] = 1;
-      // smrštění: rozžhavené místo stahuje boule
-      if (t > WORK_LO) D[k] = Math.max(0, D[k] - D[k] * SHRINK * Math.min(1, (t - WORK_LO) / (WORK_HI - WORK_LO)) * dt - 0.6 * dt);
+      const l = i ? T[k - 1] : t, r = i < GW - 1 ? T[k + 1] : t, u = j ? T[k - GW] : t, dn = j < GH - 1 ? T[k + GW] : t;
+      const nt = t + c * (l + r + u + dn - 4 * t) - COOL * (t - ROOM) * dt;
+      T2[k] = nt;
+      if (nt > Tmax[k]) Tmax[k] = nt;
+      if (t > WORK_LO) {
+        // nejlépe to stahuje v třešňové červené; přehřátá ocel jen měkne a stahuje se hůř
+        const eff = t <= WORK_HI ? (t - WORK_LO) / (WORK_HI - WORK_LO) : Math.max(.25, 1 - (t - WORK_HI) / 160);
+        D[k] = Math.max(0, D[k] - (D[k] * SHRINK + 0.6) * eff * dt);
+      }
     }
-    [T, T2] = [T2, T];
+    const s = T; T = T2; T2 = s;
   }
 
-  // --- barvy žáru ---
-  const stops = [[22,[128,134,142]],[300,[110,100,100]],[450,[90,58,54]],[600,[154,30,20]],[750,[210,60,20]],[850,[255,140,30]],[950,[255,230,120]],[1100,[255,255,230]]];
-  const LUT = [];
-  for (let t = 0; t <= 1100; t++) {
-    let i = 1; while (i < stops.length - 1 && t > stops[i][0]) i++;
-    const [t0, c0] = stops[i - 1], [t1, c1] = stops[i], k = Math.max(0, Math.min(1, (t - t0) / (t1 - t0)));
-    LUT.push(c0.map((v, n) => v + (c1[n] - v) * k));
+  // ---------- barevné tabulky ----------
+  function lut(stops, max) {
+    const out = [];
+    for (let t = 0; t <= max; t++) {
+      let i = 1; while (i < stops.length - 1 && t > stops[i][0]) i++;
+      const [t0, c0] = stops[i - 1], [t1, c1] = stops[i], k = Math.max(0, Math.min(1, (t - t0) / (t1 - t0)));
+      out.push(c0.map((v, n) => v + (c1[n] - v) * k));
+    }
+    return out;
   }
+  // žár (vlastní světlo rozžhavené oceli)
+  const GLOW = lut([[0,[90,0,0,0]],[470,[110,8,0,0]],[560,[150,20,4,.45]],[650,[200,35,10,.8]],[750,[240,75,18,.95]],[850,[255,145,40,1]],[950,[255,215,110,1]],[1200,[255,250,225,1]]], 1200);
+  // náběhové barvy oxidů podle nejvyšší dosažené teploty
+  const TEMPER = lut([[0,[230,215,160,0]],[170,[230,215,160,0]],[210,[232,210,140,.45]],[240,[200,150,80,.55]],[265,[135,75,110,.6]],[290,[55,85,170,.6]],[330,[105,135,180,.5]],[420,[115,120,128,.45]],[650,[72,68,66,.62]],[900,[46,40,38,.82]],[1200,[28,24,24,.92]]], 1200);
 
-  function draw(now) {
-    const d = img.data;
+  // ---------- vykreslení ----------
+  const L = (() => { const v = [-0.45, -0.55, 0.7], n = Math.hypot(...v); return v.map(x => x / n); })();
+  const Hh = (() => { const v = [L[0], L[1], L[2] + 1], n = Math.hypot(...v); return v.map(x => x / n); })();
+  const flatDiff = L[2], flatSpec = Math.pow(Hh[2], 40);
+  const EXAG = 9;
+
+  function buildLayers() {
+    const sd = shadeImg.data, td = tintImg.data, gd = glowImg.data, md = gaugeImg.data;
     for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
-      const k = j * GW + i, c = LUT[Math.max(0, Math.min(1100, T[k] | 0))];
-      // stínování podle sklonu (osvětlení zleva nahoře) + modrý nádech podle výšky boule
-      const sl = ((i > 0 ? D[k - 1] : D[k]) - (i < GW - 1 ? D[k + 1] : D[k]) + (j > 0 ? D[k - GW] : D[k]) - (j < GH - 1 ? D[k + GW] : D[k])) * -24;
-      const glow = Math.max(0, Math.min(1, (T[k] - 450) / 300));
-      const blue = Math.min(1, D[k] / 4) * (1 - glow) * 0.9;
-      d[k * 4]     = Math.max(0, Math.min(255, c[0] + sl * (1 - glow) - blue * 70));
-      d[k * 4 + 1] = Math.max(0, Math.min(255, c[1] + sl * (1 - glow) - blue * 20));
-      d[k * 4 + 2] = Math.max(0, Math.min(255, c[2] + sl * (1 - glow) + blue * 90));
-      d[k * 4 + 3] = 255;
+      const k = j * GW + i, p = k * 4;
+      // osvětlení podle sklonu boule
+      const dx = ((i < GW - 1 ? D[k + 1] : D[k]) - (i ? D[k - 1] : D[k])) / (2 * CELL) * EXAG;
+      const dy = ((j < GH - 1 ? D[k + GW] : D[k]) - (j ? D[k - GW] : D[k])) / (2 * CELL) * EXAG;
+      const nl = Math.hypot(dx, dy, 1), nx = -dx / nl, ny = -dy / nl, nz = 1 / nl;
+      const diff = nx * L[0] + ny * L[1] + nz * L[2];
+      const spec = Math.pow(Math.max(0, nx * Hh[0] + ny * Hh[1] + nz * Hh[2]), 40);
+      const v = 128 + (diff - flatDiff) * 240 + (spec - flatSpec) * 120;
+      sd[p] = sd[p + 1] = sd[p + 2] = v; sd[p + 3] = 255;
+      // náběhové barvy
+      const tc = TEMPER[Math.min(1200, Tmax[k] | 0)];
+      td[p] = tc[0]; td[p + 1] = tc[1]; td[p + 2] = tc[2]; td[p + 3] = tc[3] * 255;
+      // žár
+      const gc = GLOW[Math.max(0, Math.min(1200, T[k] | 0))];
+      gd[p] = gc[0]; gd[p + 1] = gc[1]; gd[p + 2] = gc[2]; gd[p + 3] = gc[3] * 255;
+      // měřidlo – vrstevnice po 1 mm
+      let on = 0;
+      if (showGauge && i < GW - 1 && j < GH - 1) {
+        const a = D[k], b = D[k + 1], e = D[k + GW];
+        for (let lv = 1; lv < 8; lv++) if ((a - lv) * (b - lv) < 0 || (a - lv) * (e - lv) < 0) { on = 1; break; }
+      }
+      md[p] = 110; md[p + 1] = 190; md[p + 2] = 255; md[p + 3] = on ? 120 : 0;
     }
-    hctx.putImageData(img, 0, 0);
-    ctx.imageSmoothingEnabled = true;
-    ctx.drawImage(heatCv, 0, 0, W, H);
-    ctx.globalAlpha = .05; ctx.strokeStyle = '#fff';
-    for (let y = 3; y < H; y += 6) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y + 2); ctx.stroke(); }
-    ctx.globalAlpha = 1;
+    shadeCtx.putImageData(shadeImg, 0, 0); tintCtx.putImageData(tintImg, 0, 0);
+    glowCtx.putImageData(glowImg, 0, 0); gaugeCtx.putImageData(gaugeImg, 0, 0);
+    bloomCtx.clearRect(0, 0, bloomCv.width, bloomCv.height);
+    bloomCtx.drawImage(glowCv, 0, 0, bloomCv.width, bloomCv.height);
+  }
 
-    // vrstevnice boulí (1, 2, 3… mm)
-    ctx.fillStyle = 'rgba(140,200,255,.7)';
-    for (let j = 0; j < GH - 1; j++) for (let i = 0; i < GW - 1; i++) {
-      const a = D[j * GW + i], b = D[j * GW + i + 1], e = D[(j + 1) * GW + i];
-      for (let lv = 1; lv < 8; lv++) if ((a - lv) * (b - lv) < 0 || (a - lv) * (e - lv) < 0) { ctx.fillRect(i * CELL + 4, j * CELL + 4, 3, 3); break; }
-    }
-    // spálená místa
-    ctx.fillStyle = 'rgba(20,10,10,.75)';
-    for (let k = 0; k < burnt.length; k++) if (burnt[k]) { const x = (k % GW) * CELL, y = ((k / GW) | 0) * CELL; ctx.fillRect(x + 1, y + 1, 8, 8); }
-
-    const on = coil.on, cx = coil.x, cy = coil.y;
-    // hadice chlazení (červená/modrá) a kabel k přístroji
-    ctx.lineCap = 'round';
-    const hose = (dx, col) => {
-      ctx.strokeStyle = '#0c0d10'; ctx.lineWidth = 9;
-      ctx.beginPath(); ctx.moveTo(cx + 40, cy + dx); ctx.bezierCurveTo(cx + 120, cy + dx + 10, W - 120, H + 10, W + 30, H - 40 + dx); ctx.stroke();
-      ctx.strokeStyle = col; ctx.lineWidth = 3; ctx.stroke();
+  function drawInductor(now) {
+    const { x: cx, y: cy, on, lift } = coil, ang = 0.42;
+    const glowAmt = Math.max(0, Math.min(1, (tcNow - 500) / 350));
+    // hadice + kabel k přístroji (k pravému dolnímu rohu)
+    const rear = [cx + Math.cos(ang) * 178, cy + Math.sin(ang) * 178];
+    const hose = (off, col, w) => {
+      ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(rear[0] + off * .4, rear[1] - off);
+      ctx.bezierCurveTo(rear[0] + 90, rear[1] + 20 - off, W - 80, H + 30, W + 40, H - 50 - off);
+      ctx.strokeStyle = 'rgba(0,0,0,.35)'; ctx.lineWidth = w + 6; ctx.stroke();
+      ctx.strokeStyle = col; ctx.lineWidth = w; ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 1.5; ctx.stroke();
     };
-    hose(-5, '#3b7bd6'); hose(5, '#d64a3b');
+    hose(-9, '#15171a', 10); hose(0, '#1d2024', 12); hose(9, '#15171a', 10);
 
-    if (on > 0.05) {
-      ctx.save(); ctx.translate(cx, cy); ctx.rotate(now / 140);
-      ctx.strokeStyle = `rgba(255,200,120,${0.6 * on})`; ctx.lineWidth = 2;
-      for (const r of [10, 20, 30, 40]) for (let a = 0; a < 3; a++) {
-        ctx.beginPath(); ctx.arc(0, 0, r, a * 2.094, a * 2.094 + 1.2); ctx.stroke();
-        const ea = a * 2.094 + 1.2, ex = Math.cos(ea) * r, ey = Math.sin(ea) * r;
-        ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(ex + Math.cos(ea - 2.2) * 5, ey + Math.sin(ea - 2.2) * 5); ctx.stroke();
-      }
-      ctx.restore();
-      for (let n = 0; n < 4; n++) {
-        const ph = ((now / 600) + n / 4) % 1;
-        ctx.beginPath(); ctx.arc(cx, cy, 44 + ph * 60, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(94,196,242,${(1 - ph) * 0.5 * on})`; ctx.lineWidth = 2; ctx.stroke();
-      }
-    }
-
-    // induktor shora: měděná spirála (pancake) v průhledném krytu + rukojeť
-    ctx.save(); ctx.translate(cx, cy);
-    ctx.fillStyle = '#23272e'; ctx.strokeStyle = '#111';
-    ctx.beginPath(); ctx.roundRect(36, -9, 46, 18, 6); ctx.fill(); ctx.stroke();       // rukojeť
-    ctx.fillStyle = '#FF702B'; ctx.fillRect(48, -9, 4, 18);                               // oranžový pruh Dawell
-    ctx.beginPath(); ctx.arc(0, 0, 40, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(27,31,37,.25)'; ctx.fill();
-    ctx.strokeStyle = grab ? '#FF9254' : '#1b1f25'; ctx.lineWidth = 3; ctx.stroke();
-    ctx.beginPath();
-    for (let a = 0; a < Math.PI * 2 * 3.2; a += 0.08) { const r = 8 + a * 1.55; ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r); }
-    ctx.strokeStyle = 'rgba(40,20,10,.7)'; ctx.lineWidth = 4.5; ctx.stroke();
-    ctx.strokeStyle = on > 0.3 ? '#f3a061' : '#c8783f'; ctx.lineWidth = 2.5; ctx.stroke();
-    ctx.beginPath(); ctx.arc(0, -32, 3.5, 0, Math.PI * 2);
-    ctx.fillStyle = on > 0.5 ? '#FF702B' : '#3a4049'; ctx.fill();
+    // stín celého induktoru na plechu (výše = větší posun)
+    const so = 10 + lift * 10;
+    ctx.save(); ctx.translate(cx + so, cy + so * 1.2); ctx.rotate(ang);
+    ctx.fillStyle = `rgba(0,0,0,${.32 - lift * .08})`;
+    ctx.beginPath(); ctx.arc(0, 0, 44, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(40, -20, 140, 40, 14); ctx.fill();
     ctx.restore();
 
-    if (!grab && time === 0) {
-      ctx.font = '600 15px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.fillStyle = '#EEF0F3';
-      ctx.fillText('↑ chyť induktor a táhni', cx, cy + 66);
-    }
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(ang);
+    // měděné přívody (trubky chlazené vodou) z cívky do pistole
+    const tube = (pts, w) => {
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.beginPath(); pts.forEach((p, n) => n ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]));
+      ctx.strokeStyle = '#3d1c0b'; ctx.lineWidth = w + 2.5; ctx.stroke();
+      ctx.strokeStyle = '#b5622c'; ctx.lineWidth = w; ctx.stroke();
+      ctx.save(); ctx.translate(-.8, -.9); ctx.strokeStyle = 'rgba(255,205,160,.75)'; ctx.lineWidth = w * .3; ctx.stroke(); ctx.restore();
+    };
+    // spirála (plochý induktor – „pancake“)
+    const sp = [];
+    for (let a = 0; a <= Math.PI * 2 * 4; a += 0.07) { const r = 9 + a * 1.25; sp.push([Math.cos(a) * r, Math.sin(a) * r]); }
+    tube(sp, 4.6);
+    tube([[sp[sp.length - 1][0], sp[sp.length - 1][1]], [52, -7], [64, -7]], 4.6);   // vnější konec
+    tube([[9, 0], [30, 4], [52, 7], [64, 7]], 4.6);                                    // vnitřní konec přes závity
+    // odraz žáru v mědi
+    if (glowAmt > 0) { ctx.beginPath(); ctx.arc(0, 0, 42, 0, Math.PI * 2); ctx.fillStyle = `rgba(255,110,30,${glowAmt * .25})`; ctx.fill(); }
 
-    // profil plechu z boku (řez řádkem pod induktorem)
-    const row = Math.max(0, Math.min(GH - 1, (cy / CELL) | 0));
+    // pistole – izolační blok, oranžové tělo Dawell, černá rukojeť
+    ctx.fillStyle = '#121315'; ctx.beginPath(); ctx.roundRect(60, -14, 20, 28, 4); ctx.fill();
+    const body = ctx.createLinearGradient(0, -18, 0, 18);
+    body.addColorStop(0, '#ffa066'); body.addColorStop(.35, '#ff7a33'); body.addColorStop(1, '#c94e10');
+    ctx.fillStyle = body; ctx.beginPath(); ctx.roundRect(78, -18, 72, 36, 10); ctx.fill();
+    ctx.strokeStyle = 'rgba(0,0,0,.4)'; ctx.lineWidth = 1; ctx.stroke();
+    const grip = ctx.createLinearGradient(0, -16, 0, 16);
+    grip.addColorStop(0, '#3a3d42'); grip.addColorStop(.4, '#24262a'); grip.addColorStop(1, '#0f1012');
+    ctx.fillStyle = grip; ctx.beginPath(); ctx.roundRect(146, -16, 36, 32, 9); ctx.fill();
+    for (let g = 0; g < 4; g++) { ctx.fillStyle = 'rgba(255,255,255,.06)'; ctx.fillRect(152 + g * 7, -13, 2, 26); }
+    ctx.fillStyle = '#1b1c1f'; ctx.fillRect(78, -3, 72, 6);
+    ctx.fillStyle = '#fff'; ctx.font = '800 9px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('DAWELL', 112, -9.5);
+    // kontrolka
+    ctx.beginPath(); ctx.arc(138, 10, 3, 0, Math.PI * 2);
+    ctx.fillStyle = on > .5 ? '#7dff9a' : '#2f3a33'; ctx.fill();
+    if (on > .5) { ctx.beginPath(); ctx.arc(138, 10, 7, 0, Math.PI * 2); ctx.fillStyle = 'rgba(125,255,154,.25)'; ctx.fill(); }
+    if (grab) { ctx.strokeStyle = 'rgba(255,146,84,.9)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, 47, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.restore();
+  }
+
+  function drawInduction(now) {
+    const { x: cx, y: cy, on } = coil;
+    if (on < .05) return;
+    // vířivé proudy v plechu
+    ctx.save(); ctx.translate(cx, cy); ctx.rotate(now / 160);
+    ctx.strokeStyle = `rgba(120,200,255,${.35 * on})`; ctx.lineWidth = 1.4;
+    for (const r of [14, 26, 38]) for (let a = 0; a < 3; a++) {
+      const a0 = a * 2.094, a1 = a0 + 1.3;
+      ctx.beginPath(); ctx.arc(0, 0, r, a0, a1); ctx.stroke();
+      const ex = Math.cos(a1) * r, ey = Math.sin(a1) * r;
+      ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(ex + Math.cos(a1 - 2.3) * 5, ey + Math.sin(a1 - 2.3) * 5); ctx.stroke();
+    }
+    ctx.restore();
+    // střídavé magnetické pole
+    for (let n = 0; n < 3; n++) {
+      const ph = ((now / 520) + n / 3) % 1;
+      ctx.beginPath(); ctx.arc(cx, cy, 50 + ph * 55, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(120,200,255,${(1 - ph) * .28 * on})`; ctx.lineWidth = 1.5; ctx.stroke();
+    }
+  }
+
+  function drawSmoke(dt) {
+    if (coil.on > .5 && tcNow > 650 && Math.random() < dt * 30) {
+      const a = Math.random() * Math.PI * 2, r = Math.random() * 30;
+      smoke.push({ x: coil.x + Math.cos(a) * r, y: coil.y + Math.sin(a) * r, r: 5, a: .22, vx: (Math.random() - .5) * 14, vy: -18 - Math.random() * 14 });
+    }
+    for (const s of smoke) { s.x += s.vx * dt; s.y += s.vy * dt; s.r += 16 * dt; s.a -= .14 * dt; }
+    smoke = smoke.filter(s => s.a > 0);
+    for (const s of smoke) {
+      const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r);
+      g.addColorStop(0, `rgba(200,200,205,${s.a})`); g.addColorStop(1, 'rgba(200,200,205,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  function drawProfile() {
+    const cy = coil.y, row = Math.max(0, Math.min(GH - 1, ((cy - PY) / CELL) | 0));
     pctx.fillStyle = '#14171B'; pctx.fillRect(0, 0, W, 90);
-    pctx.strokeStyle = 'rgba(73,209,125,.5)'; pctx.setLineDash([6, 6]); pctx.beginPath(); pctx.moveTo(0, 70); pctx.lineTo(W, 70); pctx.stroke(); pctx.setLineDash([]);
-    pctx.beginPath(); pctx.moveTo(0, 90);
-    for (let i = 0; i < GW; i++) pctx.lineTo(i * CELL + 5, 70 - D[row * GW + i] * 9);
-    pctx.lineTo(W, 70); pctx.lineTo(W, 90); pctx.closePath();
-    const g = pctx.createLinearGradient(0, 0, W, 0);
-    for (let i = 0; i < GW; i += 4) { const c = LUT[Math.max(0, Math.min(1100, T[row * GW + i] | 0))]; g.addColorStop(i / GW, `rgb(${c.map(v => v | 0).join(',')})`); }
+    // plech v řezu
+    const base = 66, sc = 8;
+    pctx.beginPath(); pctx.moveTo(PX, base + 8);
+    for (let i = 0; i < GW; i++) pctx.lineTo(PX + i * CELL + 2.5, base - D[row * GW + i] * sc);
+    for (let i = GW - 1; i >= 0; i--) pctx.lineTo(PX + i * CELL + 2.5, base + 6 - D[row * GW + i] * sc);
+    pctx.closePath();
+    const g = pctx.createLinearGradient(PX, 0, PX + PW, 0);
+    for (let i = 0; i < GW; i += 6) {
+      const t = T[row * GW + i], gc = GLOW[Math.max(0, Math.min(1200, t | 0))], a = gc[3];
+      g.addColorStop(i / GW, `rgb(${(150 * (1 - a) + gc[0] * a) | 0},${(155 * (1 - a) + gc[1] * a) | 0},${(162 * (1 - a) + gc[2] * a) | 0})`);
+    }
     pctx.fillStyle = g; pctx.fill();
+    // ocelové pravítko
+    pctx.fillStyle = '#c9ccd1'; pctx.fillRect(PX, base - 52, PW, 6);
+    pctx.fillStyle = '#5c6068';
+    for (let x = PX; x <= PX + PW; x += 10) pctx.fillRect(x, base - 46, 1, x % 50 === PX % 50 ? 5 : 3);
+    pctx.strokeStyle = 'rgba(73,209,125,.55)'; pctx.setLineDash([5, 5]);
+    pctx.beginPath(); pctx.moveTo(PX, base); pctx.lineTo(PX + PW, base); pctx.stroke(); pctx.setLineDash([]);
     pctx.fillStyle = '#6B7482'; pctx.font = '500 11px JetBrains Mono, monospace'; pctx.textAlign = 'left';
-    pctx.fillText('PROFIL Z BOKU (řez pod induktorem) · zelená = rovina', 10, 16);
-    pctx.strokeStyle = 'rgba(255,146,84,.6)'; pctx.beginPath(); pctx.moveTo(cx, 22); pctx.lineTo(cx, 90); pctx.stroke();
+    pctx.fillText('PROFIL PLECHU POD INDUKTOREM · zelená = rovina', PX, 12);
+    pctx.strokeStyle = 'rgba(255,146,84,.7)'; pctx.beginPath(); pctx.moveTo(coil.x, 20); pctx.lineTo(coil.x, 90); pctx.stroke();
+  }
+
+  function draw(now, dt) {
+    buildLayers();
+    ctx.drawImage(bgCv, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.globalCompositeOperation = 'overlay'; ctx.drawImage(shadeCv, PX, PY, PW, PH);
+    ctx.globalCompositeOperation = 'source-over'; ctx.drawImage(tintCv, PX, PY, PW, PH);
+    ctx.drawImage(gaugeCv, PX, PY, PW, PH);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.drawImage(glowCv, PX, PY, PW, PH);
+    ctx.globalAlpha = .7; ctx.drawImage(bloomCv, PX - 12, PY - 12, PW + 24, PH + 24); ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    drawInduction(now);
+    drawInductor(now);
+    drawSmoke(dt);
+    if (!grab && time === 0) {
+      ctx.font = '700 15px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+      ctx.fillStyle = 'rgba(14,16,19,.75)'; ctx.beginPath(); ctx.roundRect(coil.x - 92, coil.y - 92, 184, 28, 8); ctx.fill();
+      ctx.fillStyle = '#EEF0F3'; ctx.fillText('chyť induktor a táhni ↓', coil.x, coil.y - 73);
+    }
+    drawProfile();
   }
 
   function update(dt) {
     coil.x += (coil.tx - coil.x) * Math.min(1, dt * 14);
     coil.y += (coil.ty - coil.y) * Math.min(1, dt * 14);
-    for (let s = 0; s < 4; s++) step(dt / 4);
+    coil.lift += ((grab ? 0 : 1) - coil.lift) * Math.min(1, dt * 8);
+    const sub = Math.max(2, Math.ceil(DIFF / (CELL * CELL) * dt / 0.2));
+    for (let s = 0; s < sub; s++) step(dt / sub);
     if (grab || time > 0) time += dt;
 
     let nb = 0, mx = 0, tc = 0;
-    for (let k = 0; k < T.length; k++) { nb += burnt[k]; if (D[k] > mx) mx = D[k]; }
-    const ci = (coil.x / CELL) | 0, cj = (coil.y / CELL) | 0;
-    for (let b = -3; b <= 3; b++) for (let a = -3; a <= 3; a++) {
+    for (let k = 0; k < N; k++) { if (Tmax[k] > BURN) nb++; if (D[k] > mx) mx = D[k]; }
+    const ci = ((coil.x - PX) / CELL) | 0, cj = ((coil.y - PY) / CELL) | 0;
+    for (let b = -6; b <= 6; b++) for (let a = -6; a <= 6; a++) {
       const i = ci + a, j = cj + b;
       if (i >= 0 && i < GW && j >= 0 && j < GH) tc = Math.max(tc, T[j * GW + i]);
     }
+    tcNow = tc;
     $('tc').textContent = Math.round(tc);
     $('tc').style.color = tc >= WORK_LO && tc <= WORK_HI ? 'var(--ok)' : tc > WORK_HI ? 'var(--bad)' : '';
     $('mm').textContent = mx.toFixed(1).replace('.', ',');
@@ -314,14 +472,14 @@ canvas.drag{cursor:grabbing}
     if (!done && grab) {
       if (tc > WORK_HI + 30) setMsg('<b>Pozor, moc žhavé!</b> Posuň induktor, ať plech nespálíš.', 'bad');
       else if (tc >= WORK_LO) setMsg('<b>Třešňově červená</b> – ideální teplota, boule se stahuje.');
-      else setMsg('Ohříváš… drž induktor nad boulí, až plech zčervená.');
+      else setMsg('Ohříváš… drž induktor nad boulí, až ocel zčervená.');
     }
     if (!done && mx <= FLAT) win(nb);
   }
 
   function win(nb) {
     done = true; grab = false; cv.classList.remove('drag');
-    const pts = Math.max(0, Math.round(1000 - time * 6 - nb * 6));
+    const pts = Math.max(0, Math.round(1000 - time * 6 - nb * 0.6));
     total += pts;
     $('overTitle').textContent = nb === 0 ? 'Rovný jako stůl! 🔥' : 'Vyrovnáno!';
     $('overScore').textContent = '+' + pts;
@@ -341,11 +499,16 @@ canvas.drag{cursor:grabbing}
   $('overBtn').addEventListener('click', () => { if (lvl === LEVELS.length - 1) { lvl = 0; total = 0; } else lvl++; startLevel(); });
   $('restart').addEventListener('click', startLevel);
   $('newGame').addEventListener('click', () => { lvl = 0; total = 0; startLevel(); });
+  $('gauge').addEventListener('click', () => {
+    showGauge = !showGauge;
+    $('gauge').textContent = '📏 Měřidlo boulí: ' + (showGauge ? 'zapnuto' : 'vypnuto');
+    $('gauge').classList.toggle('on', showGauge);
+  });
 
   function loop(now) {
     const dt = Math.min(0.04, (now - (last || now)) / 1000); last = now;
     if (!done) update(dt);
-    draw(now);
+    draw(now, dt);
     requestAnimationFrame(loop);
   }
   startLevel();
