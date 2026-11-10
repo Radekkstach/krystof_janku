@@ -44,6 +44,16 @@ canvas.drag{cursor:grabbing}
 .btn:hover{border-color:var(--muted)}
 .btn.pri{background:var(--orange);color:#1a0d05;border-color:transparent}
 .btn.on{border-color:var(--orange);color:var(--orange-2)}
+.levels{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px}
+@media(max-width:760px){.levels{grid-template-columns:repeat(3,1fr)}}
+.lv{position:relative;text-align:left;padding:10px 12px;border-radius:12px;border:1px solid var(--line-2);background:var(--panel);color:var(--text);cursor:pointer;font-family:var(--font)}
+.lv:hover{border-color:var(--muted)}
+.lv .n{font-family:var(--mono);font-size:12px;color:var(--dim)}
+.lv .t{display:block;font-weight:700;font-size:13px;margin-top:2px;line-height:1.25}
+.lv .s{display:block;font-family:var(--mono);font-size:12px;color:var(--dim);margin-top:4px}
+.lv.cur{border-color:var(--orange);background:var(--orange-soft)}
+.lv.cur .n{color:var(--orange-2)}
+.lv.done .s{color:var(--ok)}
 .msg{min-height:50px;margin-top:14px;padding:12px 14px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line);font-size:15px;line-height:1.45}
 .msg b{color:var(--orange-2)}
 .msg.good{border-color:rgba(73,209,125,.5)} .msg.good b{color:var(--ok)}
@@ -66,6 +76,8 @@ canvas.drag{cursor:grabbing}
   <h1>Vyrovnej plech s <span>DHI-191 HD</span></h1>
   <p class="sub"><b>Chyť induktor myší (nebo prstem) a jezdi s ním po vyboulených místech.</b> Dokud ho držíš, indukuje do oceli vířivé proudy a ohřívá ji. Místo rozžhavené do třešňově červené (cca 600–800 °C) se při chladnutí smrští a boule se srovná. Nad 900 °C ale plech spálíš.</p>
 
+  <div class="levels" id="levels" aria-label="Výběr úrovně"></div>
+
   <div class="game">
     <div class="panel">
       <canvas id="cv" width="800" height="500" aria-label="Ocelový plech na pracovním stole a induktor"></canvas>
@@ -83,7 +95,7 @@ canvas.drag{cursor:grabbing}
     <div class="side">
       <div class="ro">
         <div class="k">Úroveň</div>
-        <div class="v"><span id="lvl">1</span> <small>/ 3</small></div>
+        <div class="v"><span id="lvl">1</span> <small>/ <span id="lvlCount">6</span></small></div>
         <div style="color:var(--muted);font-size:13px;margin-top:2px" id="lvlName"></div>
       </div>
       <div class="ro">
@@ -110,7 +122,7 @@ canvas.drag{cursor:grabbing}
   <div class="controls">
     <button class="btn" id="gauge">📏 Měřidlo boulí: vypnuto</button>
     <button class="btn" id="restart">Začít úroveň znovu</button>
-    <button class="btn" id="newGame">Nová hra</button>
+    <button class="btn" id="next">Další úroveň →</button>
   </div>
   <div class="msg" id="msg"></div>
   <p class="help">Boule poznáš podle odlesků na plechu a podle profilu pod pravítkem dole; tlačítkem Měřidlo boulí si můžeš zapnout vrstevnice po 1 mm. Po ohřevu zůstanou na oceli náběhové barvy – slámová, fialová, modrá – stejně jako ve skutečnosti. Úroveň splníš, když žádná boule nebude vyšší než 1 mm. Skutečný Dawell DHI-191 HD má 19 kW a kapalinou chlazený induktor, takže může pracovat nepřetržitě.</p>
@@ -182,9 +194,12 @@ canvas.drag{cursor:grabbing}
     { name: 'Jedna boule', bumps: [{ x: 400, y: 250, r: 60, h: 5 }] },
     { name: 'Prohnutý pás', bumps: [{ x: 250, y: 250, r: 45, h: 3.5 }, { x: 330, y: 250, r: 45, h: 4 }, { x: 410, y: 250, r: 45, h: 4.5 }, { x: 490, y: 250, r: 45, h: 4 }, { x: 570, y: 250, r: 45, h: 3.5 }] },
     { name: 'Dvě boule', bumps: [{ x: 230, y: 170, r: 55, h: 5 }, { x: 570, y: 330, r: 65, h: 6 }] },
+    { name: 'Tři různé boule', bumps: [{ x: 200, y: 330, r: 40, h: 3 }, { x: 420, y: 150, r: 55, h: 5 }, { x: 610, y: 320, r: 70, h: 6.5 }] },
+    { name: 'Velká vyboulenina', bumps: [{ x: 400, y: 250, r: 105, h: 6 }] },
+    { name: 'Zvlněný okraj', bumps: [80, 180, 280, 380, 480, 580, 680].map((x, n) => ({ x: x + 20, y: 85, r: 45, h: 3 + (n % 2) * 1.5 })) },
   ];
 
-  let T, T2, D, Tmax, D0max, lvl = 0, total = 0, time, done, coil, grab, last, showGauge = false, tcNow = ROOM;
+  let T, T2, D, Tmax, D0max, lvl = 0, time, done, coil, grab, last, showGauge = false, tcNow = ROOM;
   let smoke = [];
 
   function startLevel() {
@@ -200,6 +215,7 @@ canvas.drag{cursor:grabbing}
     time = 0; done = false;
     $('over').classList.remove('show');
     $('lvl').textContent = lvl + 1; $('lvlName').textContent = LEVELS[lvl].name;
+    if (typeof renderLevels === 'function') renderLevels();
     setMsg(`Úroveň ${lvl + 1}: <b>${LEVELS[lvl].name}</b>. Chyť induktor a vyrovnej plech.`);
   }
   function setMsg(h, c) { $('msg').innerHTML = h; $('msg').className = 'msg' + (c ? ' ' + c : ''); }
@@ -480,25 +496,38 @@ canvas.drag{cursor:grabbing}
   function win(nb) {
     done = true; grab = false; cv.classList.remove('drag');
     const pts = Math.max(0, Math.round(1000 - time * 6 - nb * 0.6));
-    total += pts;
-    $('overTitle').textContent = nb === 0 ? 'Rovný jako stůl! 🔥' : 'Vyrovnáno!';
-    $('overScore').textContent = '+' + pts;
-    $('overText').innerHTML = `Čas ${time.toFixed(1).replace('.', ',')} s · spáleno ${nb} míst<br>Celkem ${total} bodů`;
-    if (lvl === LEVELS.length - 1) {
-      let best = null; try { best = +localStorage.getItem('dawell-dhi191-rekord') || null; } catch (e) {}
-      if (!best || total > best) { best = total; try { localStorage.setItem('dawell-dhi191-rekord', best); } catch (e) {} }
-      $('overTitle').textContent = total >= 2200 ? 'Mistr rovnání! 🏆' : 'Hra dohrána!';
-      $('overScore').textContent = total;
-      $('overText').innerHTML = `bodů celkem · rekord ${best}`;
-      $('overBtn').textContent = 'Hrát znovu';
-    } else $('overBtn').textContent = 'Další úroveň →';
+    const prev = best[lvl] || 0, rec = pts > prev;
+    if (rec) { best[lvl] = pts; saveBest(); }
+    const last = lvl === LEVELS.length - 1, sum = best.reduce((a, b) => a + (b || 0), 0);
+    $('overTitle').textContent = last && best.every(b => b) ? 'Všechny úrovně hotové! 🏆' : nb === 0 ? 'Rovný jako stůl! 🔥' : 'Vyrovnáno!';
+    $('overScore').textContent = pts;
+    $('overText').innerHTML = `Čas ${time.toFixed(1).replace('.', ',')} s · spáleno ${nb} míst<br>` +
+      (rec ? 'Nový rekord úrovně!' : `Rekord úrovně: ${prev}`) + ` · celkem ${sum} bodů`;
+    $('overBtn').textContent = last ? 'Znovu od 1. úrovně' : 'Další úroveň →';
     $('over').classList.add('show');
+    renderLevels();
     setMsg('<b>Plech je rovný!</b>', 'good');
   }
 
-  $('overBtn').addEventListener('click', () => { if (lvl === LEVELS.length - 1) { lvl = 0; total = 0; } else lvl++; startLevel(); });
+  // výběr úrovní + rekordy
+  let best = [];
+  try { best = JSON.parse(localStorage.getItem('dawell-dhi191-urovne') || '[]'); } catch (e) {}
+  function saveBest() { try { localStorage.setItem('dawell-dhi191-urovne', JSON.stringify(best)); } catch (e) {} }
+  function renderLevels() {
+    $('levels').innerHTML = LEVELS.map((L, n) =>
+      `<button class="lv${n === lvl ? ' cur' : ''}${best[n] ? ' done' : ''}" data-l="${n}">
+        <span class="n">Úroveň ${n + 1}</span><span class="t">${L.name}</span>
+        <span class="s">${best[n] ? '✓ ' + best[n] + ' b.' : '—'}</span></button>`).join('');
+  }
+  $('levels').addEventListener('click', e => {
+    const b = e.target.closest('.lv'); if (!b) return;
+    lvl = +b.dataset.l; startLevel();
+  });
+  $('lvlCount').textContent = LEVELS.length;
+
+  $('overBtn').addEventListener('click', () => { lvl = (lvl + 1) % LEVELS.length; startLevel(); });
   $('restart').addEventListener('click', startLevel);
-  $('newGame').addEventListener('click', () => { lvl = 0; total = 0; startLevel(); });
+  $('next').addEventListener('click', () => { lvl = (lvl + 1) % LEVELS.length; startLevel(); });
   $('gauge').addEventListener('click', () => {
     showGauge = !showGauge;
     $('gauge').textContent = '📏 Měřidlo boulí: ' + (showGauge ? 'zapnuto' : 'vypnuto');
